@@ -8,16 +8,11 @@
 */
 
 if (empty($competition)) {
-  $competitions = wp_get_post_terms( get_the_id(), 'tm_competition');
-  if (sizeof($competitions) > 0)  {
-    $competition=$competitions[0]->name;
-  }
+  $competition = tm_get_team_competition();
 }
 if (empty($season)) {
-  $seasons = wp_get_post_terms( get_the_id(), 'tm_season');
-  if (sizeof($seasons) > 0 ) {
-    $season=$seasons[0]->name;
-  }
+  // TODO: This should come from Global Settings/Dropdown
+  $season = '2017-2018';
 }
 if (empty($team)) {
   $team = get_the_title();
@@ -40,7 +35,9 @@ if (!empty($competition)) {
     <td>LBP</td>
     <td>Pts</td>
   </thead>
-  <?php  foreach(tm_extract_rfu_leaguetable_season($competition, $season) as $tableentry) {
+  <?php
+  $tableentries = tm_get_competition_leaguetable($competition->term_id, $season);
+  foreach($tableentries as $tableentry) {
     if ( $tableentry->team == $team ) {
       $entryclass='tm-highlightedleagueentry';
     } else {

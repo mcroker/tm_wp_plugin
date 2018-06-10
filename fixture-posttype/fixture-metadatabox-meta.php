@@ -6,7 +6,7 @@ function tm_create_metadatabox_fixture() {
     'tm_fixturemeta',
     'Fixture Metadata',
     'tm_fixture_inner_custom_box',
-    'fixture',
+    'tm_fixture',
     'side',
     'high'
   );

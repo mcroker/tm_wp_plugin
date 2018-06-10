@@ -19,7 +19,7 @@ function tm_options_page()
   <?php settings_fields( 'tm_options' ); ?>
   <table>
   <tr valign="top">
-  <th scope="row"><label for="tm_default_season">Default Season</label></th>
+  <th scope="row"><label for="tm_default_season">Default Season(s)</label></th>
   <td><input type="text" id="tm_default_season" name="tm_default_season" value="<?php echo get_option('tm_default_season'); ?>" /></td>
   </tr>
   </table>

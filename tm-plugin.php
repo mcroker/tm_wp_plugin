@@ -27,23 +27,21 @@ function tm_create_sidebars() {
 add_action('init', 'tm_create_sidebars');
 
 // Widgets
-require_once('results-widget/results-widget.php');
+require_once('fixtures-widget/fixtures-widget.php');
 require_once('leaguetable-widget/leaguetable-widget.php');
 function tm_register_widgets() {
-    register_widget( 'tm_results');
+    register_widget( 'tm_fixtures');
     register_widget( 'tm_leaguetable' );
 }
 add_action( 'widgets_init', 'tm_register_widgets' );
 
 // Shortcodes
-require_once('results-widget/results-shortcode.php');
+require_once('fixtures-widget/fixtures-shortcode.php');
 require_once('leaguetable-widget/leaguetable-shortcode.php');
-require_once('utils/utils-shortcode.php');
 function tm_add_shortcodes()
 {
   add_shortcode('tm-results', 'tm_results_shortcode');
   add_shortcode('tm-leaguetable', 'tm_leaguetable_shortcode');
-  add_shortcode('tm-util', 'tm_utils_shortcode');
 }
 add_action('init', 'tm_add_shortcodes');
 
@@ -54,12 +52,11 @@ require_once('team-posttype/team-posttype.php');
 // Taxonomy
 require_once('taxonomy-oppo.php');
 require_once('taxonomy-season.php');
-require_once('taxonomy-comp.php');
+require_once('taxonomy-competition/taxonomy-competition.php');
 require_once('taxonomy-section.php');
 function tm_register_taxonomies() {
   tm_registertaxonomy_oppo();
   tm_registertaxonomy_season();
-  tm_registertaxonomy_competition();
   tm_registertaxonomy_section();
 }
 add_action('init', 'tm_register_taxonomies');

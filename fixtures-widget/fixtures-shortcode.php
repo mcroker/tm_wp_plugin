@@ -1,10 +1,12 @@
 <?php
 
+require_once('fixtures-content.php');
+
 function tm_create_shortcode_results() {
-    add_shortcode('tm-results', 'tm_results_shortcode');
+    add_shortcode('tm-fixtures', 'tm_fixtures_shortcode');
 }
 
-function tm_results_shortcode($atts = [], $content = null, $tag = '')
+function tm_fixtures_shortcode($atts = [], $content = null, $tag = '')
 {
   // normalize attribute keys, lowercase
   $atts = array_change_key_case((array)$atts, CASE_LOWER);
@@ -16,6 +18,7 @@ function tm_results_shortcode($atts = [], $content = null, $tag = '')
     'team' => '',
     'season' => '',
     'maxrows' => '',
+    'maxfuture' => '',
   ], $atts, $tag);
 
   ob_start();
@@ -24,7 +27,9 @@ function tm_results_shortcode($atts = [], $content = null, $tag = '')
   $team = $parsed_atts['team'];
   $season = $parsed_atts['season'];
   $maxrows = $parsed_atts['maxrows'];
-  include ('results-content.php');
+  $maxfuture = $parsed_atts['maxfuture'];
+  // TODO : Need to validate and parse arguements
+  tm_fixtures_widget_content();
   $o = ob_get_clean();
   // return output
   return $o;

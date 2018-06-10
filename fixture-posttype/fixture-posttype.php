@@ -7,8 +7,8 @@ require_once('fixture-metadatabox-meta.php');
 require_once('fixture-metadatabox-matchreport.php');
 
 add_action( 'init', 'tm_create_posttype_fixture' );
-add_filter('manage_tm_fixture_posts_columns', 'tm_fixture_table_head');
-add_action('manage_tm_fixture_posts_custom_column', 'tm_fixture_table_content', 10, 2 );
+add_filter( 'manage_tm_fixture_posts_columns', 'tm_fixture_table_head');
+add_action( 'manage_tm_fixture_posts_custom_column', 'tm_fixture_table_content', 10, 2 );
 add_action( 'add_meta_boxes', 'tm_create_metadatabox_matchreport' );
 add_action( 'add_meta_boxes', 'tm_create_metadatabox_fixture' );
 add_action( 'save_post', 'tm_fixture_save_postdata' );
