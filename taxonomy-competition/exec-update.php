@@ -73,9 +73,12 @@ if ( ! function_exists( 'tm_competition_exec_update' ) ):
 endif;
 
 if ( ! function_exists( 'tm_competition_exec_update_all' ) ):
-  function tm_competition_exec_update_all() {
+  function tm_competition_exec_update_all( $competitions  = Array() ) {
+    if ( sizeof($competitions) == 0 ) {
+      $competitions = tm_get_competitons();
+    }
     $response = new TMResponse();
-    foreach(tm_get_competitons() as $competition) {
+    foreach($competitions as $competition) {
       $response->competitons[$competition->slug] = tm_competition_exec_update( $competition->term_id );
       if ( $response->competitons[$competition->slug]->status != 'OK' ) {
         $response->status = 'ERROR';

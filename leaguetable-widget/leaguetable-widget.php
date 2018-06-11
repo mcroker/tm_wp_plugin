@@ -1,5 +1,7 @@
 <?php
 
+require_once('leaguetable-content.php');
+
 // Creating the widget
 class tm_leaguetable extends WP_Widget {
 
@@ -21,8 +23,7 @@ class tm_leaguetable extends WP_Widget {
   public function widget( $args, $instance ) {
     $title = apply_filters( 'tm_title', $instance['title'] );
     $competition = apply_filters( 'tm_competition', $instance['tm_competition'] );
-    $compgroup = apply_filters( 'tm_compgroup', $instance['tm_compgroup'] );
-    $season = apply_filters( 'tm_season', $instance['tm_season'] );
+    $seasons = apply_filters( 'tm_seasons', $instance['tm_seasons'] );
     $team = apply_filters( 'tm_team', $instance['team'] );
     $maxrows = apply_filters( 'tm_maxrows', $instance['tm_maxrows'] );
 
@@ -32,7 +33,7 @@ class tm_leaguetable extends WP_Widget {
     $displaytitle = $args['before_title'] . $title . $args['after_title'];
 
     // This is where you run the code and display the output
-    include('leaguetable-content.php');
+    tm_leaguetable_widget_content($displaytitle, $competition, $seasons, $team, $maxrows);
 
     echo $args['after_widget'];
   }
@@ -48,11 +49,8 @@ class tm_leaguetable extends WP_Widget {
     if ( isset( $instance[ 'tm_competition' ] ) ) {
       $competition = $instance[ 'tm_competition' ];
     }
-    if ( isset( $instance[ 'tm_compgroup' ] ) ) {
-      $compgroup = $instance[ 'tm_compgroup' ];
-    }
-    if ( isset( $instance[ 'tm_season' ] ) ) {
-      $season = $instance[ 'tm_season' ];
+    if ( isset( $instance[ 'tm_seasons' ] ) ) {
+      $season = $instance[ 'tm_seasons' ];
     }
     if ( isset( $instance[ 'tm_team' ] ) ) {
       $team = $instance[ 'tm_team' ];
@@ -71,16 +69,12 @@ class tm_leaguetable extends WP_Widget {
       <input class="widefat" id="<?php echo $this->get_field_id( 'tm_competition' ); ?>" name="<?php echo $this->get_field_name( 'tm_competition' ); ?>" type="text" value="<?php echo esc_attr( $competition ); ?>" />
     </p>
     <p>
-      <label for="<?php echo $this->get_field_id( 'tm_compgroup' ); ?>"><?php _e( 'Group:' ); ?></label>
-      <input class="widefat" id="<?php echo $this->get_field_id( 'tm_compgroup' ); ?>" name="<?php echo $this->get_field_name( 'tm_compgroup' ); ?>" type="text" value="<?php echo esc_attr( $compgroup ); ?>" />
-    </p>
-    <p>
       <label for="<?php echo $this->get_field_id( 'tm_team' ); ?>"><?php _e( 'Team:' ); ?></label>
       <input class="widefat" id="<?php echo $this->get_field_id( 'tm_team' ); ?>" name="<?php echo $this->get_field_name( 'tm_team' ); ?>" type="text" value="<?php echo esc_attr( $team ); ?>" />
     </p>
     <p>
-      <label for="<?php echo $this->get_field_id( 'tm_season' ); ?>"><?php _e( 'Season:' ); ?></label>
-      <input class="widefat" id="<?php echo $this->get_field_id( 'tm_season' ); ?>" name="<?php echo $this->get_field_name( 'tm_season' ); ?>" type="text" value="<?php echo esc_attr( $team ); ?>" />
+      <label for="<?php echo $this->get_field_id( 'tm_seasons' ); ?>"><?php _e( 'Season:' ); ?></label>
+      <input class="widefat" id="<?php echo $this->get_field_id( 'tm_seasons' ); ?>" name="<?php echo $this->get_field_name( 'tm_seasons' ); ?>" type="text" value="<?php echo esc_attr( $seasons ); ?>" />
     </p>
     <p>
       <label for="<?php echo $this->get_field_id( 'tm_maxrows' ); ?>"><?php _e( 'Max rows:' ); ?></label>
@@ -95,9 +89,8 @@ class tm_leaguetable extends WP_Widget {
     $instance = array();
     $instance['tm_title'] = ( ! empty( $new_instance['tm_title'] ) ) ? strip_tags( $new_instance['tm_title'] ) : '';
     $instance['tm_competition'] = ( ! empty( $new_instance['tm_competition'] ) ) ? strip_tags( $new_instance['tm_competition'] ) : '';
-    $instance['tm_compgroup'] = ( ! empty( $new_instance['tm_compgroup'] ) ) ? strip_tags( $new_instance['tm_compgroup'] ) : '';
     $instance['tm_team'] = ( ! empty( $new_instance['tm_team'] ) ) ? strip_tags( $new_instance['tm_team'] ) : '';
-    $instance['tm_season'] = ( ! empty( $new_instance['tm_season'] ) ) ? strip_tags( $new_instance['tm_season'] ) : '';
+    $instance['tm_seasons'] = ( ! empty( $new_instance['tm_seasons'] ) ) ? strip_tags( $new_instance['tm_seasons'] ) : '';
     $instance['tm_maxrows'] = ( ! empty( $new_instance['tm_maxrows'] ) ) ? strip_tags( $new_instance['tm_maxrows'] ) : '';
     return $instance;
   }

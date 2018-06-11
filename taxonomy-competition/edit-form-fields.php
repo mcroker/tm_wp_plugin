@@ -19,7 +19,7 @@ if ( ! function_exists( 'tm_competition_edit_form_fields' ) ):
           optionsdiv.item(i).style.display='none';
         }
       }
-      var commonoptionsdiv = document.getElementsByClassName("tm-autofetch-commonoptions");
+      var commonoptionsdiv = document.getElementsByClassName('tm-autofetch-commonoptions');
       for(var i = 0; i < commonoptionsdiv.length; i++)
       {
         if (fetcher == 'none') {
@@ -29,6 +29,30 @@ if ( ! function_exists( 'tm_competition_edit_form_fields' ) ):
           commonoptionsdiv.item(i).style.display='table-row-group';
         }
       }
+      var autofetchbutton = document.getElementById('tm-autofetch-button');
+      if (fetcher == 'none') {
+        autofetchbutton.style.display='none';
+      }
+      else {
+        autofetchbutton.style.display='inline';
+      }
+    }
+    function execAutoFetcher() {
+      var updatespan = document.getElementById('tm-update-status');
+      updatespan.textContent = 'Updating ...';
+	    var data = {
+		    'action': 'tm_competition_ajax_update',
+		    'competition': '<?php echo $term->term_id ?>'
+	    };
+	    jQuery.post( ajaxurl , data, function(response) {
+        if (response != 'OK') {
+          updatespan.textContent = 'Error';
+          alert(response);
+        } else {
+          var time = new Date();
+          updatespan.textContent = 'Updated ' + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
+        }
+	    });
     }
     </script>
     <tr class="form-field term-group-wrap">
@@ -49,19 +73,21 @@ if ( ! function_exists( 'tm_competition_edit_form_fields' ) ):
         }
         ?>
       </select>
+      <input id='tm-autofetch-button' <?php if ( $saved_autofetcher == 'none' ) { echo " style='display:none' "; } ?> class='button' type='button' onclick='java_script_:execAutoFetcher()' value='Exec Autofetch'>
+      <span id='tm-update-status'></span>
     </td>
   </tr>
 
   <tbody class="tm-autofetch-commonoptions">
     <tr class="form-field term-group-wrap">
-    <th scope="row">
-      <label for="tm_competition_seasons"><?php _e('Fetch Seasons', 'tm'); ?></label>
-    </th>
-    <td>
-      <input type="text" name="tm_competition_seasons" value="<?php echo $saved_autofetcheropts['tm_competition_seasons'] ?>" id="tm_competition_seasons"/><br>
-    </td>
-  </tr>
-</tbody>
+      <th scope="row">
+        <label for="tm_competition_seasons"><?php _e('Fetch Seasons', 'tm'); ?></label>
+      </th>
+      <td>
+        <input type="text" name="tm_competition_seasons" value="<?php echo $saved_autofetcheropts['tm_competition_seasons'] ?>" id="tm_competition_seasons"/><br>
+      </td>
+    </tr>
+  </tbody>
 
   <?php
   // TODO: Hide/Show based on selected autosaver
@@ -84,6 +110,7 @@ if ( ! function_exists( 'tm_competition_edit_form_fields' ) ):
   </tr>
 
   <?php
+
 }
 endif;
 ?>

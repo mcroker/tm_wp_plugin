@@ -7,6 +7,7 @@ require_once('exec-update.php');
 require_once('competition-shortcode.php');
 require_once('competition-functions.php');
 require_once('update-api.php');
+require_once('update-ajax.php');
 
 add_action('init', 'tm_registertaxonomy_competition');
 
