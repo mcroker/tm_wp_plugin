@@ -1,9 +1,8 @@
 <?php
 function tm_competition_api_updateall() {
-  ob_start();
-  tm_competition_exec_update_all();
-  $o = ob_get_clean();
-  return $o;
+  $data = tm_competition_exec_update_all();
+  wp_send_json($data);
+  // print_r($data);
 };
 
 add_action( 'rest_api_init', function () {
