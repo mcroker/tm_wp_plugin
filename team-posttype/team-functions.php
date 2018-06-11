@@ -49,9 +49,9 @@ if ( ! function_exists( 'tm_get_team_fixtures_objs' ) ):
     $fixtures = tm_get_team_fixtures( $team_post_id );
     $fixtureobjs = Array();
     foreach( $fixtures as $fixture) {
-      $fixtureobs[] = tm_get_fixture_obj($fixture->ID);
+      $fixtureobjs[] = tm_get_fixture_obj($fixture->ID);
     }
-    return $fixtureobs;
+    return $fixtureobjs;
   }
 endif;
 

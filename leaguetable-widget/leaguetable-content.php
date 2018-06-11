@@ -17,26 +17,27 @@ if (empty($season)) {
 if (empty($team)) {
   $team = get_the_title();
 }
-if (!empty($competition)) {
+$tableentries = tm_get_competition_leaguetable($competition->term_id, $season);
+if (!empty($tableentries)) {
     echo $displaytitle;
 ?>
 <table>
-  <thead>
-    <td>Pos</td>
-    <td>Team</td>
-    <td>P</td>
-    <td>W</td>
-    <td>D</td>
-    <td>L</td>
-    <td>PF</td>
-    <td>PA</td>
-    <td>PD</td>
-    <td>TBP</td>
-    <td>LBP</td>
-    <td>Pts</td>
+  <thead class="xtm-table-header">
+    <th class="tm-col-pri1">Pos</td>
+    <th class="tm-col-pri1">Team</td>
+    <th class="tm-col-pri3">P</td>
+    <th class="tm-col-pri3">W</td>
+    <th class="tm-col-pri3">D</td>
+    <th class="tm-col-pri3">L</td>
+    <th class="tm-col-pri5">PF</td>
+    <th class="tm-col-pri5">PA</td>
+    <th class="tm-col-pri4">PD</td>
+    <th class="tm-col-pri4">TBP</td>
+    <th class="tm-col-pri4">LBP</td>
+    <th class="tm-col-alt4">BP</td>
+    <th class="tm-col-pri2">Pts</td>
   </thead>
   <?php
-  $tableentries = tm_get_competition_leaguetable($competition->term_id, $season);
   foreach($tableentries as $tableentry) {
     if ( $tableentry->team == $team ) {
       $entryclass='tm-highlightedleagueentry';
@@ -45,18 +46,19 @@ if (!empty($competition)) {
     }
     ?>
     <tr class="<?php echo $entryclass ?>">
-      <td><?php echo $tableentry->position ?></td>
-      <td><?php echo $tableentry->team ?></td>
-      <td><?php echo $tableentry->played ?></td>
-      <td><?php echo $tableentry->wins ?></td>
-      <td><?php echo $tableentry->draws ?></td>
-      <td><?php echo $tableentry->lost ?></td>
-      <td><?php echo $tableentry->pointsfor ?></td>
-      <td><?php echo $tableentry->pointsagainst ?></td>
-      <td><?php echo $tableentry->pointsdiff ?></td>
-      <td><?php echo $tableentry->trybonus ?></td>
-      <td><?php echo $tableentry->losingbonus ?></td>
-      <td><?php echo $tableentry->points ?></td>
+      <td class="tm-col-pri1"><?php echo $tableentry->position ?></td>
+      <td class="tm-col-pri1"><?php echo $tableentry->team ?></td>
+      <td class="tm-col-pri3"><?php echo $tableentry->played ?></td>
+      <td class="tm-col-pri3"><?php echo $tableentry->wins ?></td>
+      <td class="tm-col-pri3"><?php echo $tableentry->draws ?></td>
+      <td class="tm-col-pri3"><?php echo $tableentry->lost ?></td>
+      <td class="tm-col-pri5"><?php echo $tableentry->pointsfor ?></td>
+      <td class="tm-col-pri5"><?php echo $tableentry->pointsagainst ?></td>
+      <td class="tm-col-pri4"><?php echo $tableentry->pointsdiff ?></td>
+      <td class="tm-col-pri4"><?php echo $tableentry->trybonus ?></td>
+      <td class="tm-col-pri4"><?php echo $tableentry->losingbonus ?></td>
+      <td class="tm-col-alt4"><?php echo $tableentry->losingbonus + $tableentry->trybonus ?></td>
+      <td class="tm-col-pri2"><?php echo $tableentry->points ?></td>
     </tr>
   <?php  } ?>
 </table>

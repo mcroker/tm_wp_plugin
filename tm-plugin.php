@@ -2,11 +2,10 @@
 /*
 Plugin Name: TM Plugin
 Description: Sports club management developed by Martin Croker
+
 */
 /* Start Adding Functions Below this Line */
 
-
-/* Stop Adding Functions Below this Line */
 
 require_once('inc/simple_html_dom.php');
 
@@ -70,4 +69,5 @@ require_once('tm-plugin-options.php');
 add_action( 'admin_init', 'tm_register_settings' );
 add_action('admin_menu', 'tm_register_options_page');
 
+/* Stop Adding Functions Below this Line */
 ?>

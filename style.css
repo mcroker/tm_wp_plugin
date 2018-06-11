@@ -5,3 +5,51 @@
 .tm-highlightedleagueentry TD {
   background-color: yellow
 }
+
+@media screen and (max-width: 880px) {
+  .tm-col-pri5 {
+        display:none;
+    }
+}
+
+@media screen and (min-width: 881px) {
+  .tm-col-alt5 {
+        display:none;
+    }
+}
+
+@media screen and (max-width: 800px) {
+  .tm-col-pri4 {
+        display:none;
+    }
+}
+
+@media screen and (min-width: 801px) {
+  .tm-col-alt4 {
+        display:none;
+    }
+}
+
+@media screen and (max-width: 350px) {
+  .tm-col-pri3 {
+        display:none;
+    }
+}
+
+@media screen and (min-width: 351px) {
+  .tm-col-alt3 {
+        display:none;
+    }
+}
+
+@media screen and (max-width: 300px) {
+  .tm-col-pri2 {
+        display:none;
+    }
+}
+
+@media screen and (min-width: 301px) {
+  .tm-col-alt2 {
+        display:none;
+    }
+}

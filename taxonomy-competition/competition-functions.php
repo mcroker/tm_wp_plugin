@@ -37,7 +37,14 @@ endif;
 if ( ! function_exists( 'tm_get_competition_leaguetable' ) ):
   function tm_get_competition_leaguetable($term_id, $season) {
     $data = tm_get_competition_leaguetable_data($term_id);
-    return $data[$season];
+    if ( $data == '' ) {
+      $data = Array();
+    }
+    if ( array_key_exists( $season, $data ) ) {
+      return $data[$season];
+    } else {
+      return Array();
+    }
   }
 endif;
 
