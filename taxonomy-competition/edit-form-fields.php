@@ -3,9 +3,12 @@ if ( ! function_exists( 'tm_competition_edit_form_fields' ) ):
   function tm_competition_edit_form_fields($term) {
     global $tm_competition_autofetchers;
 
-    $saved_leaguetable = tm_get_competition_leaguetable_data( $term->term_id );
-    $saved_autofetcher = tm_get_competition_autofetcher ( $term->term_id );
-    $saved_autofetcheropts = tm_get_competition_autofetcher_options ( $term->term_id );
+    $saved_leaguetable = tm_competition_get_leaguetable( $term->term_id );
+    $saved_teamdata = tm_competition_get_teams( $term->term_id );
+    $saved_autofetcher = tm_competition_get_autofetcher ( $term->term_id );
+    $saved_autofetcheropts = tm_competition_get_autofetcher_options ( $term->term_id );
+
+    // TODO : This all needs to move to a enquesed script
     ?>
     <script>
     function selectAutoFetcher(fetcher) {
@@ -45,14 +48,31 @@ if ( ! function_exists( 'tm_competition_edit_form_fields' ) ):
 		    'competition': '<?php echo $term->term_id ?>'
 	    };
 	    jQuery.post( ajaxurl , data, function(response) {
-        if (response != 'OK') {
-          updatespan.textContent = 'Error';
-          alert(response);
-        } else {
-          var time = new Date();
-          updatespan.textContent = 'Updated ' + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
-        }
+        var time = new Date();
+        updatespan.textContent = 'Fetched ' + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
+        var responseObj = JSON.parse(response);
+        var leagueelem = document.getElementById('tm_competition_leaguetable');
+        leagueelem.value = JSON.stringify(responseObj.seasons);
+        var teamselem = document.getElementById('tm_competition_teams');
+        teamselem.value = JSON.stringify(responseObj.teams);
 	    });
+    }
+    function execClearFetcherData() {
+      var updatespan = document.getElementById('tm-update-status');
+      updatespan.textContent = 'Clearing  ...';
+      var data = {
+        'action': 'tm_competition_ajax_clearleaguedata',
+        'competition': '<?php echo $term->term_id ?>'
+      };
+      jQuery.post( ajaxurl , data, function(response) {
+        var time = new Date();
+        updatespan.textContent = 'Cleared ' + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
+        var responseObj = JSON.parse(response);
+        var leagueelem = document.getElementById('tm_competition_leaguetable');
+        leagueelem.value = JSON.stringify(responseObj.seasons);
+        var teamselem = document.getElementById('tm_competition_teams');
+        teamselem.value = JSON.stringify(responseObj.teams);
+      });
     }
     </script>
     <tr class="form-field term-group-wrap">
@@ -102,12 +122,17 @@ if ( ! function_exists( 'tm_competition_edit_form_fields' ) ):
 
   <tr class="form-field term-group-wrap">
     <th scope="row">
-      <label for="tm_competition_leaguetable"><?php _e('League Table Data', 'tm'); ?></label>
+      <label for="tm_competition_leaguetable"><?php _e('Fetched Data', 'tm'); ?></label>
     </th>
     <td>
-      <textarea rows=10 id="tm_competition_leaguetable" name="tm_competition_leaguetable" readonly="true"><?php echo htmlentities(print_r($saved_leaguetable, true)) ?></textarea><br>
+      <label for="tm_competition_leaguetable"><?php _e('Leaguetable', 'tm'); ?></label><br>
+      <textarea rows=10 id="tm_competition_leaguetable" name="tm_competition_leaguetable" readonly="true"><?php echo json_encode($saved_leaguetable) ?></textarea><br>
+      <label for="tm_competition_teams"><?php _e('Teams', 'tm'); ?></label><br>
+      <textarea rows=10 id="tm_competition_teams" name="tm_competition_teams" readonly="true"><?php echo json_encode($saved_teamdata) ?></textarea><br>
+      <input id='tm-autofetch-cleardata' class='button' type='button' onclick='java_script_:execClearFetcherData()' value='Clear Data'>
     </td>
   </tr>
+
 
   <?php
 

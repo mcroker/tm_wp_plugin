@@ -8,10 +8,10 @@ if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
     if (empty($competition)) {
       $competition = tm_get_team_competition();
     } else {
-      $competition = tm_get_competiton_byname($competitionname);
+      $competition = tm_competiton_get_byname($competitionname);
     }
 
-    $tableentries = tm_get_competition_leaguetable_data($competition->term_id);
+    $tableentries = tm_competition_get_leaguetable($competition->term_id);
 
     if (empty($seasons)) {
       $seasons = get_option('tm_default_season');

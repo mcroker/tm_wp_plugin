@@ -51,12 +51,11 @@ require_once('team-posttype/team-posttype.php');
 // Taxonomy
 require_once('taxonomy-oppo.php');
 require_once('taxonomy-season.php');
+require_once('taxonomy-section/taxonomy-section.php');
 require_once('taxonomy-competition/taxonomy-competition.php');
-require_once('taxonomy-section.php');
 function tm_register_taxonomies() {
   tm_registertaxonomy_oppo();
   tm_registertaxonomy_season();
-  tm_registertaxonomy_section();
 }
 add_action('init', 'tm_register_taxonomies');
 

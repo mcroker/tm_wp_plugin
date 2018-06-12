@@ -1,33 +1,31 @@
 <?php
 
-if ( ! function_exists( 'tm_get_team_section' ) ):
-  function tm_get_team_section( $team_post_id = 0 ) {
-    if ( $term_post_id == 0 ) {
-      $term_post_id = get_the_id();
-    }
-    $fixture_terms = wp_get_post_terms( $team_post_id, 'tm_section');
-    if ( sizeof ($fixture_terms ) > 0 ) {
-      return esc_html(htmlspecialchars_decode($fixture_terms[0]->name));
-    } else {
-      return '';
-    }
-  }
-endif;
-
 if ( ! function_exists( 'tm_get_team_competition' ) ):
   function tm_get_team_competition( $team_post_id = 0 ) {
-    if ( $team_post_id == 0 ) {
-      $team_post_id = get_the_id();
-    }
-    $terms = wp_get_post_terms( $team_post_id, 'tm_competition');
-    if ( sizeof ($terms ) > 0 ) {
-      return $terms[0];
-    } else {
-      return '';
-    }
+    return tm_get_object_competition($team_post_id);
   }
 endif;
 
+if ( ! function_exists( 'tm_update_team_competition' ) ):
+  function tm_update_team_competition( $competition_slug , $team_post_id = 0 ) {
+    return tm_update_object_competition($competition_slug , $team_post_id );
+  }
+endif;
+
+// Team Section =========================================
+if ( ! function_exists( 'tm_get_team_section' ) ):
+  function tm_get_team_section( $team_post_id = 0 ) {
+    return tm_get_object_section($team_post_id);
+  }
+endif;
+
+if ( ! function_exists( 'tm_update_team_section' ) ):
+  function tm_update_team_section( $section_slug , $team_post_id = 0 ) {
+    return tm_update_object_section($section_slug , $team_post_id);
+  }
+endif;
+
+// Team Fixtures =========================================
 if ( ! function_exists( 'tm_get_team_fixtures' ) ):
   function tm_get_team_fixtures( $team_post_id = 0 ) {
     if ( $team_post_id == 0 ) {
