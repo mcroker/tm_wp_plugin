@@ -16,6 +16,7 @@ endif;
 if ( ! function_exists( 'tm_fixture_inner_custom_box' )):
   function tm_fixture_inner_custom_box($post)
   {
+
     // Use nonce for verification
     wp_nonce_field( 'tm_fixture_field_nonce', 'tm_fixture_nonce' );
 
@@ -87,8 +88,10 @@ if ( ! function_exists( 'tm_fixture_inner_custom_box' )):
       '<input type="number" name="tm_fixture_scoreagainst" value="%1$s" id="tm_fixture_scoreagainst"/></br>',
       esc_attr(trim($saved_scoreagainst))
     );
-    ?></div><?php
+    ?></div>
 
+
+ <?php
   }
   add_action( 'add_meta_boxes', 'tm_create_metadatabox_fixture' );
   $plugin_url = plugin_dir_url(dirname(__FILE__));

@@ -46,6 +46,12 @@ if ( ! function_exists( 'tm_fixture_getobj' ) ):
   }
 endif;
 
+if ( ! function_exists( 'tm_fixture_get_byid' ) ):
+  function tm_fixture_get_byid($fixtureid) {
+    return get_post( $fixtureid , 'tm_fixture' );
+  }
+endif;
+
 // Fixure Date ============================================================
 if ( ! function_exists( 'tm_fixture_get_date' ) ):
   function tm_fixture_get_date($fixture_post_id = 0) {
@@ -53,10 +59,11 @@ if ( ! function_exists( 'tm_fixture_get_date' ) ):
       $fixture_post_id = get_the_id();
     }
     $fixture_date = get_post_meta( $fixture_post_id, 'tm_fixture_date', true );
-    if ( ! is_date($fixture_date) ) {
-      $fixture_date = strtotime( $fixture_date );
+    if ( is_null($fixture_date) || $fixture_date == '') {
+      return 0;
+    } else {
+      return strtotime($fixture_date);
     }
-    return $fixture_date;
   }
 endif;
 
@@ -65,10 +72,10 @@ if ( ! function_exists( 'tm_fixture_update_date' ) ):
     if ( $fixture_post_id == 0) {
       $fixture_post_id = get_the_id();
     }
-    if ( ! is_date($newdate) ) {
-      $newdate_date = strtotime($newdate);
+    if ( is_string($newdate) ) {
+      $newdate=strtotime($newdate);
     }
-    return update_post_meta( $fixture_post_id, 'tm_fixture_date', $newdate_date );
+    return update_post_meta( $fixture_post_id, 'tm_fixture_date', date('Y-m-d', $newdate));
   }
 endif;
 
@@ -94,7 +101,7 @@ if ( ! function_exists( 'tm_fixture_get_teamname' ) ):
 endif;
 
 if ( ! function_exists( 'tm_fixture_update_team' ) ):
-  function tm_fixture_update_teamname($team_id, $fixture_post_id = 0) {
+  function tm_fixture_update_team($team_id, $fixture_post_id = 0) {
     if ( $fixture_post_id == 0) {
       $fixture_post_id = get_the_id();
     }
@@ -153,6 +160,7 @@ if ( ! function_exists( 'tm_fixture_update_opposition_withslug' ) ):
   function tm_fixture_update_opposition_withslug($term_slug, $fixture_post_id = 0) {
     // Get term ID OR create term if it doesn't exist
     $oppositionterm = tm_opposition_get_byslug($term_slug);
+
     if ( is_null ( $oppositionterm) ) {
       $oppositionterm = tm_opposition_insert_term( $term_slug );
     }
@@ -195,7 +203,7 @@ if ( ! function_exists( 'tm_fixture_update_season_withslug' ) ):
   function tm_fixture_update_season_withslug($term_slug, $fixture_post_id = 0) {
     // Get term ID OR create term if it doesn't exist
     $seasonterm = tm_season_get_byslug($term_slug);
-    if ( is_null ( $seasonterm) ) {
+    if ( is_null ($seasonterm) ) {
       $seasonterm = tm_season_insert_term( $term_slug );
     }
     // Add the term to the fixture

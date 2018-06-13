@@ -8,7 +8,6 @@ if ( ! function_exists('tm_fixture_table_head') ):
     $defaults['tm_fixture_opposition'] = 'Opposition';
     $defaults['tm_fixture_season'] = 'Season';
     $defaults['tm_fixture_competition'] = 'Competition';
-    $defaults['title'] = 'Opposition';
     return $defaults;
   }
   add_filter( 'manage_tm_fixture_posts_columns', 'tm_fixture_table_head');
@@ -17,8 +16,7 @@ endif;
 if ( ! function_exists('tm_fixture_table_content') ):
   function tm_fixture_table_content( $column_name, $post_id ) {
     if ($column_name == 'tm_fixture_date') {
-      echo date('Y-m-D', tm_fixture_get_date($post_id));
-;
+      echo date('Y-m-d', tm_fixture_get_date($post_id));
     }
     if ($column_name == 'tm_fixture_team') {
       echo tm_fixture_get_teamname($post_id);

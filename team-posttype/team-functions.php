@@ -26,9 +26,9 @@ if ( ! function_exists( 'tm_team_update_section' ) ):
 endif;
 
 // Team Fixtures =========================================
-if ( ! function_exists( 'tm_get_team_fixtures' ) ):
-  function tm_get_team_fixtures( $team_post_id = 0 ) {
-    if ( $team_post_id == 0 ) {
+if ( ! function_exists( 'tm_team_get_fixtures' ) ):
+  function tm_team_get_fixtures( $team_post_id = 0 ) {
+    if ( $team_post_id == 0 || $team_post_id == '') {
       $team_post_id = get_the_id();
     }
     $fixtures = get_posts(array(
@@ -36,15 +36,15 @@ if ( ! function_exists( 'tm_get_team_fixtures' ) ):
       'post_type'		=> 'tm_fixture',
       'post_status' => 'publish',
       'meta_key'	  => 'tm_fixture_team',
-      'meta_value'	=> get_the_id()
+      'meta_value'	=> $team_post_id
     ));
     return $fixtures;
   }
 endif;
 
-if ( ! function_exists( 'tm_get_team_fixtures_objs' ) ):
-  function tm_get_team_fixtures_objs( $team_post_id = 0 ) {
-    $fixtures = tm_get_team_fixtures( $team_post_id );
+if ( ! function_exists( 'tm_team_get_fixtures_objs' ) ):
+  function tm_team_get_fixtures_objs( $team_post_id = 0 ) {
+    $fixtures = tm_team_get_fixtures( $team_post_id );
     $fixtureobjs = Array();
     foreach( $fixtures as $fixture) {
       $fixtureobjs[] = tm_fixture_getobj($fixture->ID);

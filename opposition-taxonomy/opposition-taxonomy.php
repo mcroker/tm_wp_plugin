@@ -1,4 +1,6 @@
 <?php
+require_once('opposition-functions.php');
+
 if ( ! function_exists( 'tm_registertaxonomy_opposition' ) ):
   function tm_registertaxonomy_opposition() {
     $labels = array(

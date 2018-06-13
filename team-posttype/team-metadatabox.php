@@ -15,7 +15,6 @@ if ( ! function_exists( 'tm_team_create_metadatabox' ) ):
   $plugin_url = plugin_dir_url(__FILE__);
   wp_enqueue_script( 'team-metabox-js', $plugin_url . 'team-metadatabox.js', array('jquery'), 'v4.0.0', true );
   wp_enqueue_style( 'plugin-css', dirname($plugin_url) . 'style.css', array(), 'v4.0.0');
-  wp_localize_script( 'team-metabox-js', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 endif;
 
 if ( ! function_exists( 'tm_team_remove_metadatabox' ) ):
@@ -29,6 +28,11 @@ endif;
 if ( ! function_exists( 'tm_team_inner_custom_box' ) ):
   function tm_team_inner_custom_box($post)
   {
+    wp_localize_script( 'team-metabox-js', 'tm_php_object', array(
+      'ajax_url' => admin_url( 'admin-ajax.php' ),
+      'team_id' => $post->ID
+    ) );
+
     // Use nonce for verification
     wp_nonce_field( 'tm_team_field_nonce', 'tm_team_nonce' );
 
@@ -71,7 +75,10 @@ if ( ! function_exists( 'tm_team_inner_custom_box' ) ):
       <?php foreach($sections as $section) { ?>
         <option value='<?php echo $section->term_id ?>' <?php selected( $section->term_id, $saved_section->term_id ) ?>> <?php echo $section->name ?></option>
       <?php } ?>
-    </select>
+    </select><br>
+
+    <input id='tm-team-autofetch' class='button' type='button' onclick='java_script_:execTeamAutoFetcher()' value='Fetch Fixtures'>
+    <div><span id='tm-update-status'></span></div>
 
     <?php
   }

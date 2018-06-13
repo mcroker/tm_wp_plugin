@@ -2,9 +2,7 @@
 require_once('competition-add-form-fields.php');
 require_once('competition-edit-form-fields.php');
 require_once('competition-save-form-fields.php');
-require_once('competition-exec-update-leaguetable.php');
-require_once('competition-exec-update-results.php');
-require_once('competition-exec-update-all.php');
+require_once('competition-update-leaguetable.php');
 require_once('competition-functions.php');
 require_once('competition-api.php');
 require_once('competition-ajax.php');

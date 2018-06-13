@@ -22,7 +22,7 @@ endif;
 
 if ( ! function_exists( 'tm_season_get_byslug' ) ):
   function tm_season_get_byslug($term_slug) {
-    return get_term( Array ( 'slug' => $term_slug ), 'tm_season' );
+    return get_term_by('slug' , $term_slug, 'tm_season' );
   }
 endif;
 

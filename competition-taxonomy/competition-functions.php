@@ -91,14 +91,11 @@ if ( ! function_exists( 'tm_competition_get_autofetcher_options' ) ):
     $autofetcheropts['tm_competition_id'] = $term->term_id;
     $autofetcheropts['tm_competition_slug'] = $term->slug;
     $autofetcheropts['tm_competition_description'] = $term->description;
-    if ( ! array_key_exists( 'tm_competition_seasons' , $autofetcheropts) ) {
-      $autofetcheropts['tm_competition_seasons'] = Array();
+    if ( ! array_key_exists( 'tm_competition_seasons' , $autofetcheropts) || trim($autofetcheropts['tm_competition_seasons'] == '' )) {
+      $autofetcheropts['tm_competition_seasons'] = get_option('tm_default_season');
     }
-    if ( ! is_array($autofetcheropts['tm_competition_seasons']) ) {
+    if ( is_string($autofetcheropts['tm_competition_seasons']) ) {
       $autofetcheropts['tm_competition_seasons'] = explode(',', $autofetcheropts['tm_competition_seasons']);
-    }
-    if ( sizeof($autofetcheropts['tm_competition_seasons']) == 0 ) {
-      $autofetcheropts['tm_competition_seasons'] = explode(',',get_option('tm_default_season'));
     }
     return $autofetcheropts;
   }
@@ -106,7 +103,7 @@ endif;
 
 if ( ! function_exists( 'tm_competition_update_autofetcher_options' ) ):
   function tm_competition_update_autofetcher_options($term_id, $data) {
-    if ( ! is_array($data['tm_competition_seasons']) ) {
+    if ( is_string($data['tm_competition_seasons'] && $data['tm_competition_seasons'] != '') ) {
       $data['tm_competition_seasons'] = explode(',', $data['tm_competition_seasons']);
     };
     return update_term_meta( $term_id, 'tm_competition_autofetcher_options' , $data );

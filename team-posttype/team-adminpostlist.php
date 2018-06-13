@@ -4,7 +4,7 @@ if ( ! function_exists( 'tm_team_table_head' ) ):
     $defaults['title'] = 'Team';
     $defaults['tm_section'] = 'Section';
     $defaults['tm_competition'] = 'Competition';
-    $defaults['tm_leagueteam'] = 'Teamname';
+    $defaults['tm_leagueteam'] = 'Competition_Teamname';
     return $defaults;
   }
   add_filter( 'manage_tm_team_posts_columns', 'tm_team_table_head');

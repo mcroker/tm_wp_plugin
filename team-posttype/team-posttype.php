@@ -3,6 +3,9 @@
 require_once('team-functions.php');
 require_once('team-adminpostlist.php');
 require_once('team-metadatabox.php');
+require_once('team-update-results.php');
+require_once('team-ajax.php');
+require_once('team-api.php');
 
 // Our custom post type function
 if ( ! function_exists( 'tm_create_posttype_team' ) ):

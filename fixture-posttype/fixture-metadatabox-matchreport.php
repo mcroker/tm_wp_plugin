@@ -6,7 +6,7 @@ if ( ! function_exists('tm_create_metadatabox_matchreport')):
       'tm_matchreport',
       'Match Report',
       'tm_matchreport_inner_custom_box',
-      'fixture',
+      'tm_fixture',
       'normal',
       'default'
     );
@@ -24,7 +24,6 @@ if ( ! function_exists('tm_matchreport_inner_custom_box')):
     // Get saved value, if none exists, "default" is selected
     $saved_matchreport = get_post_meta( $post->ID, 'tm_fixture_matchreport', true);
     wp_editor( $saved, "tm_fixture_matchreport");
-
   }
 endif;
 

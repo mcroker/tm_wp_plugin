@@ -39,7 +39,7 @@ endif;
 if ( ! function_exists( 'tm_fixtures_widget_content' ) ):
   function tm_fixtures_widget_content( $team_id = 0, $maxrows = 6, $maxfuture = 3 ) {
     // TODO: Need to all team id to be specified.
-    $fixtures = tm_get_team_fixtures_objs( $team_id );
+    $fixtures = tm_team_get_fixtures_objs( $team_id );
     if (sizeof($fixtures) > 0) {
       echo $displaytitle;
 

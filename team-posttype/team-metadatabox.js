@@ -7,7 +7,7 @@ function getLeagueTeams(competitionid) {
       'action': 'tm_competition_ajax_getteams',
       'competition': competitionid
     };
-    jQuery.get( ajax_object.ajax_url , data, function(response) {
+    jQuery.get( tm_php_object.ajax_url , data, function(response) {
       responseObj = JSON.parse(response);
       leagueTeams[competitionid] = responseObj.teams;
       populateTeamsDropdown(leagueTeams[competitionid]);
@@ -32,3 +32,18 @@ function populateTeamsDropdown(teams) {
     teamsselect.options.add(opt);
   }
 };
+
+
+function execTeamAutoFetcher() {
+  var updatespan = document.getElementById('tm-update-status');
+  updatespan.textContent = 'Fetching ...';
+  var data = {
+    'action': 'tm_team_ajax_update',
+    'team_id': tm_php_object.team_id
+  };
+  jQuery.post( tm_php_object.ajax_url , data, function(response) {
+    var time = new Date();
+    var responseObj = JSON.parse(response);
+    updatespan.textContent = responseObj.fixtures.length + ' fixtures updated ' + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
+  });
+}
