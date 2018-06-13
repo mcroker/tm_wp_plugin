@@ -1,6 +1,6 @@
 <?php
 function tm_competition_api_updateall() {
-  $data = tm_competition_exec_update_all();
+  $data = tm_competition_exec_update_all_competitions();
   wp_send_json($data);
   // print_r($data);
 };

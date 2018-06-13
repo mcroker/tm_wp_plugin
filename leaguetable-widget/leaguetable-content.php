@@ -4,9 +4,8 @@
 */
 if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
   function tm_leaguetable_widget_content($displaytitle, $competitionname, $seasons, $team) {
-
     if (empty($competition)) {
-      $competition = tm_get_team_competition();
+      $competition = tm_team_get_competition();
     } else {
       $competition = tm_competiton_get_byname($competitionname);
     }
@@ -18,7 +17,7 @@ if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
     }
     $seasonsarray = Array();
     foreach (explode(',', $seasons) as $season) {
-      if ( sizeof($tableentries[$season]) > 0 ) {
+      if ( is_array($tableentries[$season]) && sizeof($tableentries[$season]) > 0 ) {
         $seasonsarray[] = $season;
       }
     }

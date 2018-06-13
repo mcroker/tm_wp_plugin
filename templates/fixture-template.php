@@ -21,15 +21,15 @@ get_header(); ?>
 				while (have_posts()) : the_post();
 
         $post = get_post();
-				$team = tm_get_fixture_teamname( $post->ID );
-				$opposition = tm_get_fixture_opposition( $post->ID );
-				$scorefor = tm_get_fixture_scorefor( $post->ID );
-				$scoreagainst = tm_get_fixture_scoreagainst( $post->ID );
+				$team = tm_fixture_get_team( $post->ID )->name;
+				$opposition = tm_fixture_get_opposition( $post->ID );
+				$scorefor = tm_fixture_get_scorefor( $post->ID );
+				$scoreagainst = tm_fixture_get_scoreagainst( $post->ID );
 
         echo __( '<h1>' . $team . ' v ' . $opposition . '</h1>');
         echo __( '<h3>' . $scorefor . ' - ' . $scoreagainst . '</h3>');
 
-				$match_report = tm_get_fixture_matchreport( $post->ID );
+				$match_report = tm_fixture_get_matchreport( $post->ID );
 				if ($match_report != '') {
 					echo __( '<h3>Match Report</h3>', 'tm');
 					echo $match_report;

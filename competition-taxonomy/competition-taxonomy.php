@@ -1,18 +1,16 @@
 <?php
-
-require_once('add-form-fields.php');
-require_once('edit-form-fields.php');
-require_once('save-form-fields.php');
-require_once('exec-update.php');
-require_once('competition-shortcode.php');
+require_once('competition-add-form-fields.php');
+require_once('competition-edit-form-fields.php');
+require_once('competition-save-form-fields.php');
+require_once('competition-exec-update-leaguetable.php');
+require_once('competition-exec-update-results.php');
+require_once('competition-exec-update-all.php');
 require_once('competition-functions.php');
 require_once('competition-api.php');
 require_once('competition-ajax.php');
 
-add_action('init', 'tm_registertaxonomy_competition');
-
-if ( ! function_exists( 'tm_registertaxonomy_competition' ) ):
-  function tm_registertaxonomy_competition() {
+if ( ! function_exists( 'tm_competition_registertaxonomy' ) ):
+  function tm_competition_registertaxonomy() {
     $labels = array(
       'name' => _x( 'Competitions', 'taxonomy general name', 'tm' ),
       'singular_name' => _x('Competitions', 'taxonomy singular name', 'tm'),
@@ -36,18 +34,9 @@ if ( ! function_exists( 'tm_registertaxonomy_competition' ) ):
     );
 
     register_taxonomy('tm_competition', array('tm_fixture','tm_team'), $args);
-    add_action( 'tm_competition_add_form_fields', 'tm_competition_add_form_fields', 10, 2 );
-    add_action( 'tm_competition_edit_form_fields', 'tm_competition_edit_form_fields', 10, 2 );
-    add_action( 'created_tm_competition', 'tm_competition_save', 10, 2 );
-    add_action( 'edited_tm_competition', 'tm_competition_save', 10, 2 );
-
-    do_action( 'tm_competition_register_plugins' );
   }
+  add_action('init', 'tm_competition_registertaxonomy');
 endif;
 
-// Autofetchers ===================================================
-$tm_competition_autofetchers = Array (
-  'none' => 'No Automatic Data Update'
-);
 
 ?>

@@ -27,7 +27,7 @@ function tm_fixtures_widget_content_row($fixture) {
   <tr>
     <td>
       <?php // TODO: Add logos and opposition URL ?>
-      <?php echo $fixture->fixtureDateText ?><br>
+      <?php echo date('F d, Y', $fixture->fixtureDate) ?><br>
       <?php echo $fixture->teamname . ' v ' . $fixture->opposition ?><br>
       <?php echo $fixture->scorefor . ' v ' . $fixture->scoreagainst ?>
     </td>
@@ -52,7 +52,7 @@ if ( ! function_exists( 'tm_fixtures_widget_content' ) ):
         // Future fixtures
         uasort( $fixtures, 'tm_cmp_fixtures_by_date_asc');
         foreach($fixtures as $fixture) {
-          if ( $rowsdisplayed < $maxfuture && $rowsdisplayed < $maxrows && $fixture->fixtureDateText >= $now) {
+          if ( $rowsdisplayed < $maxfuture && $rowsdisplayed < $maxrows && $fixture->fixtureDate >= $now) {
             $rowsdisplayed += 1;
             tm_fixtures_widget_content_row($fixture);
           }
@@ -60,7 +60,7 @@ if ( ! function_exists( 'tm_fixtures_widget_content' ) ):
         // Past results
         uasort( $fixtures, 'tm_cmp_fixtures_by_date_desc');
         foreach($fixtures as $fixture) {
-          if ( $rowsdisplayed < $maxrows && $fixture->fixtureDateText < $now) {
+          if ( $rowsdisplayed < $maxrows && $fixture->fixtureDate < $now) {
             $rowsdisplayed += 1;
             tm_fixtures_widget_content_row($fixture);
           }

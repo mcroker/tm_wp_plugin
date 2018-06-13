@@ -12,6 +12,27 @@
     }
 }
 
+DIV.tm-meta-smallinput {
+  width: 100%;
+  text-align: right;
+}
+
+DIV.tm-meta-smallinput input
+ {
+  width: 55%;
+  text-align: left;
+}
+
+DIV.tm-meta-smallinput select
+ {
+  width: 55%;
+  text-align: left;
+}
+
+.tm-meta-fullinput {
+  width: 100%;
+}
+
 @media screen and (min-width: 881px) {
   .tm-col-alt5 {
         display:none;
