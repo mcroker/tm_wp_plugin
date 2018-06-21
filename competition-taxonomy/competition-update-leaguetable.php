@@ -28,7 +28,7 @@ endif;
 if ( ! function_exists( 'tm_competition_update_all_competitions' ) ):
   function tm_competition_update_all_competitions( $competitions  = Array() ) {
     if ( sizeof($competitions) == 0 ) {
-      $competitions = tm_competiton_getall();
+      $competitions = tm_competition_getall();
     }
     foreach($competitions as $competition) {
       tm_competition_update_leguetable( $competition->term_id );

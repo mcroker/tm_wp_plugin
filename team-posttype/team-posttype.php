@@ -3,9 +3,12 @@
 require_once('team-functions.php');
 require_once('team-adminpostlist.php');
 require_once('team-metadatabox.php');
+require_once('team-metadatabox-logo.php');
+require_once('team-metadatabox-coaches.php');
+require_once('team-metadatabox-players.php');
 require_once('team-update-results.php');
 require_once('team-ajax.php');
-require_once('team-api.php');
+require_once('team-save-form-fields.php');
 
 // Our custom post type function
 if ( ! function_exists( 'tm_create_posttype_team' ) ):

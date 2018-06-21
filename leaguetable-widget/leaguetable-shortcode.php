@@ -13,7 +13,6 @@ if ( ! function_exists( 'tm_leaguetable_shortcode' ) ):
       'seasons' => '',
       'team' => '',
       'title' => '',
-      'maxrows' => ''
     ], $atts, $tag);
 
     ob_start();
@@ -21,8 +20,7 @@ if ( ! function_exists( 'tm_leaguetable_shortcode' ) ):
     $seasons = $parsed_atts['seasons'];
     $team = $parsed_atts['team'];
     $displaytitle = $parsed_atts['title'];
-    $maxrows = $parsed_atts['maxrows'];
-    tm_leaguetable_widget_content($displaytitle, $competition, $seasons, $team, $maxrows);
+    tm_leaguetable_widget_content($displaytitle, $competition, $seasons, $team);
     $o = ob_get_clean();
     // return output
     return $o;

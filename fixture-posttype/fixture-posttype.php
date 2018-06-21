@@ -4,6 +4,7 @@ require_once('fixture-posttype.php');
 require_once('fixture-adminpostlist.php');
 require_once('fixture-metadatabox-meta.php');
 require_once('fixture-metadatabox-matchreport.php');
+require_once('fixture-save-form-fields.php');
 
 // Our custom post type function
 if ( ! function_exists( 'tm_create_posttype_fixture' )):

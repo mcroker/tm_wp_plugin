@@ -4,7 +4,7 @@ if ( ! function_exists( 'tm_competition_edit_form_fields' ) ):
 
     $plugin_url = plugin_dir_url(__FILE__);
     wp_enqueue_script( 'competition-edit-form-js', $plugin_url . 'competition-edit-form-fields.js', array('jquery'), 'v4.0.0', true );
-    wp_localize_script( 'competition-edit-form-js', 'tm_php_object', array(
+    wp_localize_script( 'competition-edit-form-js', 'tmphpobject', array(
       'ajax_url' => admin_url( 'admin-ajax.php' ),
       'term_id' => $term->term_id
     ) );

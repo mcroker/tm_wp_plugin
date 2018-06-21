@@ -10,7 +10,8 @@ endif;
 
 if ( ! function_exists( 'tm_season_insert_term' ) ):
   function tm_season_insert_term($term_slug) {
-    wp_insert_term( $term_slug, 'tm_season', $args = array() );
+    $resp = wp_insert_term( $term_slug, 'tm_season', $args = array() );
+    return get_term( $resp->term_id , 'tm_season' );
   }
 endif;
 

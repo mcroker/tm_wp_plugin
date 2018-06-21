@@ -1,22 +1,26 @@
 <?php
 require_once('opposition-functions.php');
+require_once('opposition-logo-field.php');
+require_once('opposition-edit-form-fields.php');
+require_once('opposition-add-form-fields.php');
+require_once('opposition-save-form-fields.php');
 
 if ( ! function_exists( 'tm_registertaxonomy_opposition' ) ):
   function tm_registertaxonomy_opposition() {
     $labels = array(
-      'name' => _x( 'Oppositions', 'taxonomy general name', 'twrfc_domain' ),
-      'singular_name' => _x('Oppositions', 'taxonomy singular name', 'twrfc_domain'),
-      'search_items' => __('Search Opposition', 'twrfc_domain'),
-      'popular_items' => __('Common Oppositions', 'twrfc_domain'),
-      'all_items' => __('All Oppositions', 'twrfc_domain'),
-      'edit_item' => __('Edit Opposition', 'twrfc_domain'),
-      'update_item' => __('Update Opposition', 'twrfc_domain'),
-      'add_new_item' => __('Add new Opposition', 'twrfc_domain'),
-      'new_item_name' => __('New Opposition:', 'twrfc_domain'),
-      'add_or_remove_items' => __('Remove Opposition', 'twrfc_domain'),
-      'choose_from_most_used' => __('Choose from common Opposition', 'twrfc_domain'),
-      'not_found' => __('No Opposition found.', 'twrfc_domain'),
-      'menu_name' => __('Oppositions', 'twrfc_domain'),
+      'name' => _x( 'Oppositions', 'taxonomy general name', 'tm' ),
+      'singular_name' => _x('Oppositions', 'taxonomy singular name', 'tm'),
+      'search_items' => __('Search Opposition', 'tm'),
+      'popular_items' => __('Common Oppositions', 'tm'),
+      'all_items' => __('All Oppositions', 'tm'),
+      'edit_item' => __('Edit Opposition', 'tm'),
+      'update_item' => __('Update Opposition', 'tm'),
+      'add_new_item' => __('Add new Opposition', 'tm'),
+      'new_item_name' => __('New Opposition:', 'tm'),
+      'add_or_remove_items' => __('Remove Opposition', 'tm'),
+      'choose_from_most_used' => __('Choose from common Opposition', 'tm'),
+      'not_found' => __('No Opposition found.', 'tm'),
+      'menu_name' => __('Oppositions', 'tm'),
     );
 
     $args = array(

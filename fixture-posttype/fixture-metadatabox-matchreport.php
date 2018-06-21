@@ -23,7 +23,7 @@ if ( ! function_exists('tm_matchreport_inner_custom_box')):
 
     // Get saved value, if none exists, "default" is selected
     $saved_matchreport = get_post_meta( $post->ID, 'tm_fixture_matchreport', true);
-    wp_editor( $saved, "tm_fixture_matchreport");
+    wp_editor( $saved_matchreport, "tm_fixture_matchreport");
   }
 endif;
 
@@ -31,6 +31,9 @@ endif;
 if ( ! function_exists('tm_matchreport_save_postdata')):
   function tm_matchreport_save_postdata( $post_id )
   {
+    $post_type = get_post_type($post_id);
+    if ( "tm_fixture" != $post_type ) return;
+
     // verify if this is an auto save routine.
     // If it is our form has not been submitted, so we dont want to do anything
     if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
@@ -38,6 +41,8 @@ if ( ! function_exists('tm_matchreport_save_postdata')):
 
     // verify this came from the our screen and with proper authorization,
     // because save_post can be triggered at other times
+    if (! isset( $_POST['tm_matchreport_nonce']) )
+    return;
     if ( !wp_verify_nonce( $_POST['tm_matchreport_nonce'], 'tm_matchreport_field_nonce' ) )
     return;
 

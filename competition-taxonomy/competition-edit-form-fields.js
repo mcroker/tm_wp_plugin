@@ -36,7 +36,7 @@ function execAutoFetcher() {
   var fetcherselect = document.getElementById('tm_competition_autofetch');
   var data = {
     'action': 'tm_competition_ajax_update',
-    'competition': tm_php_object.term_id,
+    'competition': tmphpobject.term_id,
     'tm_competition_seasons': document.getElementById('tm_competition_seasons').value ,
     'tm_competition_autofetch': fetcherselect.options[fetcherselect.selectedIndex].value
   };
@@ -45,7 +45,7 @@ function execAutoFetcher() {
     data[field.name] = field.value;
   });
 
-  jQuery.post( tm_php_object.ajax_url , data, function(response) {
+  jQuery.post( tmphpobject.ajax_url , data, function(response) {
     var time = new Date();
     updatespan.textContent = 'Fetched ' + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
     var responseObj = JSON.parse(response);
@@ -62,9 +62,9 @@ function execClearFetcherData() {
   updatespan.textContent = 'Clearing  ...';
   var data = {
     'action': 'tm_competition_ajax_clearleaguedata',
-    'competition': tm_php_object.term_id
+    'competition': tmphpobject.term_id
   };
-  jQuery.post( tm_php_object.ajax_url , data, function(response) {
+  jQuery.post( tmphpobject.ajax_url , data, function(response) {
     var time = new Date();
     updatespan.textContent = 'Cleared ' + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
     var responseObj = JSON.parse(response);

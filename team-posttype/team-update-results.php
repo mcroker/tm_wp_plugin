@@ -3,29 +3,32 @@
 if ( ! function_exists('tm_team_update_all_results') ):
   function tm_team_update_all_results() {
     $teamposts = get_posts(array (
-      'numberposts'	=> -1,
-      'post_type'		=> 'tm_team',
-      'post_status' => 'publish',
-      'title'       => $result->opposition,
-      'tax_query' => array(
+      'numberposts' 	=> -1,
+      'post_type'		 => 'tm_team',
+      'meta_query'	 => array(
+        'relation'	=> 'AND',
+        array(
+          'key'	 	   => 'tm_team_useautofetch',
+          'value'	   => 1,
+          'compare'  => '='
+        ) ,
+        array(
+          'key'	 	   => 'tm_team_leagueteam',
+          'value'	   => '',
+          'compare'  => '!='
+        ) ,
+      ),
+      'tax_query'    => array(
         array(
           'taxonomy' => 'tm_competition',
           'operator' => 'EXISTS', // or 'EXISTS'
         )),
       ));
       foreach($teamposts as $teampost) {
-        tm_competition_exec_update_team_results($teampost->ID);
+        tm_team_update_team_results($teampost->ID);
       }
     }
   endif;
-  /*
-  'meta_query'	=> array (
-  array(
-  'key'	 	  => 'tm_team_rfucompetition',
-  'compare' => 'EXISTS'
-  )
-  )
-  */
 
   /* == UPDATE Results ============================================================ */
   if ( ! function_exists('tm_team_update_team_results') ):
@@ -46,6 +49,7 @@ if ( ! function_exists('tm_team_update_all_results') ):
         // Match each post against opposition, team, and fixture date
         // With each matched fixture updated based on fetched results
         foreach($fixturedata as $result) {
+
           $fixtures = get_posts(array(
             'numberposts'	=> -1,
             'post_type'		=> 'tm_fixture',
@@ -62,12 +66,23 @@ if ( ! function_exists('tm_team_update_all_results') ):
                 'value'	  => $result->fixturedate->format('Y-m-d'),
                 'compare' => '='
               ),
+              array(
+                'key'	  	=> 'tm_fixture_createdbyautofetch',
+                'value'	  => 1,
+                'compare' => '='
+              )
             ),
             'tax_query' => array(
+              'relation'	=> 'AND',
               array(
                 'taxonomy' => 'tm_opposition',
                 'field'    => 'slug',
                 'terms'    => $result->opposition
+              ),
+              array(
+                'taxonomy' => 'tm_season',
+                'field'    => 'slug',
+                'terms'    => $result->season
               )
             ),
           ));
@@ -78,25 +93,26 @@ if ( ! function_exists('tm_team_update_all_results') ):
           // Add this to fixtures (as if found origionally) - to include in update Loop.
           // i.e. we do create and then update (to avoid code duplciation)
           if ( sizeof( $fixtures ) == 0 ) {
+            switch($result->homeaway) {
+              case 'H': $newtitle = $result->opposition . ' (Home)'; break;
+              case 'A': $newtitle = $result->opposition . ' (Away)'; break;
+              default: $newtitle = $result->opposition;
+            }
             $newfixture = wp_insert_post ( array(
-              'post_title' => $result->opposition,
+              'post_title' => $newtitle,
               'post_status' => 'publish',
               'post_type' => 'tm_fixture'
             ) );
+            tm_fixture_update_createdbyautofetch( true, $newfixture );
+            tm_fixture_update_useautofetch(true, $newfixture );
             $fixtures[] = get_post ($newfixture);
           }
 
           // fixture posts updating post post-netadata and post-terms
           foreach ($fixtures as $fixture) {
-            /* wp_insert_post (  array(
-              'ID' => $fixture->ID,
-              'post_title' => $result->opposition,
-              'post_status' => 'publish',
-              'post_type' => 'tm_fixture'
-            ) ); */
-            // TODO : Need to capture home vs away
             tm_fixture_update_date( $result->fixturedate->getTimestamp(), $fixture->ID );
             tm_fixture_update_team( $team_id , $fixture->ID );
+            tm_fixture_update_homeaway( $result->homeaway , $fixture->ID );
             if ( $result->scoreagainst != '' ) {
               tm_fixture_update_scoreagainst($result->scoreagainst,  $fixture->ID);
             }

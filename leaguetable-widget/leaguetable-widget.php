@@ -9,33 +9,49 @@ if ( ! class_exists( 'TM_Leaguetable') ):
       parent::__construct(
 
         // Base ID of your widget
-        'tm',
+        'tm_leaguetable',
 
         // Widget name will appear in UI
-        __('League Table Widget', 'tm'),
+        __('TM League Table', 'tm'),
 
         // Widget description
-        array( 'description' => __( 'League Table Widget', 'tm' ), )
+        array( 'description' => __( 'League table display', 'tm' ), )
       );
     }
 
     // Creating widget front-end
     public function widget( $args, $instance ) {
-      $title = apply_filters( 'tm_title', $instance['title'] );
-      $competition = apply_filters( 'tm_competition', $instance['tm_competition'] );
-      $seasons = apply_filters( 'tm_seasons', $instance['tm_seasons'] );
-      $team = apply_filters( 'tm_team', $instance['team'] );
-      $maxrows = apply_filters( 'tm_maxrows', $instance['tm_maxrows'] );
+      if ( isset($instance['title']) ) {
+        $title = apply_filters( 'tm_title', $instance['title'] );
+        if ( ! empty($title) ) $title = $args['before_title'] . $title . $args['after_title'];
+      } else {
+        $title = $args['before_title'] . __( 'Leaguetable' , 'tm' ) . $args['after_title'];
+      }
+      if ( isset($instance['tm_competition']) )  {
+        $competition = apply_filters( 'tm_competition', $instance['tm_competition'] );
+      } else {
+        $competition ='';
+      }
+      if ( isset($instance['tm_seasons']) ) {
+        $seasons = apply_filters( 'tm_seasons', $instance['tm_seasons'] );
+      } else {
+        $seasons ='';
+      }
+      if ( isset($instance['team']) ) {
 
-      // before and after widget arguments are defined by themes
-      echo $args['before_widget'];
-      if ( ! empty( $title ) )
-      $displaytitle = $args['before_title'] . $title . $args['after_title'];
+        $team = apply_filters( 'tm_team', $instance['team'] );
+      } else {
+        $team = '';
+      }
 
-      // This is where you run the code and display the output
-      tm_leaguetable_widget_content($displaytitle, $competition, $seasons, $team, $maxrows);
-
-      echo $args['after_widget'];
+    // This is where you run the code and display the output
+      if ( isset($args['before_widget']) ) {
+        echo $args['before_widget'];
+      }
+      tm_leaguetable_widget_content($title, $competition, $seasons, $team, $args);
+      if ( isset($args['after_widget']) ) {
+        echo $args['after_widget'];
+      }
     }
 
     // Widget Backend
@@ -44,19 +60,22 @@ if ( ! class_exists( 'TM_Leaguetable') ):
         $title = $instance[ 'title' ];
       }
       else {
-        $title = __( 'Results', 'tm' );
+        $title = __( 'Leaguetable', 'tm' );
       }
       if ( isset( $instance[ 'tm_competition' ] ) ) {
         $competition = $instance[ 'tm_competition' ];
+      } else {
+        $competition = '';
       }
       if ( isset( $instance[ 'tm_seasons' ] ) ) {
         $seasons = $instance[ 'tm_seasons' ];
+      } else {
+        $seasons = '';
       }
       if ( isset( $instance[ 'tm_team' ] ) ) {
         $team = $instance[ 'tm_team' ];
-      }
-      if ( isset( $instance[ 'tm_maxrows' ] ) ) {
-        $maxrows = $instance[ 'tm_maxrows' ];
+      } else {
+        $team = '';
       }
       // Widget admin form
       ?>
@@ -76,10 +95,6 @@ if ( ! class_exists( 'TM_Leaguetable') ):
         <label for="<?php echo $this->get_field_id( 'tm_seasons' ); ?>"><?php _e( 'Season:' ); ?></label>
         <input class="widefat" id="<?php echo $this->get_field_id( 'tm_seasons' ); ?>" name="<?php echo $this->get_field_name( 'tm_seasons' ); ?>" type="text" value="<?php echo esc_attr( $seasons ); ?>" />
       </p>
-      <p>
-        <label for="<?php echo $this->get_field_id( 'tm_maxrows' ); ?>"><?php _e( 'Max rows:' ); ?></label>
-        <input class="widefat" id="<?php echo $this->get_field_id( 'tm_maxrows' ); ?>" name="<?php echo $this->get_field_name( 'tm_maxrows' ); ?>" type="text" value="<?php echo esc_attr( $maxrows ); ?>" />
-      </p>
 
       <?php
     }
@@ -91,7 +106,6 @@ if ( ! class_exists( 'TM_Leaguetable') ):
       $instance['tm_competition'] = ( ! empty( $new_instance['tm_competition'] ) ) ? strip_tags( $new_instance['tm_competition'] ) : '';
       $instance['tm_team'] = ( ! empty( $new_instance['tm_team'] ) ) ? strip_tags( $new_instance['tm_team'] ) : '';
       $instance['tm_seasons'] = ( ! empty( $new_instance['tm_seasons'] ) ) ? strip_tags( $new_instance['tm_seasons'] ) : '';
-      $instance['tm_maxrows'] = ( ! empty( $new_instance['tm_maxrows'] ) ) ? strip_tags( $new_instance['tm_maxrows'] ) : '';
       return $instance;
     }
   } // Class ends here

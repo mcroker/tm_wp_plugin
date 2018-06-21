@@ -16,8 +16,8 @@ if ( ! class_exists('TM_LeagueTableEntry')):
   };
 endif;
 
-if ( ! function_exists( 'tm_competiton_getall' ) ):
-  function tm_competiton_getall() {
+if ( ! function_exists( 'tm_competition_getall' ) ):
+  function tm_competition_getall() {
     return get_terms([
       'taxonomy' => 'tm_competition',
       'hide_empty' => false
@@ -25,14 +25,14 @@ if ( ! function_exists( 'tm_competiton_getall' ) ):
   }
 endif;
 
-if ( ! function_exists( 'tm_competiton_get_byname' ) ):
-  function tm_competiton_get_byname($competitionname) {
+if ( ! function_exists( 'tm_competition_get_byname' ) ):
+  function tm_competition_get_byname($competitionname) {
     return get_term( Array ( 'name' => $competitionname ), 'tm_competition' );
   }
 endif;
 
-if ( ! function_exists( 'tm_competiton_get_byid' ) ):
-  function tm_competiton_get_byid($competitionid) {
+if ( ! function_exists( 'tm_competition_get_byid' ) ):
+  function tm_competition_get_byid($competitionid) {
     return get_term( $competitionid , 'tm_competition' );
   }
 endif;
@@ -86,7 +86,7 @@ if ( ! function_exists( 'tm_competition_get_autofetcher_options' ) ):
     if ( $autofetcheropts == '' ) {
       $autofetcheropts = Array();
     }
-    $term = tm_competiton_get_byid($term_id);
+    $term = tm_competition_get_byid($term_id);
     $autofetcheropts['tm_competition_name'] = $term->name;
     $autofetcheropts['tm_competition_id'] = $term->term_id;
     $autofetcheropts['tm_competition_slug'] = $term->slug;
@@ -143,8 +143,10 @@ if ( ! function_exists( 'tm_competition_updateon_object' ) ):
     if ( $object_id == 0 ) {
       $object_id = get_the_id();
     }
-    $term = tm_competiton_get_byid( $term_id );
-    wp_set_object_terms( $object_id, $term->slug, 'tm_competition' , false);
+    $term = tm_competition_get_byid( $term_id );
+    if ($term) {
+      wp_set_object_terms( $object_id, $term->slug, 'tm_competition' , false);
+    }
   }
 endif;
 

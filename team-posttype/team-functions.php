@@ -1,5 +1,14 @@
 <?php
 
+if ( ! function_exists( 'tm_team_getall' ) ):
+  function tm_team_getall() {
+    return get_posts(array (
+       'numberposts'	=> -1,
+      'post_type' => 'tm_team'
+    ));
+  }
+endif;
+
 if ( ! function_exists( 'tm_team_get_competition' ) ):
   function tm_team_get_competition( $team_post_id = 0 ) {
     return tm_competition_getfrom_object($team_post_id);
@@ -72,4 +81,84 @@ if ( ! function_exists( 'tm_team_update_leagueteam' ) ):
     return update_post_meta( $team_post_id, 'tm_team_leagueteam' , $data );
   }
 endif;
+
+// Autofetch fixtures =========================================
+if ( ! function_exists( 'tm_team_get_useautofetch' ) ):
+  function tm_team_get_useautofetch( $team_post_id = 0 ) {
+    if ( $team_post_id == 0 ) {
+      $team_post_id = get_the_id();
+    }
+    $useautofetch = get_post_meta( $team_post_id, 'tm_team_useautofetch' , true );
+    return $useautofetch;
+  }
+endif;
+
+if ( ! function_exists( 'tm_team_update_useautofetch' ) ):
+  function tm_team_update_useautofetch($data, $team_post_id = 0 ) {
+    if ( $team_post_id == 0 ) {
+      $team_post_id = get_the_id();
+    }
+    return update_post_meta( $team_post_id, 'tm_team_useautofetch' , $data );
+  }
+endif;
+
+// team logo =========================================
+if ( ! function_exists( 'tm_team_get_logo' ) ):
+  function tm_team_get_logo( $team_post_id = 0 ) {
+    if ( $team_post_id == 0 ) {
+      $team_post_id = get_the_id();
+    }
+    $teamlogoid = get_post_meta( $team_post_id, 'tm_team_logo_id' , true );
+    return $teamlogoid;
+  }
+endif;
+
+if ( ! function_exists( 'tm_team_update_logo' ) ):
+  function tm_team_update_logo($data, $team_post_id = 0 ) {
+    if ( $team_post_id == 0 ) {
+      $team_post_id = get_the_id();
+    }
+    return update_post_meta( $team_post_id, 'tm_team_logo_id' , $data );
+  }
+endif;
+
+// Team Players ============================================================
+if ( ! function_exists( 'tm_team_get_playerstext' ) ):
+  function tm_team_get_playerstext($team_post_id = 0) {
+    if ( $team_post_id == 0) {
+      $team_post_id = get_the_id();
+    }
+    return get_post_meta( get_the_ID(), 'tm_team_playerstext', true );
+  }
+endif;
+
+if ( ! function_exists( 'tm_team_update_playerstext' ) ):
+  function tm_team_update_playerstext($data, $team_post_id = 0) {
+    if ( $team_post_id == 0) {
+      $team_post_id = get_the_id();
+    }
+    return update_post_meta( $team_post_id, 'tm_team_playerstext', $data);
+  }
+endif;
+
+// Team Coaches ============================================================
+if ( ! function_exists( 'tm_team_get_coachestext' ) ):
+  function tm_team_get_coachestext($team_post_id = 0) {
+    if ( $team_post_id == 0) {
+      $team_post_id = get_the_id();
+    }
+    return get_post_meta( get_the_ID(), 'tm_team_coachestext', true );
+  }
+endif;
+
+if ( ! function_exists( 'tm_team_update_coachestext' ) ):
+  function tm_team_update_coachestext($data, $team_post_id = 0) {
+    if ( $team_post_id == 0) {
+      $team_post_id = get_the_id();
+    }
+    return update_post_meta( $team_post_id, 'tm_team_coachestext', $data );
+  }
+endif;
+
+
 ?>

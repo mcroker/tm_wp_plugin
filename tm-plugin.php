@@ -6,7 +6,6 @@ Description: Sports club management developed by Martin Croker
 
 /* Start Adding Functions Below this Line */
 
-require_once('inc/simple_html_dom.php');
 
 // CSS
 function tm_load_plugin_css() {
@@ -16,15 +15,15 @@ function tm_load_plugin_css() {
 add_action( 'wp_enqueue_scripts', 'tm_load_plugin_css' );
 
 // Sidebars
-require_once('templates/fixture-sidebar.php');
-require_once('templates/team-sidebar.php');
+// require_once('templates/fixture-sidebar.php');
+// require_once('templates/team-sidebar.php');
 
 // Widgets
-require_once('fixtures-widget/fixtures-widget.php');
+require_once('fixturelist-widget/fixturelist-widget.php');
 require_once('leaguetable-widget/leaguetable-widget.php');
 
 // Shortcodes
-require_once('leaguetable-widget/leaguetable-shortcode.php');
+// require_once('leaguetable-widget/leaguetable-shortcode.php');
 
 // Post types
 require_once('fixture-posttype/fixture-posttype.php');
@@ -36,9 +35,10 @@ require_once('season-taxonomy/season-taxonomy.php');
 require_once('section-taxonomy/section-taxonomy.php');
 require_once('competition-taxonomy/competition-taxonomy.php');
 
-require_once('tm-plugin-template.php');
+// require_once('tm-plugin-template.php');
 require_once('tm-plugin-options.php');
 require_once('tm-plugin-autofetch.php');
+require_once('tm-plugin-api.php');
 
 require_once('logo-integration/logo-integration.php');
 

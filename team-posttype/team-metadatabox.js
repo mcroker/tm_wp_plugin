@@ -1,21 +1,21 @@
-var leagueTeams = [];
-function getLeagueTeams(competitionid) {
-  if (competitionid[leagueTeams]) {
-    populateTeamsDropdown(leagueTeams[competitionid]);
+var tmteamleagueTeams = [];
+function tmteamgetLeagueTeams(competitionid) {
+  if (tmteamleagueTeams[competitionid]) {
+    tmteampopulateTeamsDropdown(tmteamleagueTeams[competitionid]);
   } else {
     var data = {
       'action': 'tm_competition_ajax_getteams',
       'competition': competitionid
     };
-    jQuery.get( tm_php_object.ajax_url , data, function(response) {
+    jQuery.post( tmphpobject.ajax_url , data, function(response) {
       responseObj = JSON.parse(response);
-      leagueTeams[competitionid] = responseObj.teams;
-      populateTeamsDropdown(leagueTeams[competitionid]);
+      tmteamleagueTeams[competitionid] = responseObj.teams;
+      tmteampopulateTeamsDropdown(tmteamleagueTeams[competitionid]);
     });
   };
 };
 
-function populateTeamsDropdown(teams) {
+function tmteampopulateTeamsDropdown(teams) {
   var teamsselect = document.getElementById('tm_team_leagueteam');
   for(i = teamsselect.options.length - 1 ; i >= 0 ; i--)
   {
@@ -33,17 +33,16 @@ function populateTeamsDropdown(teams) {
   }
 };
 
-
 function execTeamAutoFetcher() {
   var updatespan = document.getElementById('tm-update-status');
   updatespan.textContent = 'Fetching ...';
   var data = {
     'action': 'tm_team_ajax_update',
-    'team_id': tm_php_object.team_id
+    'team_id': tmphpobject.team_id
   };
-  jQuery.post( tm_php_object.ajax_url , data, function(response) {
+  jQuery.post( tmphpobject.ajax_url , data, function(response) {
     var time = new Date();
     var responseObj = JSON.parse(response);
     updatespan.textContent = responseObj.fixtures.length + ' fixtures updated ' + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
   });
-}
+};

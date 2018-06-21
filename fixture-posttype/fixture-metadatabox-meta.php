@@ -1,105 +1,34 @@
 <?php
-/* Adds a box to the main column on the Post and Page edit screens */
-if ( ! function_exists( 'tm_create_metadatabox_fixture' )):
-  function tm_create_metadatabox_fixture() {
+if ( ! function_exists( 'tm_fixture_create_metadatabox' )):
+  function tm_fixture_create_metadatabox() {
     add_meta_box(
       'tm_fixturemeta',
       'Fixture Metadata',
       'tm_fixture_inner_custom_box',
       'tm_fixture',
       'side',
-      'high'
+      'low'
     );
   }
+  add_action( 'add_meta_boxes', 'tm_fixture_create_metadatabox' );
 endif;
 
-if ( ! function_exists( 'tm_fixture_inner_custom_box' )):
-  function tm_fixture_inner_custom_box($post)
-  {
-
-    // Use nonce for verification
-    wp_nonce_field( 'tm_fixture_field_nonce', 'tm_fixture_nonce' );
-
-    // Get saved value, if none exists, "default" is selected
-    $saved_team = get_post_meta( $post->ID, 'tm_fixture_team', true);
-    $teams = get_posts(array (
-      'post_type' => 'tm_team'
-    ));
-    wp_reset_query();
-    printf('<label for="tm_fixture_team"> Team </label><br>');
-    printf('<select class="tm-meta-fullinput" name="tm_fixture_team" id="tm_fixture_team"/>');
-    foreach($teams as $team)
-    {
-      printf(
-        '<option value="%1$s" %2$s > %3$s </option>',
-        esc_attr($team->ID),
-        selected($saved_team, $team->ID, false),
-        esc_html($team->post_title)
-      );
-    }
-    printf('</select>');
-
-    $competitions = tm_competiton_getall();
-    $saved_competition = tm_fixture_get_competition();
-    ?>
-    <label for="tm_team_competition"> Competition </label><br>
-    <select class="tm-meta-fullinput" id='tm_team_competition' name='tm_team_competition'>
-      <option value=''>None/Friendly</option>
-      <?php foreach($competitions as $competition) { ?>
-        <option value='<?php echo $competition->term_id ?>' <?php selected( $competition->term_id, $saved_competition->term_id ) ?>> <?php echo $competition->name ?></option>
-      <?php } ?>
-    </select>
-    <br>
-
-    <?php
-    $seasons = tm_season_getall( $saved_competition->term_id );
-    $saved_season = tm_fixture_get_season();
-    ?><div class="tm-meta-smallinput">
-      <label for="tm_team_leagueteam"> Season </label>
-      <select id='tm_team_leagueteam' name='tm_team_leagueteam'>
-        <?php foreach($seasons as $season) { ?>
-          <option value='<?php echo $season->term_id ?>' <?php selected( $season->term_id , $saved_season->term_id ) ?>> <?php echo $season->name ?></option>
-        <?php } ?>
-      </select><br>
-    </div><?php
-
-    $saved_date = tm_fixture_get_date();
-    ?><div class="tm-meta-smallinput"><?php
-    printf(
-      '<label for="tm_fixture_date">Fixture Date</label>'.
-      '<input type="date" name="tm_fixture_date" value="%1$s" id="tm_fixture_date"/>',
-      date('Y-m-d',$saved_date)
-    );
-    ?></div><?php
-
-    $saved_scorefor = get_post_meta( $post->ID, 'tm_fixture_scorefor', true);
-    ?><div class="tm-meta-smallinput"><?php
-    printf(
-      '<label for="tm_fixture_scorefor">Team Score</label>'.
-      '<input type="number" name="tm_fixture_scorefor" value="%1$s" id="tm_fixture_scorefor"/></br>',
-      esc_attr(trim($saved_scorefor))
-    );
-    ?></div><?php
-
-    $saved_scoreagainst = get_post_meta( $post->ID, 'tm_fixture_scoreagainst', true);
-    ?><div class="tm-meta-smallinput"><?php
-    printf(
-      '<label for="tm_fixture_scoreagainst">Opposition Score</label>'.
-      '<input type="number" name="tm_fixture_scoreagainst" value="%1$s" id="tm_fixture_scoreagainst"/></br>',
-      esc_attr(trim($saved_scoreagainst))
-    );
-    ?></div>
-
-
- <?php
+// Enqueue admin scripts ========================================
+if ( ! function_exists( 'tm_fixture_enqueue_adminscripts' )):
+  function tm_fixture_enqueue_adminscripts($hook) {
+    $plugin_url = plugin_dir_url(__FILE__);
+    wp_enqueue_style( 'plugin-css', dirname($plugin_url) . '/style.css', array(), 'v4.0.0');
+    wp_enqueue_script( 'fixture-metabox-meta-js', $plugin_url . 'fixture-metadatabox-meta.js', array('jquery'), 'v4.0.0', false );
+    wp_localize_script( 'fixture-metabox-meta-js', 'tmphpobject', array(
+       'ajax_url' => admin_url( 'admin-ajax.php' )
+     ) );
   }
-  add_action( 'add_meta_boxes', 'tm_create_metadatabox_fixture' );
-  $plugin_url = plugin_dir_url(dirname(__FILE__));
-  wp_enqueue_style( 'team-metabox-css', $plugin_url . 'style.css', array(), 'v4.0.0');
+  add_action( 'admin_enqueue_scripts', 'tm_fixture_enqueue_adminscripts' );
 endif;
 
+// Remove other metaboxes ========================================
 if ( ! function_exists( 'tm_fixture_remove_metadatabox' ) ):
-  function tm_fixture_remove_metadatabox() {
+  function tm_fixture_remove_metadatabox($hook) {
     remove_meta_box( 'tagsdiv-tm_opposition', 'tm_fixture', 'normal' );
     remove_meta_box( 'tagsdiv-tm_season', 'tm_fixture', 'normal' );
     remove_meta_box( 'tagsdiv-tm_competition', 'tm_fixture', 'normal' );
@@ -107,45 +36,143 @@ if ( ! function_exists( 'tm_fixture_remove_metadatabox' ) ):
   add_action( 'admin_menu' , 'tm_fixture_remove_metadatabox' );
 endif;
 
-/* When the post is saved, saves our custom data */
-if ( ! function_exists( 'tm_fixture_save_postdata' ) ):
-  function tm_fixture_save_postdata( $post_id )
+// Fixture Inner Custom Box ========================================
+if ( ! function_exists( 'tm_fixture_inner_custom_box' )):
+  function tm_fixture_inner_custom_box($post)
   {
-    // verify if this is an auto save routine.
-    // If it is our form has not been submitted, so we dont want to do anything
-    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
-    return;
 
-    // verify this came from the our screen and with proper authorization,
-    // because save_post can be triggered at other times
-    if ( !wp_verify_nonce( $_POST['tm_fixture_nonce'], 'tm_fixture_field_nonce' ) )
-    return;
+    // Use nonce for verification
+    wp_nonce_field( 'tm_fixture_field_nonce', 'tm_fixture_nonce' );
+    wp_reset_query();
+    ?>
 
-    if ( isset($_POST['tm_fixture_team']) ){
-      update_post_meta( $post_id, 'tm_fixture_team', $_POST['tm_fixture_team'] );
+    <?php
+    if ( tm_fixture_get_createdbyautofetch() ) {
+      $useautofetch = tm_fixture_get_useautofetch();
+      ?>
+      <div class="tm-meta-smallinput">
+        <label for="tm_fixture_useautofetch"> Sync with autofetch? </label>
+        <input type="checkbox" id="tm_fixture_useautofetch" name="tm_fixture_useautofetch"
+        onchange="java_script_:tmfixtureuseautofetch(this.checked);" <?php checked($useautofetch) ?> />
+      </div>
+    <?php } else {
+      $useautofetch = false;
+    } ?>
+
+    <?php
+    $teams = tm_team_getall();
+    $saved_team = tm_fixture_get_team();
+    ?>
+    <label for="tm_fixture_team"> Team </label><br>
+    <select class="tm-meta-fullinput tm-meta-disableifautofetched"
+    <?php disabled($useautofetch, true, true ) ?> name="tm_fixture_team" id="tm_fixture_team" >
+      <?php foreach($teams as $team)  { ?>
+        <option value="<?php echo esc_attr($team->ID) ?>" <?php selected($saved_team->ID, $team->ID, true) ?> >
+          <?php echo esc_html($team->post_title) ?>
+        </option>
+      <?php } ?>
+    </select>
+
+    <?php
+    $competitions = tm_competition_getall();
+    $saved_competition = tm_fixture_get_competition();
+    if ( $saved_competition ) {
+      $saved_competition_id = $saved_competition->term_id;
+    } else {
+      $saved_competition_id = false;
     }
+    ?>
+    <label for="tm_fixture_competition"> Competition </label><br>
+    <select class="tm-meta-fullinput tm-meta-disableifautofetched" id='tm_fixture_competition'
+    name='tm_fixture_competition' <?php disabled($useautofetch, true, true ) ?>
+    onchange='java_script_:tmfixturegetLeagueTeams(this.options[this.selectedIndex].value);'>
+    <option value=''> None/Friendly </option>
+    <?php foreach($competitions as $competition) { ?>
+      <option value="<?php echo esc_attr($competition->term_id) ?>" <?php selected( $competition->term_id, $saved_competition_id ) ?> >
+        <?php echo esc_html($competition->name) ?>
+      </option>
+    <?php } ?>
+  </select>
+  <br>
 
-    if ( isset($_POST['tm_team_competition']) ){
-      tm_fixture_update_competition( $_POST['tm_team_competition'] );
-    }
-
-    if ( isset($_POST['tm_fixture_season']) ){
-      tm_fixture_update_section( $_POST['tm_fixture_season'] );
-    }
-
-    if ( isset($_POST['tm_fixture_date']) ){
-      tm_fixture_update_date( $_POST['tm_fixture_date'] );
-    }
-
-    if ( isset($_POST['tm_fixture_scorefor']) ){
-      tm_fixture_update_scorefor( $_POST['tm_fixture_scorefor'] );
-    }
-
-    if ( isset($_POST['tm_fixture_scoreagainst']) ){
-      tm_fixture_update_scoreagainst( $_POST['tm_fixture_scoreagainst'] );
-    }
-
+  <?php
+  if ( $saved_competition ) {
+    $leagueteams = tm_competition_get_teams( $saved_competition->term_id );
+  } else {
+    $leagueteams = Array();
   }
-  add_action( 'save_post', 'tm_fixture_save_postdata' );
+  $saved_opposition = tm_fixture_get_opposition();
+  ?>
+  <label for="tm_fixture_leagueteam_select"> Opposition </label><br>
+  <select id='tm_fixture_leagueteam_select' name='tm_fixture_leagueteam_select'
+  class='tm-meta-fullinput tm-meta-disableifautofetched' <?php disabled($useautofetch, true, true ) ?>
+  <?php if ( ! $saved_competition_id ) { ?> style='display:none;' <?php } ?> >
+    <?php foreach($leagueteams as $leagueteam) { ?>
+      <option value='<?php echo $leagueteam ?>' <?php selected( $leagueteam , $saved_opposition ) ?> >
+        <?php echo $leagueteam ?>
+      </option>
+    <?php } ?>
+  </select>
+  <input
+    id='tm_fixture_leagueteam_text' name='tm_fixture_leagueteam_text'
+    type='text' class='tm-meta-fullinput' <?php disabled($useautofetch, true, true ) ?>
+    value='<?php echo esc_attr($saved_opposition) ?>'
+    <?php if ( $saved_competition_id ) { ?> style='display:none;' <?php } ?>
+  />
+
+  <div class="tm-meta-smallinput">
+    <label for="tm_fixture_date">Fixture Date</label>
+    <input class="tm-meta-disableifautofetched" type="date" name="tm_fixture_date"
+    <?php disabled($useautofetch, true, true ) ?>
+    id="tm_fixture_date" value="<?php echo date('Y-m-d',tm_fixture_get_date()) ?>"  />
+  </div>
+
+  <?php
+  $seasons = tm_season_getall();
+  $saved_season = tm_fixture_get_season();
+  ?>
+  <div class="tm-meta-smallinput">
+    <label for="tm_fixture_season"> Season </label>
+    <select id='tm_fixture_season' class='tm-meta-disableifautofetched' name='tm_fixture_season'
+    <?php disabled($useautofetch, true, true ) ?> >
+      <?php foreach($seasons as $season) { ?>
+        <option value='<?php echo esc_attr($season->term_id) ?>' <?php selected( $season->term_id , $saved_season->term_id ) ?> >
+          <?php echo esc_html($season->name) ?>
+        </option>
+      <?php } ?>
+    </select>
+  </div>
+
+  <?php
+  $homeaways = Array (
+    'H' => 'Home',
+    'A' => 'Away'
+  );
+  ?>
+  <div class="tm-meta-smallinput">
+    <label for="tm_fixture_homeaway"> Home/Away </label>
+    <select class="tm-meta-disableifautofetched" id='tm_fixture_homeaway' name='tm_fixture_homeaway' <?php disabled($useautofetch, true, true ) ?> >
+      <?php foreach($homeaways as $key => $value) { ?>
+        <option value='<?php echo esc_attr($key) ?>' <?php selected( $key, tm_fixture_get_homeaway() , true ) ?> >
+          <?php echo esc_html($value) ?>
+        </option>
+      <?php } ?>
+    </select>
+  </div>
+
+  <div class="tm-meta-smallinput">
+    <label for="tm_fixture_scorefor">Team Score</label>
+    <input class="tm-meta-disableifautofetched" type="number" name="tm_fixture_scorefor" id="tm_fixture_scorefor"
+    value="<?php echo esc_attr(tm_fixture_get_scorefor()) ?>" <?php disabled($useautofetch, true, true ) ?> />
+  </div>
+
+  <div class="tm-meta-smallinput">
+    <label for="tm_fixture_scoreagainst">Opposition Score</label>
+    <input class="tm-meta-disableifautofetched" type="number" name="tm_fixture_scoreagainst" id="tm_fixture_scoreagainst"
+    value="<?php echo esc_attr(tm_fixture_get_scoreagainst()) ?>"  <?php disabled($useautofetch, true, true ) ?> />
+  </div>
+
+  <?php
+}
 endif;
 ?>

@@ -6,35 +6,117 @@
   background-color: yellow
 }
 
-@media screen and (max-width: 880px) {
-  .tm-col-pri5 {
-        display:none;
-    }
-}
-
 DIV.tm-meta-smallinput {
   width: 100%;
   text-align: right;
 }
 
-DIV.tm-meta-smallinput input
- {
-  width: 55%;
-  text-align: left;
-}
-
+DIV.tm-meta-smallinput input[type="text"],
+DIV.tm-meta-smallinput input[type="date"],
+DIV.tm-meta-smallinput input[type="number"],
 DIV.tm-meta-smallinput select
  {
-  width: 55%;
+  width: 56%;
   text-align: left;
 }
 
 .tm-meta-fullinput {
   width: 100%;
 }
+DIV.tm-leaguetabe-season-select {
+  width: 100%;
+  text-align: right;
+}
+
+DIV.tm-leaguetabe-season-select select {
+  width: 100px;
+}
+
+/* ================== */
+	.team-logo {
+		width: 20%;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.logo-odd {
+		text-align: left;
+		float: left;
+	}
+
+	.logo-even {
+		text-align: right;
+		float: right;
+	}
+
+	.logo-odd img {
+		margin-right: 10px;
+	}
+
+	.logo-even img {
+		margin-left: 10px;
+	}
+
+	.tm-team-name {
+		display: inline;
+		clear: none;
+	}
+
+  /* Event Blocks */
+.tm-event-blocks .tm-event-date,
+.tm-event-blocks .tm-event-time,
+.tm-event-blocks .tm-event-results,
+.tm-event-blocks .tm-event-title {
+	text-align: center;
+	display: block;
+	margin: 10px 0;
+	clear: none;
+}
+.tm-event-blocks .tm-event-league,
+.tm-event-blocks .tm-event-season,
+.tm-event-blocks .tm-event-venue {
+	text-align: center;
+	margin: 0 20%;
+	padding: 0 20px;
+}
+.tm-event-blocks .team-logo {
+	margin: 10px;
+	width: 20%;
+	height: 4em;
+	max-width: 6em;
+	text-align: center;
+}
+.tm-event-blocks .logo-odd {
+	float: left;
+}
+.tm-event-blocks .logo-even {
+	float: right;
+}
+.tm-event-blocks .team-logo img {
+	max-width: 100%;
+	max-height: 100%;
+	width: auto;
+	height: auto;
+}
+.tm-fixtures-results {
+	clear: both;
+}
+.widget .tm-event-blocks .tm-event-title {
+	margin: 10px;
+	padding: 0;
+	clear: both;
+}
+/* ================== */
 
 @media screen and (min-width: 881px) {
   .tm-col-alt5 {
+        display:none;
+    }
+}
+
+@media screen and (max-width: 880px) {
+  .tm-col-pri5 {
         display:none;
     }
 }

@@ -16,8 +16,6 @@ if ( ! function_exists( 'tm_competition_save_values' ) ):
 
     tm_competition_update_autofetcher_options($term_id , $autofetcheropts);
   }
-  add_action( 'created_tm_competition', 'tm_competition_save', 10, 2 );
-  add_action( 'edited_tm_competition', 'tm_competition_save', 10, 2 );
 endif;
 
 

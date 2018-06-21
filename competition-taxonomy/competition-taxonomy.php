@@ -4,7 +4,6 @@ require_once('competition-edit-form-fields.php');
 require_once('competition-save-form-fields.php');
 require_once('competition-update-leaguetable.php');
 require_once('competition-functions.php');
-require_once('competition-api.php');
 require_once('competition-ajax.php');
 
 if ( ! function_exists( 'tm_competition_registertaxonomy' ) ):
@@ -23,10 +22,12 @@ if ( ! function_exists( 'tm_competition_registertaxonomy' ) ):
       'choose_from_most_used' => __('Choose from common Competition', 'tm'),
       'not_found' => __('No Competition found.', 'tm'),
       'menu_name' => __('Competitions', 'tm'),
+      'parent_item' => __('Parent', 'tm'),
+      'parent_item_colon' => __('Parent:', 'tm'),
     );
 
     $args = array(
-      'hierarchical' => false,
+      'hierarchical' => true,
       'labels' => $labels,
       'show_ui' => true
     );
