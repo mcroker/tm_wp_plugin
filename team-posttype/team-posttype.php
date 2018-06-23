@@ -3,7 +3,6 @@
 require_once('team-functions.php');
 require_once('team-adminpostlist.php');
 require_once('team-metadatabox.php');
-require_once('team-metadatabox-logo.php');
 require_once('team-metadatabox-coaches.php');
 require_once('team-metadatabox-players.php');
 require_once('team-update-results.php');

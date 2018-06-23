@@ -9,14 +9,8 @@ if ( ! function_exists( 'tm_competition_update_leguetable' ) ):
     if ( tm_autofetch_isvalidplugin($autofetcher) ) {
       $autofetcheropts = tm_competition_get_autofetcher_options ( $term_id );
 
-      // Start with existing saved value
-      $leaguetable = tm_competition_get_leaguetable( $term_id );
-
-      // Update for each in scope season (leaving other values unchanged)
-      foreach ($autofetcheropts['tm_competition_seasons'] as $season) {
-        $autofetcheropts['tm_competition_season'] = $season;
-        $leaguetable[$season] = tm_autofetch_fetch_leaguetable($autofetcher, $autofetcheropts );
-      }
+      // Update
+      $leaguetable = tm_autofetch_fetch_leaguetable($autofetcher, $autofetcheropts );
 
       // Save update as term meta
       tm_competition_update_leaguetable( $term_id , $leaguetable );
@@ -35,11 +29,9 @@ if ( ! function_exists( 'tm_competition_update_all_competitions' ) ):
 
       $teams = Array();
       $leaguetables = tm_competition_get_leaguetable( $competition->term_id );
-      foreach ($leaguetables as $seasonleaguetable) {
-        foreach ($seasonleaguetable as $tablentry) {
-          if ( ! array_key_exists( $tablentry->team, $teams) ) {
-            $teams[] = $tablentry->team;
-          }
+      foreach ($leaguetables as $tablentry) {
+        if ( ! array_key_exists( $tablentry->team, $teams) ) {
+          $teams[] = $tablentry->team;
         }
       }
       tm_competition_update_teams($competition->term_id , $teams);

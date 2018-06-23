@@ -27,7 +27,7 @@ if ( ! function_exists( 'tm_competition_registertaxonomy' ) ):
     );
 
     $args = array(
-      'hierarchical' => true,
+      'hierarchical' => false,
       'labels' => $labels,
       'show_ui' => true
     );

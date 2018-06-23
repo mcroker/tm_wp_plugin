@@ -10,17 +10,15 @@ if ( ! function_exists( 'tm_leaguetable_shortcode' ) ):
     // override default attributes with user attributes
     $parsed_atts = shortcode_atts([
       'competition' => '',
-      'seasons' => '',
       'team' => '',
       'title' => '',
     ], $atts, $tag);
 
     ob_start();
     $competition = $parsed_atts['competition'];
-    $seasons = $parsed_atts['seasons'];
     $team = $parsed_atts['team'];
     $displaytitle = $parsed_atts['title'];
-    tm_leaguetable_widget_content($displaytitle, $competition, $seasons, $team);
+    tm_leaguetable_widget_content($displaytitle, $competition, $team, Array() );
     $o = ob_get_clean();
     // return output
     return $o;

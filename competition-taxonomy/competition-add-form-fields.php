@@ -5,6 +5,12 @@ if ( ! function_exists( 'tm_competition_add_form_fields' ) ):
     $plugin_url = plugin_dir_url(__FILE__);
     wp_enqueue_script( 'competition-add-form-js', $plugin_url . 'competition-add-form-fields.js', array(), 'v4.0.0', true );
     ?>
+
+    <div class="form-field term-group">
+      <label for="tm_competition_sortkey"><?php _e('Sort Key', 'tm'); ?></label>
+      <input type="text" name="tm_competition_sortkey" value="" id="tm_competition_sortkey"/><br>
+    </div>
+
     <div class="form-field term-group">
       <label for="tm_competition_autofetch"><?php _e('Automatic Fetch Plugin', 'tm'); ?></label>
       <select name="tm_competition_autofetch" id="tm_competition_autofetch" onchange="java_script_:selectAutoFetcher(this.options[this.selectedIndex].value)"/>
@@ -21,12 +27,8 @@ if ( ! function_exists( 'tm_competition_add_form_fields' ) ):
       }
       ?>
     </select>
-
-    <div style="display:none" class="tm-autofetch-commonoptions">
-      <label for="tm_competition_seasons"><?php _e('Fetch Seasons', 'tm'); ?></label>
-      <input type="text" name="tm_competition_seasons" value="" id="tm_competition_seasons"/><br>
-    </div>
-
+  </div>
+  <div class="form-field term-group">
     <?php
     // TODO: Hide/Show based on selected autosaver
     foreach(tm_autofetch_get_plugins() as $fetcherkey => $fetcherdesc) {
@@ -37,8 +39,9 @@ if ( ! function_exists( 'tm_competition_add_form_fields' ) ):
       }
     }
     ?>
-  </div><?php
+  </div>
+  <?php
 }
-    add_action( 'tm_competition_add_form_fields', 'tm_competition_add_form_fields', 10, 2 );
+add_action( 'tm_competition_add_form_fields', 'tm_competition_add_form_fields', 10, 2 );
 endif;
 ?>

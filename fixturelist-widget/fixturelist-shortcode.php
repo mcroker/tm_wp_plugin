@@ -25,7 +25,7 @@ if ( ! function_exists( 'tm_fixturelist_shortcode' ) ):
     $season = $parsed_atts['season'];
     $maxrows = $parsed_atts['maxrows'];
     $maxfuture = $parsed_atts['maxfuture'];
-    // TODO : Need to validate and parse arguements
+    // TODO : Need to validate and parse CORRECT arguements
     tm_fixturelist_widget_content();
     $o = ob_get_clean();
     // return output

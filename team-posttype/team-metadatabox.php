@@ -11,7 +11,7 @@ if ( ! function_exists( 'tm_team_create_metadatabox' ) ):
       'default'
     );
   }
-  add_action( 'add_meta_boxes', 'tm_team_create_metadatabox' );
+  // add_action( 'add_meta_boxes', 'tm_team_create_metadatabox' );
 endif;
 
 
@@ -21,7 +21,7 @@ if ( ! function_exists( 'tm_team_enqueue_adminscripts' )):
     wp_enqueue_script( 'team-metabox-js', $plugin_url . 'team-metadatabox.js', array('jquery'), 'v4.0.0', true );
     wp_enqueue_style( 'plugin-css', dirname($plugin_url) . '/style.css', array(), 'v4.0.0');
   }
-  add_action( 'admin_enqueue_scripts', 'tm_team_enqueue_adminscripts' );
+  // add_action( 'admin_enqueue_scripts', 'tm_team_enqueue_adminscripts' );
 endif;
 
 
@@ -30,7 +30,7 @@ if ( ! function_exists( 'tm_team_remove_metadatabox' ) ):
     remove_meta_box( 'tagsdiv-tm_competition', 'tm_team', 'normal' );
     remove_meta_box( 'tagsdiv-tm_section', 'tm_team', 'normal' );
   }
-  add_action( 'admin_menu' , 'tm_team_remove_metadatabox' );
+  // add_action( 'admin_menu' , 'tm_team_remove_metadatabox' );
 endif;
 
 
@@ -46,7 +46,7 @@ if ( ! function_exists( 'tm_team_inner_custom_box' ) ):
     wp_nonce_field( 'tm_team_field_nonce', 'tm_team_nonce' );
 
     $competitions = tm_competition_getall();
-    $saved_competition = tm_team_get_competition();
+    $saved_competition = tm_team_get_competitions();
     ?>
     <label for="tm_team_competition"> Competition </label><br>
     <select class="tm-meta-fullinput" id='tm_team_competition' name='tm_team_competition' onchange='java_script_:tmteamgetLeagueTeams(this.options[this.selectedIndex].value)'>

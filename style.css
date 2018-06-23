@@ -23,20 +23,23 @@ DIV.tm-meta-smallinput select
 .tm-meta-fullinput {
   width: 100%;
 }
-DIV.tm-leaguetabe-season-select {
+DIV.tm-fixture-competition-select,
+DIV.tm-leaguetabe-competition-select {
   width: 100%;
   text-align: right;
 }
 
-DIV.tm-leaguetabe-season-select select {
-  width: 100px;
+DIV.tm-leaguetabe-competition-select select {
+  xx-width: 300px;
 }
+
 
 /* ================== */
 	.team-logo {
-		width: 20%;
+		max-width: 20%;
+    height: auto;
 		white-space: nowrap;
-		overflow: hidden;
+		/* overflow: hidden; */
 		text-overflow: ellipsis;
 	}
 

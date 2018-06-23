@@ -1,18 +1,17 @@
 <?php
 function tm_test() {
 
-$data->upload_max_filesize = ini_get( 'upload_max_filesize' );
-$data->post_max_size = ini_get( 'post_max_size' );
+  $term_id = 81;
+  $autofetcher = tm_competition_get_autofetcher ( $term_id );
 
-$data->u_bytes = wp_convert_hr_to_bytes( ini_get( 'upload_max_filesize' ) );
-$data->p_bytes = wp_convert_hr_to_bytes( ini_get( 'post_max_size' ) );
+  // Only do something if the autofetcher is still registered
+  if ( tm_autofetch_isvalidplugin($autofetcher) ) {
+    $autofetcheropts = tm_competition_get_autofetcher_options ( $term_id );
 
-$data->wp_max_upload_size = wp_max_upload_size();
-
-$data->display = sprintf( __( 'Maximum upload file size: %s.' ), esc_html( size_format( $data->wp_max_upload_size ) ) );
-
-wp_send_json($data);
-
+    // Update
+    $leaguetable = tm_autofetch_fetch_leaguetable($autofetcher, $autofetcheropts );
+  }
+ wp_send_json($leaguetable);
 };
 
 function tm_api_updateall() {

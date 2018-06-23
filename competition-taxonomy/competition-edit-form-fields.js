@@ -37,7 +37,7 @@ function execAutoFetcher() {
   var data = {
     'action': 'tm_competition_ajax_update',
     'competition': tmphpobject.term_id,
-    'tm_competition_seasons': document.getElementById('tm_competition_seasons').value ,
+    'tm_competition_sortkey': document.getElementById('tm_competition_sortkey').value ,
     'tm_competition_autofetch': fetcherselect.options[fetcherselect.selectedIndex].value
   };
   var formFields = jQuery("#fetcher_" + fetcherselect.options[fetcherselect.selectedIndex].value + "_options").serializeArray();
@@ -50,7 +50,7 @@ function execAutoFetcher() {
     updatespan.textContent = 'Fetched ' + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
     var responseObj = JSON.parse(response);
     var leagueelem = document.getElementById('tm_competition_leaguetable');
-    leagueelem.value = JSON.stringify(responseObj.seasons);
+    leagueelem.value = JSON.stringify(responseObj.leaguetable);
     var teamselem = document.getElementById('tm_competition_teams');
     teamselem.value = JSON.stringify(responseObj.teams);
   });

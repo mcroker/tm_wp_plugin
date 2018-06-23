@@ -8,7 +8,7 @@
 */
 
 if ( ! function_exists( 'tm_fixturelist_block_header' ) ):
-  function tm_fixturelist_block_header($team_id, $title) {
+  function tm_fixturelist_block_header($team, $title, $fixtures) {
     ?>
     <div class="tm-table-wrapper">
       <table class="tm-event-blocks tm-data-table tm-paginated-table">
@@ -29,7 +29,11 @@ if ( ! function_exists( 'tm_fixturelist_block_header' ) ):
           <tr class="tm-row tm-post">
             <td>
             <?php
-            $teamlogoid = tm_team_get_logo( $team_id );
+            $options = get_option( 'tm', array() );
+            if ( array_key_exists( 'logo_url', $options ) && ! empty( $options['logo_url'] ) ) {
+              $teamlogo = $options['logo_url'];
+              $teamlogo = esc_url( set_url_scheme( $teamlogo ) );
+            }
             $opposition = tm_opposition_get_byslug( $fixture->opposition );
             $oppositionlogoid = tm_opposition_get_logo( $opposition->term_id );
 
@@ -38,7 +42,7 @@ if ( ! function_exists( 'tm_fixturelist_block_header' ) ):
               $awayteam = $fixture->opposition;
               $homescore = $fixture->scorefor;
               $awayscore = $fixture->scoreagainst;
-              $homelogo = wp_get_attachment_image( $teamlogoid, "team-logo", "", array( "class" => "team-logo logo-even img-responsive" ) );
+              $homelogo = '<img class="team-logo logo-even img-responsive" src="' . $teamlogo . '" />';
               $awaylogo = wp_get_attachment_image( $oppositionlogoid, "team-logo", "", array( "class" => "team-logo logo-odd img-responsive" ) );
             } else {
               $hometeam = $fixture->opposition;
@@ -46,7 +50,7 @@ if ( ! function_exists( 'tm_fixturelist_block_header' ) ):
               $homescore = $fixture->scoreagainst;
               $awayscore = $fixture->scorefor;
               $homelogo = wp_get_attachment_image( $oppositionlogoid, "team-logo", "", array( "class" => "team-logo logo-even img-responsive" ) );
-              $awaylogo = wp_get_attachment_image( $teamlogoid, "team-logo", "", array( "class" => "team-logo logo-odd img-responsive" ) );
+              $awaylogo = '<img class="team-logo logo-even img-responsive" src="' . $teamlogo . '" />';
             }
             ?>
               <span class="team-logo logo-even"><?php echo $homelogo ?></span>
@@ -62,7 +66,7 @@ if ( ! function_exists( 'tm_fixturelist_block_header' ) ):
 
 
       if ( ! function_exists( 'tm_fixturelist_block_footer' ) ):
-        function tm_fixturelist_block_footer($team_id) {
+        function tm_fixturelist_block_footer($team, $title, $fixtures) {
           ?>
         </tbody>
       </table>

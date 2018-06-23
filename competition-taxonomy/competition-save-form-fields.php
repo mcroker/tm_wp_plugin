@@ -8,8 +8,8 @@ if ( ! function_exists( 'tm_competition_save_values' ) ):
       tm_competition_update_autofetcher($term_id, $data['tm_competition_autofetch']);
     }
 
-    if ( isset($data['tm_competition_seasons']) ) {
-      $autofetcheropts['tm_competition_seasons'] = $data['tm_competition_seasons'];
+    if ( isset($data['tm_competition_sortkey']) ) {
+      $autofetcheropts['tm_competition_sortkey'] = $data['tm_competition_sortkey'];
     }
 
     $autofetcheropts = tm_autofetch_competition_saveoptions($data['tm_competition_autofetch'], $data) + $autofetcheropts;

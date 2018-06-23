@@ -18,8 +18,9 @@ if ( ! function_exists( 'tm_team_table_content' ) ):
       echo $section->name;
     }
     if ($column_name == 'tm_competition') {
-      $competition = tm_team_get_competition( $post_id );
-      echo $competition->name;
+      $competitions = tm_team_get_competitions( $post_id );
+      $competitionnames = array_map(create_function('$competition', 'return $competition->name;') , $competitions);
+      echo implode(',', $competitionnames );
     }
     if ($column_name == 'tm_leagueteam') {
       $leagueteam = tm_team_get_leagueteam( $post_id );

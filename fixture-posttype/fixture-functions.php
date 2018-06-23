@@ -249,7 +249,12 @@ if ( ! function_exists( 'tm_fixture_get_competition' ) ):
     if ( $term_id == 0) {
       $term_id = get_the_id();
     }
-    return tm_competition_getfrom_object($term_id);
+    $result = tm_competition_getfrom_object($term_id);
+    if ( sizeof($result) >= 0) {
+      return $result[0];
+    } else {
+      return '';
+    }
   }
 endif;
 

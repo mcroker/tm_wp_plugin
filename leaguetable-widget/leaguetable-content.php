@@ -2,45 +2,59 @@
 /**
 * @package TM
 */
+
+class TM_Leaguetable_Fixtures {
+  public $comp;
+  public $sortkey;
+  public $tableentries;
+}
+
+if ( ! function_exists( 'tm_leaguetable_cmp_competitions_by_sortkey_desc' ) ):
+  function tm_leaguetable_cmp_competitions_by_sortkey_desc($a, $b)
+  {
+    return ($a->sortkey < $b->sortkey);
+  }
+endif;
+
+
 if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
-  function tm_leaguetable_widget_content($displaytitle, $competitionname, $seasons, $team) {
-    if (empty($competition)) {
-      $competition = tm_team_get_competition();
+  function tm_leaguetable_widget_content($displaytitle, $competitionname, $team, $args) {
+
+
+    if (empty($competitionname)) {
+      $competitions = tm_team_get_competitions();
     } else {
-      $competition = tm_competition_get_byname($competitionname);
-    }
-
-    $tableentries = tm_competition_get_leaguetable($competition->term_id);
-
-    if (empty($seasons)) {
-      $seasons = get_option('tm_default_season');
-    }
-    $seasonsarray = Array();
-    foreach (explode(',', $seasons) as $season) {
-      if ( array_key_exists($season, $tableentries) ) {
-        if ( is_array($tableentries[$season]) && sizeof($tableentries[$season]) > 0 ) {
-          $seasonsarray[] = $season;
-        }
-      }
+      $competitions = Array ( tm_competition_get_byname($competitionname) );
     }
 
     if (empty($team)) {
       $team = tm_fixture_get_teamname();
     }
 
-    if (!empty($tableentries) && sizeof($seasonsarray) > 0 ) {
-      $defaultseason = max($seasonsarray);
+    if ( sizeof($competitions) > 0 ) {
+      $defaultcompetition = max(array_map(create_function('$item', 'return $item->sortkey;') , $competitions));
+
+      $internalcomps = Array();
+      foreach ($competitions as $competition) {
+        $comp = new TM_Leaguetable_Fixtures();
+        $comp->comp = $competition;
+        $comp->sortkey = tm_competition_get_sortkey($competition->term_id);
+        $comp->tableentries = tm_competition_get_leaguetable($competition->term_id);
+        $internalcomps[] = $comp;
+      }
+      uasort($internalcomps, 'tm_leaguetable_cmp_competitions_by_sortkey_desc');
+      $defaultcompetition = $internalcomps[0]->sortkey;
 
       $plugin_url = plugin_dir_url(__FILE__);
       wp_enqueue_style( 'plugin-css', dirname($plugin_url) . '/style.css', array(), 'v4.0.0');
 
       ?>
       <script>
-      function selectSeason(season) {
-        var leaguebody = document.getElementsByClassName("tm-season-leaguetable");
+      function tmLeaguetableSelectCompetition(competition) {
+        var leaguebody = document.getElementsByClassName("tm-competition-leaguetable");
         for(var i = 0; i < leaguebody.length; i++)
         {
-          if (leaguebody.item(i).id == "leaguetable_season_" + season) {
+          if (leaguebody.item(i).id == "leaguetable_competition_" + competition) {
             leaguebody.item(i).style.display='table-row-group';
           }
           else {
@@ -49,7 +63,7 @@ if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
         }
       }
       </script>
-      <?php echo $displaytitle ?>
+      <?php echo $displaytitle;  ?>
       <div class="tm-table-wrapper">
         <table class="tm-league-table tm-data-table">
           <thead class="tm-table-caption">
@@ -68,10 +82,15 @@ if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
             <th class="tm-col-pri2">Pts</th>
           </thead>
           <?php $even = false ?>
-          <? foreach($seasonsarray as $season) { ?>
-            <tbody id='leaguetable_season_<?php echo $season ?>' class='tm-season-leaguetable' <?php if ( $season != $defaultseason ) { echo "style='display:none'"; } ?>>
+          <?php
+          foreach($internalcomps as $intcomp) {
+            $competition = $intcomp->comp;
+            $sortkey = $intcomp->sortkey;
+            $tableentries = $intcomp->tableentries;
+            ?>
+            <tbody id='leaguetable_competition_<?php echo esc_attr($sortkey) ?>' class='tm-competition-leaguetable' <?php if ( $sortkey != $defaultcompetition ) { echo "style='display:none'"; } ?>>
               <?php
-              foreach($tableentries[$season] as $tableentry) {
+              foreach($tableentries as $tableentry) {
                 if ( $tableentry->team == $team ) {
                   $entryclass='tm-highlightedleagueentry';
                 } else {
@@ -101,22 +120,23 @@ if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
                 </tr>
               <?php  } ?>
             </tbody>
-          <?php } ?>
+          <?php }  ?>
         </table>
-        <div class="tm-leaguetabe-season-select">
-          <?php if ( sizeof($seasonsarray) > 1) { ?>
-            <select name="tm_leaguetable_seasons" onchange="java_script_:selectSeason(this.options[this.selectedIndex].value)">
-              <? foreach($seasonsarray as $season) {
-                ?><option value='<?php echo $season ?>' <?php selected( $season, $defaultseason ) ?>><?php echo $season ?></option><?php
+        <div class="tm-leaguetable-competition-select">
+          <?php if ( sizeof($competitions) > 1) { ?>
+            <select name="tm_leaguetable_competitions" onchange="java_script_:tmLeaguetableSelectCompetition(this.options[this.selectedIndex].value)">
+              <? foreach($competitions as $competition) {
+                  $sortkey = tm_competition_get_sortkey($competition->term_id);
+                ?><option value='<?php echo $sortkey ?>' <?php selected( $sortkey, $defaultcompetition ) ?>><?php echo $competition->name ?></option><?php
               } ?>
             </select>
           <?php } else { ?>
-            <span><?php echo $seasonsarray[0]; ?></span>
+            <span><?php echo $competitions[0]->name; ?></span>
           <?php } ?>
         </div>
       </div>
-        <?php
-      }
+      <?php
     }
-  endif;
-  ?>
+  }
+endif;
+?>

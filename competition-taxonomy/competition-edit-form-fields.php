@@ -17,6 +17,15 @@ if ( ! function_exists( 'tm_competition_edit_form_fields' ) ):
 
     <tr class="form-field term-group-wrap">
       <th scope="row">
+        <label for="tm_competition_sortkey"><?php _e('Sort Key', 'tm'); ?></label>
+      </th>
+      <td>
+        <input type="text" name="tm_competition_sortkey" value="<?php echo $saved_autofetcheropts['tm_competition_sortkey'] ?>" id="tm_competition_sortkey"/><br>
+      </td>
+    </tr>
+
+    <tr class="form-field term-group-wrap">
+      <th scope="row">
         <label for="tm_competition_autofetch"><?php _e('Automatic Fetch Plugin', 'tm'); ?></label>
       </th>
       <td>
@@ -38,16 +47,6 @@ if ( ! function_exists( 'tm_competition_edit_form_fields' ) ):
       </td>
     </tr>
 
-    <tbody class="tm-autofetch-commonoptions">
-      <tr class="form-field term-group-wrap">
-        <th scope="row">
-          <label for="tm_competition_seasons"><?php _e('Fetch Seasons', 'tm'); ?></label>
-        </th>
-        <td>
-          <input type="text" name="tm_competition_seasons" value="<?php echo implode(',',$saved_autofetcheropts['tm_competition_seasons']) ?>" id="tm_competition_seasons"/><br>
-        </td>
-      </tr>
-    </tbody>
 
     <?php
     foreach(tm_autofetch_get_plugins() as $fetcherkey => $fetcherdesc) {

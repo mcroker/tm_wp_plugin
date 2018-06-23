@@ -65,11 +65,10 @@ if ( ! function_exists( 'tm_competition_update_teams' ) ):
   }
 endif;
 
-if ( ! function_exists( 'tm_competition_get_seasons' ) ):
-  // Returms array
-  function tm_competition_get_seasons($term_id) {
+if ( ! function_exists( 'tm_competition_get_sortkey' ) ):
+  function tm_competition_get_sortkey($term_id) {
     $autofetcheropts = tm_competition_get_autofetcher_options($term_id);
-    return $autofetcheropts['tm_competition_seasons'];
+    return $autofetcheropts['tm_competition_sortkey'];
   }
 endif;
 
@@ -91,21 +90,12 @@ if ( ! function_exists( 'tm_competition_get_autofetcher_options' ) ):
     $autofetcheropts['tm_competition_id'] = $term->term_id;
     $autofetcheropts['tm_competition_slug'] = $term->slug;
     $autofetcheropts['tm_competition_description'] = $term->description;
-    if ( ! array_key_exists( 'tm_competition_seasons' , $autofetcheropts) || trim($autofetcheropts['tm_competition_seasons'] == '' )) {
-      $autofetcheropts['tm_competition_seasons'] = get_option('tm_default_season');
-    }
-    if ( is_string($autofetcheropts['tm_competition_seasons']) ) {
-      $autofetcheropts['tm_competition_seasons'] = explode(',', $autofetcheropts['tm_competition_seasons']);
-    }
     return $autofetcheropts;
   }
 endif;
 
 if ( ! function_exists( 'tm_competition_update_autofetcher_options' ) ):
   function tm_competition_update_autofetcher_options($term_id, $data) {
-    if ( is_string($data['tm_competition_seasons'] && $data['tm_competition_seasons'] != '') ) {
-      $data['tm_competition_seasons'] = explode(',', $data['tm_competition_seasons']);
-    };
     return update_term_meta( $term_id, 'tm_competition_autofetcher_options' , $data );
   }
 endif;
@@ -130,10 +120,10 @@ if ( ! function_exists( 'tm_competition_getfrom_object' ) ):
       $object_id = get_the_id();
     }
     $terms = wp_get_object_terms( $object_id, 'tm_competition');
-    if ( sizeof ($terms ) > 0 ) {
-      return $terms[0];
+    if ( is_array ($terms ) ) {
+      return $terms;
     } else {
-      return '';
+      return Array();
     }
   }
 endif;

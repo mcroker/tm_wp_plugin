@@ -9,8 +9,8 @@ if ( ! function_exists( 'tm_team_getall' ) ):
   }
 endif;
 
-if ( ! function_exists( 'tm_team_get_competition' ) ):
-  function tm_team_get_competition( $team_post_id = 0 ) {
+if ( ! function_exists( 'tm_team_get_competitions' ) ):
+  function tm_team_get_competitions( $team_post_id = 0 ) {
     return tm_competition_getfrom_object($team_post_id);
   }
 endif;
