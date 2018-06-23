@@ -42,19 +42,19 @@ if ( ! function_exists( 'tm_fixturelist_block_header' ) ):
               $awayteam = $fixture->opposition;
               $homescore = $fixture->scorefor;
               $awayscore = $fixture->scoreagainst;
-              $homelogo = '<img class="team-logo logo-even img-responsive" src="' . $teamlogo . '" />';
-              $awaylogo = wp_get_attachment_image( $oppositionlogoid, "team-logo", "", array( "class" => "team-logo logo-odd img-responsive" ) );
+              $homelogo = '<img class="team-logo logo-odd img-responsive" src="' . $teamlogo . '" />';
+              $awaylogo = wp_get_attachment_image( $oppositionlogoid, "team-logo", "", array( "class" => "team-logo logo-even img-responsive" ) );
             } else {
               $hometeam = $fixture->opposition;
               $awayteam = $fixture->teamname;
               $homescore = $fixture->scoreagainst;
               $awayscore = $fixture->scorefor;
-              $homelogo = wp_get_attachment_image( $oppositionlogoid, "team-logo", "", array( "class" => "team-logo logo-even img-responsive" ) );
+              $homelogo = wp_get_attachment_image( $oppositionlogoid, "team-logo", "", array( "class" => "team-logo logo-odd img-responsive" ) );
               $awaylogo = '<img class="team-logo logo-even img-responsive" src="' . $teamlogo . '" />';
             }
             ?>
-              <span class="team-logo logo-even"><?php echo $homelogo ?></span>
-              <span class="team-logo logo-odd"><?php echo $awaylogo ?></span>
+              <span class="team-logo logo-odd"><?php echo $homelogo ?></span>
+              <span class="team-logo logo-even"><?php echo $awaylogo ?></span>
               <time class="tm-event-date"><a href="<?php echo $fixture->url ?>"><?php echo date('F d, Y', $fixture->fixturedate) ?></a></time><br>
               <h5 class="tm-event-results"><?php echo $homescore . __( ' - ' , 'tm' ) . $awayscore ?></h5>
               <h4 class="tm-event-title"><?php echo $hometeam . __( ' Vs. ' , 'tm' ) . $awayteam ?></h4>
