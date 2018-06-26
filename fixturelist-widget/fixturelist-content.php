@@ -6,8 +6,9 @@
 *
 * @package TM
 */
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
-class TM_FixtureList_Fixtures {
+class TMFixtureList_Fixtures {
   public $comp;
   public $sortkey;
   public $tableentries;
@@ -52,25 +53,27 @@ if ( ! function_exists( 'tm_fixturelist_widget_content' ) ):
     if ( empty($team_id) ) {
       switch ( get_post_type() ) {
         case 'tm_team':
-        $fixtures = tm_team_get_fixtures_objs( get_the_id() );
+        $team = new TMTeam();
+        $fixtures = $team->fixtures;
         $team_id = get_the_id();
         break;
 
         case 'tm_fixture':
-        $fixtures = Array ( tm_fixture_getobj( get_the_id() ) );
-        $team_id = tm_fixture_get_team( $fixtures->ID )->ID;
+        $fixture = new TMFixture();
+        $fixtures = Array ( $fixture );
+        $team_id = $fixture->team->ID;
         break;
 
         default:
         $fixtures = Array();
       }
     } else {
-      $fixtures = tm_team_get_fixtures_objs( $team_id );
-    }
+      $team = new TMTeam( $team_id );
+      $fixtures = $team->fixtures;
+}
 
     if (sizeof($fixtures) > 0) {
       echo $title;
-
 
       switch ( $displaystyle ) {
         case "block":
@@ -105,12 +108,13 @@ if ( ! function_exists( 'tm_fixturelist_widget_content' ) ):
         break;
 
         default: {
+          // TODO: This could make more use of new classes....
           $competitions = Array();
           foreach ($fixtures as $fixture) {
             if ( !array_key_exists($fixture->competition->slug, $competitions) ) {
               $compobj = new TM_Leaguetable_Fixtures();
-              $compobj->comp = tm_competition_get_byid($fixture->competition);
-              $compobj->sortkey = tm_competition_get_sortkey($fixture->competition->term_id);
+              $compobj->comp = $fixture->competition;
+              $compobj->sortkey = $fixture->competition->ID;
               $compobj->fixtures = [];
               $competitions[$fixture->competition->slug] = $compobj;
             }

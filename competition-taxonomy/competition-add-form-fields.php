@@ -1,5 +1,8 @@
 <?php
-if ( ! function_exists( 'tm_competition_add_form_fields' ) ):
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
+// Add form fields ==================================================
+if ( is_admin() && ! function_exists( 'tm_competition_add_form_fields' ) ):
   function tm_competition_add_form_fields($taxonomy) {
 
     $plugin_url = plugin_dir_url(__FILE__);
@@ -13,7 +16,7 @@ if ( ! function_exists( 'tm_competition_add_form_fields' ) ):
 
     <div class="form-field term-group">
       <label for="tm_competition_autofetch"><?php _e('Automatic Fetch Plugin', 'tm'); ?></label>
-      <select name="tm_competition_autofetch" id="tm_competition_autofetch" onchange="java_script_:selectAutoFetcher(this.options[this.selectedIndex].value)"/>
+      <select name="tm_competition_autofetch" id="tm_competition_autofetch" onchange="java_script_:tmCompetitionSelectAutoFetcher(this.options[this.selectedIndex].value)"/>
       <?php
       $registered_plugins = tm_autofetch_get_plugins();
 
@@ -30,7 +33,6 @@ if ( ! function_exists( 'tm_competition_add_form_fields' ) ):
   </div>
   <div class="form-field term-group">
     <?php
-    // TODO: Hide/Show based on selected autosaver
     foreach(tm_autofetch_get_plugins() as $fetcherkey => $fetcherdesc) {
       if ( function_exists( $fetcherkey . '_competition_add_form_fields' ) ) {
         ?><div style="display:none" class="tm-autofetch-options" id="fetcher_<?php echo $fetcherkey ?>_options"><?php
@@ -41,7 +43,7 @@ if ( ! function_exists( 'tm_competition_add_form_fields' ) ):
     ?>
   </div>
   <?php
-}
-add_action( 'tm_competition_add_form_fields', 'tm_competition_add_form_fields', 10, 2 );
+  }
+  add_action( 'tm_competition_add_form_fields', 'tm_competition_add_form_fields', 10, 2 );
 endif;
 ?>

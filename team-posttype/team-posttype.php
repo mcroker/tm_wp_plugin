@@ -1,6 +1,5 @@
 <?php
 
-require_once('team-functions.php');
 require_once('team-adminpostlist.php');
 require_once('team-metadatabox.php');
 require_once('team-metadatabox-coaches.php');

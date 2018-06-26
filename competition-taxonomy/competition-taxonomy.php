@@ -1,4 +1,6 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
 require_once('competition-add-form-fields.php');
 require_once('competition-edit-form-fields.php');
 require_once('competition-save-form-fields.php');

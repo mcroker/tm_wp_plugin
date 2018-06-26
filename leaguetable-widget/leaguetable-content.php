@@ -16,19 +16,13 @@ if ( ! function_exists( 'tm_leaguetable_cmp_competitions_by_sortkey_desc' ) ):
   }
 endif;
 
-
 if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
   function tm_leaguetable_widget_content($displaytitle, $competitionname, $team, $args) {
-
-
+    $team = new TMTeam( get_the_id() );
     if (empty($competitionname)) {
-      $competitions = tm_team_get_competitions();
+      $competitions = $team->competitions;
     } else {
-      $competitions = Array ( tm_competition_get_byname($competitionname) );
-    }
-
-    if (empty($team)) {
-      $team = tm_fixture_get_teamname();
+      $competitions = Array ( TMCompetition::getByName($competitionname) );
     }
 
     if ( sizeof($competitions) > 0 ) {
@@ -38,8 +32,8 @@ if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
       foreach ($competitions as $competition) {
         $comp = new TM_Leaguetable_Fixtures();
         $comp->comp = $competition;
-        $comp->sortkey = tm_competition_get_sortkey($competition->term_id);
-        $comp->tableentries = tm_competition_get_leaguetable($competition->term_id);
+        $comp->sortkey = $competition->sortkey;
+        $comp->tableentries = $competition->leaguetable;
         $internalcomps[] = $comp;
       }
       uasort($internalcomps, 'tm_leaguetable_cmp_competitions_by_sortkey_desc');
@@ -126,8 +120,7 @@ if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
           <?php if ( sizeof($competitions) > 1) { ?>
             <select name="tm_leaguetable_competitions" onchange="java_script_:tmLeaguetableSelectCompetition(this.options[this.selectedIndex].value)">
               <? foreach($competitions as $competition) {
-                  $sortkey = tm_competition_get_sortkey($competition->term_id);
-                ?><option value='<?php echo $sortkey ?>' <?php selected( $sortkey, $defaultcompetition ) ?>><?php echo $competition->name ?></option><?php
+                ?><option value='<?php echo $competition->sortkey ?>' <?php selected( $sortkey, $defaultcompetition ) ?>><?php echo $competition->name ?></option><?php
               } ?>
             </select>
           <?php } else { ?>

@@ -22,8 +22,8 @@ if ( ! function_exists('tm_team_players_inner_custom_box')):
     wp_nonce_field( 'tm_team_players_field_nonce', 'tm_team_players_nonce' );
 
     // Get saved value, if none exists, "default" is selected
-    $saved_players = tm_team_get_playerstext( $post->ID );
-    wp_editor( $saved_players, "tm_team_get_playerstext");
+    $team = new TMTeam($post);
+    wp_editor( $team->playerstext, "tm_team_get_playerstext");
   }
 endif;
 
@@ -47,8 +47,9 @@ if ( ! function_exists('tm_team_players_save_postdata')):
     if ( !wp_verify_nonce( $_POST['tm_players_nonce'], 'tm_players_field_nonce' ) )
     return;
 
-    if ( isset($_POST['tm_team_playerstext']) ){
-      tm_team_update_playerstext($_POST['tm_team_playerstext'], $post_id );
+    if ( isset($_POST['tm_team_playerstext']) ) {
+      $team = new TMTeam($post_id);
+      $team->playerstext = $_POST['tm_team_playerstext'];
     }
 
   }

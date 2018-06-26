@@ -1,11 +1,13 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
 require_once('fixturelist-content.php');
 require_once('fixturelist-block-content.php');
 require_once('fixturelist-table-content.php');
 require_once('fixturelist-shortcode.php');
 
-if ( ! class_exists( 'TM_Fixtures') ):
-  class TM_Fixturelist extends WP_Widget {
+if ( ! class_exists( 'TMFixtures') ):
+  class TMFixturelist extends WP_Widget {
 
     function __construct() {
       parent::__construct(
@@ -21,7 +23,7 @@ if ( ! class_exists( 'TM_Fixtures') ):
       );
     }
 
-    // Creating widget front-end
+    // Creating widget front-end ==================================================
     public function widget( $args, $instance ) {
       if ( isset($instance['title'])) {
         $title = apply_filters( 'title', $instance['title'] );
@@ -50,17 +52,12 @@ if ( ! class_exists( 'TM_Fixtures') ):
         $maxfuture = '';
       }
 
-      // before and after widget arguments are defined by themes
       echo $args['before_widget'];
-
-      // This is where you run the code and display the output
-      // TODO : Need to validate and parse arguements
       tm_fixturelist_widget_content($displaystyle, $title, $team, $maxrows, $maxfuture );
-
       echo $args['after_widget'];
     }
 
-    // Widget Backend
+    // Widget Backend ==================================================
     public function form( $instance ) {
       if ( isset( $instance[ 'title' ] ) ) {
         $title = $instance[ 'title' ];
@@ -89,7 +86,7 @@ if ( ! class_exists( 'TM_Fixtures') ):
         $maxfuture = 3;
       }
 
-      // Widget admin form
+      // Widget admin form ==================================================
       ?>
       <p>
         <label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:' ); ?></label>
@@ -112,8 +109,8 @@ if ( ! class_exists( 'TM_Fixtures') ):
         <select class="widefat" id="<?php echo $this->get_field_id( 'tm_team' ); ?>" name="<?php echo $this->get_field_name( 'tm_team' ); ?>" >
           <option value=''>Page default</option>
           <?php
-          foreach (tm_team_getall() as $teamitem) { ?>
-            <option value=<?php echo $teamitem->ID ?> <?php selected( $team , $teamitem->ID  ) ?> > <?php echo $teamitem->post_title ?> </option>
+          foreach (TMTeam::getAll() as $teamitem) { ?>
+            <option value=<?php echo $teamitem->ID ?> <?php selected( $team , $teamitem->ID  ) ?> > <?php echo $teamitem->title ?> </option>
           <?php } ?>
         </select>
       </p>
@@ -125,13 +122,10 @@ if ( ! class_exists( 'TM_Fixtures') ):
         <label for="<?php echo $this->get_field_id( 'tm_maxfuture' ); ?>"><?php _e( 'Max Future:' ); ?></label>
         <input class="widefat" id="<?php echo $this->get_field_id( 'tm_maxfuture' ); ?>" name="<?php echo $this->get_field_name( 'tm_maxfuture' ); ?>" type="text" value="<?php echo esc_attr( $maxfuture ); ?>" />
       </p>
-
-
-
       <?php
     }
 
-    // Updating widget replacing old instances with new
+    // Updating widget replacing old instances with new ==================================================
     public function update( $new_instance, $old_instance ) {
       $instance = array();
       $instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
@@ -144,9 +138,10 @@ if ( ! class_exists( 'TM_Fixtures') ):
   } // Class wpb_widget ends here
 endif;
 
+// Register widget ==================================================
 if ( ! function_exists('tm_fixturelist_register_widget') ):
   function tm_fixturelist_register_widget() {
-    register_widget( 'TM_Fixturelist');
+    register_widget( 'TMFixturelist');
   }
   add_action( 'widgets_init', 'tm_fixturelist_register_widget' );
 endif;

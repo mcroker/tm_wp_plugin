@@ -1,14 +1,13 @@
 <?php
-require_once('fixture-functions.php');
-require_once('fixture-posttype.php');
-require_once('fixture-adminpostlist.php');
-require_once('fixture-metadatabox-meta.php');
-require_once('fixture-metadatabox-matchreport.php');
-require_once('fixture-save-form-fields.php');
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
+is_admin() && require_once('fixture-admin-postlist.php');
+is_admin() && require_once('fixture-admin-metadatabox.php');
+is_admin() && require_once('fixture-admin-savemetadata.php');
 
 // Our custom post type function
-if ( ! function_exists( 'tm_create_posttype_fixture' )):
-  function tm_create_posttype_fixture() {
+if ( ! function_exists( 'tm_fixture_create_posttype' )):
+  function tm_fixture_create_posttype() {
     // Set UI labels for Custom Post Type
     $labels = array(
       'name'                => _x( 'Fixtures', 'Post Type General Name', 'tm' ),
@@ -59,6 +58,6 @@ if ( ! function_exists( 'tm_create_posttype_fixture' )):
 
     register_post_type( 'tm_fixture', $args );
   }
-  add_action( 'init', 'tm_create_posttype_fixture' );
+  add_action( 'init', 'tm_fixture_create_posttype' );
 endif;
 ?>

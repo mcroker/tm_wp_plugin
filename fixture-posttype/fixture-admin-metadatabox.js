@@ -1,3 +1,4 @@
+// tmfixtureuseautofetch ==================================================
 function tmfixtureuseautofetch(usefetcher) {
   var disableoptions = document.getElementsByClassName("tm-meta-disableifautofetched");
   for(var i = 0; i < disableoptions.length; i++)
@@ -6,6 +7,7 @@ function tmfixtureuseautofetch(usefetcher) {
   }
 };
 
+// tmFixturePopulateTeamsDropdown ==================================================
 function tmFixturePopulateTeamsDropdown(teams) {
   var teamsselect = document.getElementById('tm_fixture_leagueteam_select');
   for(var i = teamsselect.options.length - 1 ; i >= 0 ; i--)
@@ -26,6 +28,7 @@ function tmFixturePopulateTeamsDropdown(teams) {
   };
 };
 
+// tmfixturegetLeagueTeams ==================================================
 var tmfixtureleagueTeams = [];
 function tmfixturegetLeagueTeams(competitionid) {
   var oppselect = document.getElementById('tm_fixture_leagueteam_select');
@@ -57,5 +60,4 @@ function tmfixturegetLeagueTeams(competitionid) {
       });
     };
   };
-
 };

@@ -22,8 +22,8 @@ if ( ! function_exists('tm_team_coaches_inner_custom_box')):
     wp_nonce_field( 'tm_coaches_field_nonce', 'tm_team_coaches_nonce' );
 
     // Get saved value, if none exists, "default" is selected
-    $saved_coaches = tm_team_get_coachestext($post->ID);
-    wp_editor( $saved_coaches, "tm_team_coachestext");
+    $team = new TMTeam($post);
+    wp_editor( $team->coachestext, "tm_team_coachestext");
   }
 endif;
 
@@ -48,9 +48,9 @@ if ( ! function_exists('tm_team_coaches_save_postdata')):
     return;
 
     if ( isset($_POST['tm_team_coachestext']) ) {
-      tm_team_update_coachestext($_POST['tm_team_coachestext'], $post_id );
+      $team = new TMTeam($post_id);
+      $team->coachestext = $_POST['tm_team_coachestext'];
     }
-
   }
   add_action( 'save_post', 'tm_team_coaches_save_postdata' );
 endif;

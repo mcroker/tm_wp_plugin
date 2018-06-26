@@ -3,7 +3,8 @@ if ( ! function_exists( 'tm_team_ajax_update' ) ):
   function tm_team_ajax_update() {
     // TODO : Really need to save the form before doing this
     tm_team_update_team_results($_POST['team_id']);
-    $data->fixtures = tm_team_get_fixtures($_POST['team_id']);
+    $team = new TMTeam($_POST['team_id']);
+    $data->fixtures = $team->fixtures;
     // echo json_encode($data,true);
     // wp_die();
   }

@@ -1,25 +1,29 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
-if ( ! function_exists( 'tm_competition_save_values' ) ):
+// Save Values ==================================================
+if ( is_admin() && ! function_exists( 'tm_competition_save_values' ) ):
   function tm_competition_save_values($term_id, $data){
-    $autofetcheropts = tm_competition_get_autofetcher_options($term_id);
+    $competition = new TMCompetition($term_id);
+
+    $autofetcheropts = $competition->autofetcheropts;
 
     if ( isset($data['tm_competition_autofetch']) ){
-      tm_competition_update_autofetcher($term_id, $data['tm_competition_autofetch']);
+      $competition->autofetcher = $data['tm_competition_autofetch'];
     }
 
     if ( isset($data['tm_competition_sortkey']) ) {
       $autofetcheropts['tm_competition_sortkey'] = $data['tm_competition_sortkey'];
     }
 
-    $autofetcheropts = tm_autofetch_competition_saveoptions($data['tm_competition_autofetch'], $data) + $autofetcheropts;
+    $autofetcheropts = tm_autofetch_competition_saveoptions($competition->autofetcher, $data) + $autofetcheropts;
 
-    tm_competition_update_autofetcher_options($term_id , $autofetcheropts);
+    $competition->autofetcheropts = $autofetcheropts;
   }
 endif;
 
-
-if ( ! function_exists( 'tm_competition_save' ) ):
+// Save Post ==================================================
+if ( is_admin() && ! function_exists( 'tm_competition_save' ) ):
   function tm_competition_save( $term_id, $tt_id ){
     return tm_competition_save_values($term_id, $_POST);
   }

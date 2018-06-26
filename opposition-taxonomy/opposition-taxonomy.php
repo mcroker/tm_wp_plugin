@@ -1,5 +1,4 @@
 <?php
-require_once('opposition-functions.php');
 require_once('opposition-logo-field.php');
 require_once('opposition-edit-form-fields.php');
 require_once('opposition-add-form-fields.php');

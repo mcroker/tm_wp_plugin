@@ -1,4 +1,4 @@
-function selectAutoFetcher(fetcher) {
+function tmCompetitionSelectAutoFetcher(fetcher) {
   var optionsdiv = document.getElementsByClassName("tm-autofetch-options");
   for(var i = 0; i < optionsdiv.length; i++)
   {

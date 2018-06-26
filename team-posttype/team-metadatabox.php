@@ -25,13 +25,6 @@ if ( ! function_exists( 'tm_team_enqueue_adminscripts' )):
 endif;
 
 
-if ( ! function_exists( 'tm_team_remove_metadatabox' ) ):
-  function tm_team_remove_metadatabox() {
-    remove_meta_box( 'tagsdiv-tm_competition', 'tm_team', 'normal' );
-    remove_meta_box( 'tagsdiv-tm_section', 'tm_team', 'normal' );
-  }
-  // add_action( 'admin_menu' , 'tm_team_remove_metadatabox' );
-endif;
 
 
 if ( ! function_exists( 'tm_team_inner_custom_box' ) ):
@@ -45,47 +38,20 @@ if ( ! function_exists( 'tm_team_inner_custom_box' ) ):
     // Use nonce for verification
     wp_nonce_field( 'tm_team_field_nonce', 'tm_team_nonce' );
 
-    $competitions = tm_competition_getall();
-    $saved_competition = tm_team_get_competitions();
+    $team = new TMTeam($post);
     ?>
-    <label for="tm_team_competition"> Competition </label><br>
-    <select class="tm-meta-fullinput" id='tm_team_competition' name='tm_team_competition' onchange='java_script_:tmteamgetLeagueTeams(this.options[this.selectedIndex].value)'>
-      <option value=''>None</option>
-      <?php foreach($competitions as $competition) { ?>
-        <option value='<?php echo $competition->term_id ?>' <?php selected( $competition->term_id, $saved_competition->term_id ) ?>> <?php echo $competition->name ?></option>
-      <?php } ?>
-    </select>
-    <br>
 
-    <?php
-    $leagueteams = tm_competition_get_teams( $saved_competition->term_id );
-    $saved_leagueteam = tm_team_get_leagueteam();
-    ?>
+    <?php $leagueteams = tm_competition_get_teams( $saved_competition->term_id ); ?>
     <label for="tm_team_leagueteam"> Team </label><br>
     <select class="tm-meta-fullinput" id='tm_team_leagueteam' name='tm_team_leagueteam'>
       <?php foreach($leagueteams as $leagueteam) { ?>
-        <option value='<?php echo $leagueteam ?>' <?php selected( $leagueteam , $saved_leagueteam ) ?>> <?php echo $leagueteam ?></option>
+        <option value='<?php echo $leagueteam ?>' <?php selected( $leagueteam , $team->leagueteam ) ?>> <?php echo $leagueteam ?></option>
       <?php } ?>
     </select><br>
 
-    <?php
-    $sections = tm_section_getall();
-    $saved_section = tm_team_get_section();
-    ?>
-    <label for="tm_team_section"> Section </label><br>
-    <select class="tm-meta-fullinput" id='tm_team_section' name='tm_team_section'>
-      <option value=''>None</option>
-      <?php foreach($sections as $section) { ?>
-        <option value='<?php echo $section->term_id ?>' <?php selected( $section->term_id, $saved_section->term_id ) ?>> <?php echo $section->name ?></option>
-      <?php } ?>
-    </select><br>
-
-    <?php
-    $saved_useautofetch = tm_team_get_useautofetch();
-    ?>
     <div class="tm-meta-smallinput">
       <label for="tm_team_autofetch"> Automatically fetch fixtures? </label>
-      <input type='checkbox' class='tm-meta-smallinput' id='tm_team_useautofetch' name='tm_team_useautofetch' <?php checked($saved_useautofetch) ?>>
+      <input type='checkbox' class='tm-meta-smallinput' id='tm_team_useautofetch' name='tm_team_useautofetch' <?php checked($team->useautofetch) ?>>
     </div><br>
 
     <input id='tm-team-autofetch' class='button' type='button' onclick='java_script_:execTeamAutoFetcher()' value='Fetch Fixtures'>

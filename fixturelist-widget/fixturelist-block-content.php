@@ -6,6 +6,7 @@
 *
 * @package TM
 */
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 if ( ! function_exists( 'tm_fixturelist_block_header' ) ):
   function tm_fixturelist_block_header($team, $title, $fixtures) {
@@ -22,7 +23,6 @@ if ( ! function_exists( 'tm_fixturelist_block_header' ) ):
         }
       endif;
 
-
       if ( ! function_exists( 'tm_fixturelist_block_row' ) ):
         function tm_fixturelist_block_row($team_id, $fixture) {
           ?>
@@ -34,22 +34,20 @@ if ( ! function_exists( 'tm_fixturelist_block_header' ) ):
               $teamlogo = $options['logo_url'];
               $teamlogo = esc_url( set_url_scheme( $teamlogo ) );
             }
-            $opposition = tm_opposition_get_byslug( $fixture->opposition );
-            $oppositionlogoid = tm_opposition_get_logo( $opposition->term_id );
 
             if ( $fixture->homeaway != 'A' ) {
-              $hometeam = $fixture->teamname;
+              $hometeam = $fixture->team->title;
               $awayteam = $fixture->opposition;
               $homescore = $fixture->scorefor;
               $awayscore = $fixture->scoreagainst;
               $homelogo = '<img class="team-logo logo-odd img-responsive" src="' . $teamlogo . '" />';
-              $awaylogo = wp_get_attachment_image( $oppositionlogoid, "team-logo", "", array( "class" => "team-logo logo-even img-responsive" ) );
+              $awaylogo = wp_get_attachment_image( $fixture->opposition->logo, "team-logo", "", array( "class" => "team-logo logo-even img-responsive" ) );
             } else {
               $hometeam = $fixture->opposition;
-              $awayteam = $fixture->teamname;
+              $awayteam = $fixture->team->title;
               $homescore = $fixture->scoreagainst;
               $awayscore = $fixture->scorefor;
-              $homelogo = wp_get_attachment_image( $oppositionlogoid, "team-logo", "", array( "class" => "team-logo logo-odd img-responsive" ) );
+              $homelogo = wp_get_attachment_image( $fixture->opposition->logo, "team-logo", "", array( "class" => "team-logo logo-odd img-responsive" ) );
               $awaylogo = '<img class="team-logo logo-even img-responsive" src="' . $teamlogo . '" />';
             }
             ?>
@@ -57,7 +55,7 @@ if ( ! function_exists( 'tm_fixturelist_block_header' ) ):
               <span class="team-logo logo-even"><?php echo $awaylogo ?></span>
               <time class="tm-event-date"><a href="<?php echo $fixture->url ?>"><?php echo date('F d, Y', $fixture->fixturedate) ?></a></time><br>
               <h5 class="tm-event-results"><?php echo $homescore . __( ' - ' , 'tm' ) . $awayscore ?></h5>
-              <h4 class="tm-event-title"><?php echo $hometeam . __( ' Vs. ' , 'tm' ) . $awayteam ?></h4>
+              <h4 class="tm-event-title"><?php echo $hometeam->name . __( ' Vs. ' , 'tm' ) . $awayteam->name ?></h4>
             </td>
           </tr>
           <?php

@@ -13,22 +13,22 @@ endif;
 
 if ( ! function_exists( 'tm_team_table_content' ) ):
   function tm_team_table_content( $column_name, $post_id ) {
+    $team = new TMTeam( $post_id );
     if ($column_name == 'tm_section') {
-      $section = tm_team_get_section( $post_id );
-      echo $section->name;
+      $sections = $team->sections;
+      $sectionnames = array_map(create_function('$competition', 'return $competition->name;') , $sections);
+      echo implode(',', $sectionnames );
     }
     if ($column_name == 'tm_competition') {
-      $competitions = tm_team_get_competitions( $post_id );
+      $competitions = $team->competitions;
       $competitionnames = array_map(create_function('$competition', 'return $competition->name;') , $competitions);
       echo implode(',', $competitionnames );
     }
     if ($column_name == 'tm_leagueteam') {
-      $leagueteam = tm_team_get_leagueteam( $post_id );
-      echo $leagueteam;
+      echo $team->leagueteam;
     }
     if ($column_name == 'tm_team_useautofetch') {
-      $useautofetch = tm_team_get_useautofetch( $post_id );
-      if ( $useautofetch == 1 ) {
+      if ( $team->useautofetch == 1 ) {
         echo "Yes";
       }
     }

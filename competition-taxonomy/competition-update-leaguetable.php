@@ -1,4 +1,7 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+// TODO:  This should really move into autofetcher directory
+
 /* == UPDATE LEAGUETABLE ============================================================ */
 if ( ! function_exists( 'tm_competition_update_leguetable' ) ):
   function tm_competition_update_leguetable( $term_id ){

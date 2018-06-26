@@ -14,6 +14,13 @@ function tm_load_plugin_css() {
 }
 add_action( 'wp_enqueue_scripts', 'tm_load_plugin_css' );
 
+require_once('classes/TMCompetition.php');
+require_once('classes/TMFixture.php');
+require_once('classes/TMOpposition.php');
+require_once('classes/TMSeason.php');
+require_once('classes/TMSection.php');
+require_once('classes/TMTeam.php');
+
 // Sidebars
 // require_once('templates/fixture-sidebar.php');
 // require_once('templates/team-sidebar.php');

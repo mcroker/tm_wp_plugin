@@ -6,6 +6,7 @@
 *
 * @package TM
 */
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 // Table Header  ==================================================
 if ( ! function_exists( 'tm_fixturelist_table_header' ) ):
@@ -43,11 +44,7 @@ if ( ! function_exists( 'tm_fixturelist_table_header' ) ):
           ?>
           <tr class="tm-row tm-post">
             <?php
-            $teamlogoid = tm_team_get_logo();
-            $opposition = tm_opposition_get_byslug( $fixture->opposition );
-            $oppositionlogoid = tm_opposition_get_logo( $opposition->term_id );
-            $teamlogo = wp_get_attachment_image( $teamlogoid, "team-logo", "", array( "class" => "team-logo logo-even img-responsive" ) );
-            $oppositionlogo = wp_get_attachment_image( $oppositionlogoid, "team-logo", "", array( "class" => "team-logo logo-odd img-responsive" ) );
+            $opposition = $fixture->opposition;
             ?>
 
             <td> <a href="<?php echo $fixture->url ?>"><?php echo date('F d, Y', $fixture->fixturedate) ?></a> </td>

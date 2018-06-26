@@ -1,6 +1,4 @@
 <?php
-require_once('section-functions.php');
-
 if ( ! function_exists( 'tm_registertaxonomy_competition' ) ):
   function tm_registertaxonomy_section() {
     $labels = array(

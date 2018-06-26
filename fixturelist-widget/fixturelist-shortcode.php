@@ -1,4 +1,6 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+//TODO: Fixturelist shortcode unlikely to still be working - test & correct
 
 require_once('fixturelist-content.php');
 

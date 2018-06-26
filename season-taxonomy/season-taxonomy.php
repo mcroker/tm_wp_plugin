@@ -1,6 +1,4 @@
 <?php
-require_once('season-functions.php');
-
 if ( ! function_exists( 'tm_registertaxonomy_season' ) ):
   function tm_registertaxonomy_season() {
     $labels = array(

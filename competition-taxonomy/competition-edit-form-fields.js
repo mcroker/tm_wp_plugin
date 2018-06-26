@@ -1,4 +1,5 @@
-function selectAutoFetcher(fetcher) {
+// tmCompetitionSelectAutoFetcher ==================================================
+function tmCompetitionSelectAutoFetcher(fetcher) {
   var optionsdiv = document.getElementsByClassName("tm-autofetch-options");
   for(var i = 0; i < optionsdiv.length; i++)
   {
@@ -28,7 +29,8 @@ function selectAutoFetcher(fetcher) {
   }
 }
 
-function execAutoFetcher() {
+// tmCompetitionExecAutoFetcher ==================================================
+function tmCompetitionExecAutoFetcher() {
 
   var updatespan = document.getElementById('tm-update-status');
   updatespan.textContent = 'Updating ...';
@@ -57,7 +59,8 @@ function execAutoFetcher() {
 }
 
 
-function execClearFetcherData() {
+// tmCompetitionExecClearFetchedData ==================================================
+function tmCompetitionExecClearFetchedData() {
   var updatespan = document.getElementById('tm-update-status');
   updatespan.textContent = 'Clearing  ...';
   var data = {
@@ -69,7 +72,7 @@ function execClearFetcherData() {
     updatespan.textContent = 'Cleared ' + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
     var responseObj = JSON.parse(response);
     var leagueelem = document.getElementById('tm_competition_leaguetable');
-    leagueelem.value = JSON.stringify(responseObj.seasons);
+    leagueelem.value = JSON.stringify(responseObj.leaguetable);
     var teamselem = document.getElementById('tm_competition_teams');
     teamselem.value = JSON.stringify(responseObj.teams);
   });

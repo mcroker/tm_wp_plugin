@@ -33,12 +33,12 @@ if ( ! function_exists('tm_team_update_all_results') ):
   /* == UPDATE Results ============================================================ */
   if ( ! function_exists('tm_team_update_team_results') ):
     function tm_team_update_team_results($team_id) {
-      $competitions = tm_team_get_competitions($team_id);
-      foreach($competitions as $competition) {
+      $team = new TMTeam($team_id);
+      foreach($team->competitions as $competition) {
         $autofetcher = tm_competition_get_autofetcher($competition->term_id);
         if ( tm_autofetch_isvalidplugin($autofetcher) ) {
           $autofetcheropts = tm_competition_get_autofetcher_options($competition->term_id);
-          $autofetcheropts['tm_team_leagueteam'] = tm_team_get_leagueteam($team_id);
+          $autofetcheropts['tm_team_leagueteam'] = $team->ID;
           $fixturedata = tm_autofetch_fetch_results($autofetcher, $autofetcheropts);
           // Match each post against opposition, team, and fixture date
           // With each matched fixture updated based on fetched results
@@ -92,30 +92,27 @@ if ( ! function_exists('tm_team_update_all_results') ):
                 case 'A': $newtitle = $result->opposition . ' (Away)'; break;
                 default: $newtitle = $result->opposition;
               }
-              $newfixture = wp_insert_post ( array(
-                'post_title' => $newtitle,
-                'post_status' => 'publish',
-                'post_type' => 'tm_fixture'
-              ) );
-              tm_fixture_update_createdbyautofetch( true, $newfixture );
-              tm_fixture_update_useautofetch(true, $newfixture );
-              $fixtures[] = get_post ($newfixture);
+              $fixtureobj = TMFixture::createPost($newtitle);
+              $fixtureobj->useautofetch = true;
+              $fixtureobj->createdbyautofetch = true;
+              $fixtures[] = $fixtureobj->wp_post;
             }
 
             // fixture posts updating post post-netadata and post-terms
-            foreach ($fixtures as $fixture) {
-              tm_fixture_update_date( $result->fixturedate->getTimestamp(), $fixture->ID );
-              tm_fixture_update_team( $team_id , $fixture->ID );
-              tm_fixture_update_homeaway( $result->homeaway , $fixture->ID );
+            foreach ($fixtures as $fixturepost) {
+              $fixture = new TMFixture($fixturepost);
+              $fixture->fixturedate = $result->fixturedate->getTimestamp();
+              $fixture->team_id = $team_id;
+              $fixture->homeaway = $result->homeaway;
               if ( $result->scoreagainst != '' ) {
-                tm_fixture_update_scoreagainst($result->scoreagainst,  $fixture->ID);
+                $fixture->scoreagainst = $result->scoreagainst;
               }
               if ( $result->scorefor != '' ) {
-                tm_fixture_update_scorefor($result->scorefor,  $fixture->ID);
+                $fixture->scorefor = $result->scorefor;
               }
-              tm_fixture_update_season_withslug($result->season, $fixture->ID);
-              tm_fixture_update_opposition_withslug($result->opposition, $fixture->ID);
-              tm_fixture_update_competition($competition->term_id, $fixture->ID);
+              $fixture->season = $result->season;
+              $fixture->updateOppositionWithSlug($result->opposition, $fixture->ID);
+              $fixture->competition = $competition->term_id;
             }
           }
         }
