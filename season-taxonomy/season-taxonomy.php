@@ -1,6 +1,8 @@
 <?php
-if ( ! function_exists( 'tm_registertaxonomy_season' ) ):
-  function tm_registertaxonomy_season() {
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
+if ( ! function_exists( 'tm_season_registertaxonomy' ) ):
+  function tm_season_registertaxonomy() {
     $labels = array(
       'name' => _x( 'Seasons', 'taxonomy general name', 'tm' ),
       'singular_name' => _x('Seasons', 'taxonomy singular name', 'tm'),
@@ -25,6 +27,6 @@ if ( ! function_exists( 'tm_registertaxonomy_season' ) ):
 
     register_taxonomy('tm_season', array('tm_fixture'), $args);
   }
-  add_action('init', 'tm_registertaxonomy_season');
+  add_action('init', 'tm_season_registertaxonomy');
 endif;
 ?>

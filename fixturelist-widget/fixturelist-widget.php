@@ -6,7 +6,7 @@ require_once('fixturelist-block-content.php');
 require_once('fixturelist-table-content.php');
 require_once('fixturelist-shortcode.php');
 
-if ( ! class_exists( 'TMFixtures') ):
+if ( ! class_exists( 'TMFixturelist') ):
   class TMFixturelist extends WP_Widget {
 
     function __construct() {

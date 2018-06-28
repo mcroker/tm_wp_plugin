@@ -1,21 +1,11 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
 function tm_test() {
-
-  $term_id = 81;
-  $autofetcher = tm_competition_get_autofetcher ( $term_id );
-
-  // Only do something if the autofetcher is still registered
-  if ( tm_autofetch_isvalidplugin($autofetcher) ) {
-    $autofetcheropts = tm_competition_get_autofetcher_options ( $term_id );
-
-    // Update
-    $leaguetable = tm_autofetch_fetch_leaguetable($autofetcher, $autofetcheropts );
-  }
- wp_send_json($leaguetable);
 };
 
 function tm_api_updateall() {
-  tm_competition_update_all_competitions();
+  tm_autofetch_update_all_competitions();
   tm_team_update_all_results();
   wp_send_json(null);
 };
@@ -26,7 +16,7 @@ function tm_team_api_updateall() {
 };
 
 function tm_competition_api_updateall() {
-  tm_competition_update_all_competitions();
+  tm_autofetch_update_all_competitions();
   wp_send_json(null);
 };
 

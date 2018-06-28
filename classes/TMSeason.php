@@ -1,4 +1,6 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
 require_once('TMBasePost.php');
 
 if ( ! class_exists('TMSeason')):

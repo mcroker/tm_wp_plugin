@@ -1,4 +1,6 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
 if ( ! function_exists( 'tm_opposition_add_form_fields' ) ):
   function tm_opposition_add_form_fields($taxonomy) {
 

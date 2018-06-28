@@ -1,7 +1,8 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
 if ( ! function_exists( 'tm_opposition_edit_form_fields' ) ):
   function tm_opposition_edit_form_fields($term) {
-
     $opposition = new TMOpposition($term);
     ?>
 
@@ -10,7 +11,7 @@ if ( ! function_exists( 'tm_opposition_edit_form_fields' ) ):
         <label for="tm_opposition_url"><?php _e('URL', 'tm'); ?></label>
       </th>
       <td>
-        <input type="text" name="tm_opposition_url" value="<?php echo $opposition->url ?>" id="tm_opposition_url"/><br>
+        <input type="text" name="tm_opposition_url" value="<?php echo esc_attr($opposition->url) ?>" id="tm_opposition_url"/><br>
       </td>
     </tr>
 
@@ -23,7 +24,6 @@ if ( ! function_exists( 'tm_opposition_edit_form_fields' ) ):
       </td>
     </tr>
 
-    ();
     <?php
   }
   add_action( 'tm_opposition_edit_form_fields', 'tm_opposition_edit_form_fields', 10, 2 );

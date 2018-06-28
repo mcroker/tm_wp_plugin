@@ -1,4 +1,5 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 if ( ! function_exists( 'tm_plugin_templates' ) ):
   function tm_plugin_templates( $template ) {

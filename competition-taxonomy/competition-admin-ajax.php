@@ -6,9 +6,9 @@ if ( is_admin() && ! function_exists( 'tm_competition_ajax_update' ) ):
   function tm_competition_ajax_update() {
     tm_competition_save_values($_POST['competition'], $_POST);
     $competition = new TMCompetition($_POST['competition']);
-    tm_competition_update_all_competitions( Array ( $competition ) );
-    $data->leaguetable = tm_competition_get_leaguetable( $competition->term_id );
-    $data->teams = tm_competition_get_teams( $competition->term_id );
+    tm_autofetch_update_all_competitions( Array ( $competition ) );
+    $data->leaguetable = $competition->leaguetable;
+    $data->teams = $competition->teamdata;
     echo json_encode($data,true);
     wp_die();
   }
@@ -19,10 +19,10 @@ endif;
 if ( is_admin() && ! function_exists( 'tm_competition_ajax_clearleaguedata' ) ):
   function tm_competition_ajax_clearleaguedata() {
     $competition = new TMCompetition($_POST['competition']);
-    tm_competition_update_leaguetable( $competition->term_id , '' );
-    tm_competition_update_teams( $competition->term_id , '' );
-    $data->leaguetable = tm_competition_get_leaguetable( $competition->term_id );
-    $data->teams = tm_competition_get_teams( $competition->term_id );
+    $competition->leaguetable = '';
+    $competition->teamdata = '';
+    $data->leaguetable = $competition->leaguetable;
+    $data->teams = $competition->teamdata;
     echo json_encode($data,true);
     wp_die();
   }
@@ -35,7 +35,7 @@ if ( is_admin() && ! function_exists( 'tm_competition_ajax_getteams' ) ):
     // TODO Remove current team from the list
     $data = new stdClass();
     $competition = new TMCompetition($_POST['competition']);
-    $data->teams = tm_competition_get_teams( $competition->term_id );
+    $data->teams = $competition->teamdata;
     echo json_encode($data,true);
     wp_die();
   }

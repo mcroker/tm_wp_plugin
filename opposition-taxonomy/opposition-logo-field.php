@@ -1,8 +1,12 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
 function tm_opposition_logo_field ( $term ) {
 	global $content_width, $_wp_additional_image_sizes;
+	$opposition = new TMOpposition($term);
+
 	if ( ! is_null($term) ) {
-	  $image_id = tm_opposition_get_logo( $term->term_id );
+	  $image_id = $opposition->logo;
 	} else {
 		$image_id = null;
 	}

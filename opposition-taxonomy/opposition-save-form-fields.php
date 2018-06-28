@@ -1,4 +1,6 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
 if ( ! function_exists( 'tm_opposition_save' ) ):
   function tm_opposition_save( $term_id, $tt_id ){
 

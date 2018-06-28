@@ -6,6 +6,7 @@ Description: Sports club management developed by Martin Croker
 
 /* Start Adding Functions Below this Line */
 
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 // CSS
 function tm_load_plugin_css() {
@@ -20,10 +21,7 @@ require_once('classes/TMOpposition.php');
 require_once('classes/TMSeason.php');
 require_once('classes/TMSection.php');
 require_once('classes/TMTeam.php');
-
-// Sidebars
-// require_once('templates/fixture-sidebar.php');
-// require_once('templates/team-sidebar.php');
+require_once('classes/TMLeagueTableEntry.php');
 
 // Widgets
 require_once('fixturelist-widget/fixturelist-widget.php');
@@ -46,8 +44,6 @@ require_once('competition-taxonomy/competition-taxonomy.php');
 require_once('tm-plugin-options.php');
 require_once('tm-plugin-autofetch.php');
 require_once('tm-plugin-api.php');
-
-require_once('logo-integration/logo-integration.php');
 
 /* Stop Adding Functions Below this Line */
 ?>

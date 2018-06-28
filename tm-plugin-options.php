@@ -1,5 +1,5 @@
 <?php
-
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 if ( ! function_exists( 'tm_register_settings' ) ):
   function tm_register_settings() {

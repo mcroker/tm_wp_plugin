@@ -1,19 +1,20 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
+require_once('TMBaseGeneric.php');
+
 if ( ! class_exists('TMBaseTax')):
-  class TMBaseTax {
+  class TMBaseTax extends TMBaseGeneric {
     public static $taxonomy;
     protected static $meta_keys = [];
     private $_taxonomy;
-    protected $term_id;
-    protected $term_obj;
     protected $cache = [];
 
     function __construct($term) {
       if ($term instanceof WP_Term) {
-        $this->term_id = $term->term_id;
-        $this->term_obj = $term;
+        parent::__construct($term->term_id, $term);
       } else { // hopefully an id
-        $this->term_id = $term;
+        parent::__construct($term);
       }
       $classname = get_called_class();
       $this->_taxonomy = $classname::$taxonomy;
@@ -56,75 +57,79 @@ if ( ! class_exists('TMBaseTax')):
       return new $classname($resp->term_id);
     }
 
-    public function __get ($key) {
-      return $this->get_cached_value($key);
-    }
+    // Getters and setters ==================================================
 
-    public function __set ($key, $value) {
-      $this->update_cached_value($key, $value);
-    }
 
-    protected function get_cached_value($key) {
+    protected function get_value($key) {
       $classname = get_called_class();
-      // Remove _id if present at end of key
-      if ( substr($key, -3) == '_id') {
-        $stemkey = substr($key, 0, length($key) - 3);
-      } else {
-        $stemkey = $key;
-      }
-
+      $stemkey = TMBaseTax::get_stemkey($key);
       if ( array_key_exists($stemkey, $classname::$meta_keys) ) {
         $conf = $classname::$meta_keys[$stemkey];
         switch ( $conf['type'] ) {
-          case 'meta_attrib':
-          if ( ! array_key_exists( $key, $this->cache ) ) {
-            $this->cache[$stemkey] = get_term_meta( $this->term_id, $conf['meta_key'] , true );
-          }
-          return $this->cache[$stemkey];
-          break;
-
-          case 'related_posts':
-          $conf = $classname::$meta_keys[$stemkey];
-          return $conf['classname']::getRelatedToTax($classname::$taxonomy, $this->term_id);
-          break;
-
-          default:
-          throw(new Error('Type of meta config not recognised'));
+          case 'related_posts':      return $this->get_related_posts($key, $conf['classname']); break;
+          default:                   parent::get_value($key);
         }
       } else {
         switch ( $key ) {
-          case 'ID': // ============================================================
-          return $this->term_id;
-          break;
+          case 'name': return $this->term->name; break;
+          case 'slug': return $this->term->slug; break;
 
-          case 'name': // ============================================================
-          return $this->term->name;
-          break;
-
-          case 'slug': // ============================================================
-          return $this->term->slug;
-          break;
-
-          case 'term': // ============================================================
-          if ( is_null($this->term_obj) ) {
-            $this->term_obj = get_term( $this->term_id , $this->_taxonomy );
+          case 'term':
+          if ( is_null($this->_obj) ) {
+            $this->_obj = get_term( $this->_id , $this->_taxonomy );
           }
-          return $this->term_obj;
+          return $this->_obj;
           break;
 
           default:
-          throw(new Error('Key ' + $key + ' not configured'));
+          parent::get_value($key);
         }
       }
     }
-    protected function update_cached_value($key, $value) {
-      //TODO!!!!!!!! NOT DONE§
-      $classname = get_called_class();
 
-      if ( array_key_exists($key, $classname::$meta_keys) ) {
+    /*
+    protected function update_value($key, $value) {
+      $classname = get_called_class();
+      $stemkey = TMBaseTax::get_stemkey($key);
+      if ( array_key_exists($stemkey, $classname::$meta_keys) ) {
         $conf = $classname::$meta_keys[$stemkey];
+        switch ( $conf['type'] ) {
+          default:                   return parent::update_value($key, $value);;
+        }
+      } else {
+        switch ( $key ) {
+          default:                   return parent::update_value($key, $value);;
+        }
       }
     }
+      */
+
+    // attrib_string ==================================================
+    protected function update_meta_value($meta_key, $value) {
+      update_term_meta( $this->_id, $meta_key , $value );
+    }
+
+    protected function get_meta_value($meta_key) {
+      get_term_meta( $this->_id, $meta_key , true );
+    }
+
+    // related_posts =================================================
+    // protected function update_attrib_string($key, $meta_key, $value) {
+    // }
+
+    protected function get_related_posts($key, $postclass) {
+      $classname = get_called_class();
+      return $postclass::getRelatedToTax($classname::$taxonomy, $this->_id);
+    }
+
+    // Sorters ==================================================
+    public static function sort_by_slug_asc($a, $b) {
+        return ($a->slug > $b->slug);
+    }
+    public static function sort_by_slug_desc($a, $b) {
+        return ($a->slug < $b->slug);
+    }
+
 
   }
 endif;

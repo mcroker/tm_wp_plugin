@@ -1,6 +1,8 @@
 <?php
-if ( ! function_exists( 'tm_registertaxonomy_competition' ) ):
-  function tm_registertaxonomy_section() {
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
+if ( ! function_exists( 'tm_section_registertaxonomy' ) ):
+  function tm_section_registertaxonomy() {
     $labels = array(
       'name' => _x( 'Sections', 'taxonomy general name', 'tm' ),
       'singular_name' => _x('Sections', 'taxonomy singular name', 'tm'),
@@ -25,6 +27,6 @@ if ( ! function_exists( 'tm_registertaxonomy_competition' ) ):
 
     register_taxonomy('tm_section', array('tm_team'), $args);
   }
-  add_action('init', 'tm_registertaxonomy_section');
+  add_action('init', 'tm_section_registertaxonomy');
 endif;
 ?>

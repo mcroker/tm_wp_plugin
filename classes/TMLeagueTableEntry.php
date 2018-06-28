@@ -1,8 +1,8 @@
 <?php
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
-if ( ! class_exists('TM_LeagueTableEntry')):
-  class TM_LeagueTableEntry {
+if ( ! class_exists('TMLeagueTableEntry')):
+  class TMLeagueTableEntry {
     public $position;
     public $team;
     public $played;

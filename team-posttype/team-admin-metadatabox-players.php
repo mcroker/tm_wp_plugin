@@ -1,6 +1,8 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
 /* Adds a box to the main column on the Post and Page edit screens */
-if ( ! function_exists('tm_team_create_metadatabox_players')):
+if ( is_admin() && ! function_exists('tm_team_create_metadatabox_players')):
   function tm_team_create_metadatabox_players() {
     add_meta_box(
       'tm_players',
@@ -29,8 +31,8 @@ endif;
 
 // ==================================================
 /* When the post is saved, saves our custom data */
-if ( ! function_exists('tm_team_players_save_postdata')):
-  function tm_team_players_save_postdata( $post_id )
+if ( ! function_exists('tm_team_save_metadatabox_players')):
+  function tm_team_save_metadatabox_players( $post_id )
   {
     $post_type = get_post_type($post_id);
     if ( "tm_team" != $post_type ) return;
@@ -53,6 +55,6 @@ if ( ! function_exists('tm_team_players_save_postdata')):
     }
 
   }
-  add_action( 'save_post', 'tm_team_players_save_postdata' );
+  add_action( 'save_post', 'tm_team_save_metadatabox_players' );
 endif;
 ?>

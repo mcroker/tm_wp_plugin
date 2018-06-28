@@ -89,7 +89,7 @@ if ( is_admin() && ! function_exists( 'tm_fixture_inner_custom_box' )):
     if ( $fixture->createdbyautofetch ) {
       ?>
       <div class="tm-meta-smallinput">
-        <label for="tm_fixture_useautofetch"> Sync with autofetch? </label>
+        <label for="tm_fixture_useautofetch"><?php echo esc_html__('Sync with autofetch?','tm') ?></label>
         <input type="checkbox" id="tm_fixture_useautofetch" name="tm_fixture_useautofetch" onchange="java_script_:tmfixtureuseautofetch(this.checked);" <?php checked($fixture->useautofetch) ?> />
       </div>
     <?php } else { // not created by autofetch
@@ -99,7 +99,7 @@ if ( is_admin() && ! function_exists( 'tm_fixture_inner_custom_box' )):
     // Team --------------------
     $teams = TMTeam::getAll();
     ?>
-    <label for="tm_fixture_team"> Team </label><br>
+    <label for="tm_fixture_team"><?php echo esc_html__('Team','tm') ?></label><br>
     <select class="tm-meta-fullinput tm-meta-disableifautofetched"
     <?php disabled($fixture->useautofetch, true, true ) ?> name="tm_fixture_team" id="tm_fixture_team" >
       <?php foreach($teams as $team)  { ?>
@@ -111,60 +111,47 @@ if ( is_admin() && ! function_exists( 'tm_fixture_inner_custom_box' )):
 
     <?php // Competition --------------------
     // onchange triggers tmfixturegetLeagueTeams which invokes ajax to retrieve possible team names
-    $competitions = tm_competition_getall();
-    $saved_competition = $fixture->competition;
-    if ( $saved_competition ) {
-      $saved_competition_id = $saved_competition->term_id;
-    } else {
-      $saved_competition_id = false;
-    }
     ?>
-    <label for="tm_fixture_competition"> Competition </label><br>
+    <label for="tm_fixture_competition"><?php echo esc_html__('Competition','tm') ?></label><br>
     <select class="tm-meta-fullinput tm-meta-disableifautofetched" id='tm_fixture_competition'
     name='tm_fixture_competition' <?php disabled($fixture->useautofetch, true, true ) ?>
     onchange='java_script_:tmfixturegetLeagueTeams(this.options[this.selectedIndex].value);'>
     <option value=''> None/Friendly </option>
-    <?php foreach($competitions as $competition) { ?>
-      <option value="<?php echo esc_attr($competition->term_id) ?>" <?php selected( $competition->term_id, $saved_competition_id ) ?> >
+    <?php foreach(TMCompetition::getAll() as $competition) { ?>
+      <option value="<?php echo esc_attr($competition->ID) ?>" <?php selected( $competition->ID, $fixture->competition_id ) ?> >
         <?php echo esc_html($competition->name) ?>
       </option>
     <?php } ?>
   </select>
   <br>
 
-  <?php // League teams (retrieve based on competition using ajax)--------------------
-  if ( $saved_competition ) {
-    $leagueteams = tm_competition_get_teams( $saved_competition->term_id );
-  } else {
-    $leagueteams = Array();
-  }
-  ?>
-  <label for="tm_fixture_leagueteam_select"> Opposition </label><br>
+  <?php // League teams (retrieve based on competition using ajax)-------------------- ?>
+  <label for="tm_fixture_leagueteam_select"><?php echo esc_html__('Opposition','tm') ?></label><br>
   <select id='tm_fixture_leagueteam_select' name='tm_fixture_leagueteam_select'
   class='tm-meta-fullinput tm-meta-disableifautofetched' <?php disabled($fixture->useautofetch, true, true ) ?>
-  <?php if ( ! $saved_competition_id ) { ?> style='display:none;' <?php } ?> >
-    <?php foreach($leagueteams as $leagueteam) { ?>
-      <option value='<?php echo esc_attr($leagueteam) ?>' <?php selected( $leagueteam , $fixture->opposition ) ?> >
+  <?php if ( ! $competition->ID ) { ?> style='display:none;' <?php } ?> >
+    <?php foreach($fixture->competition->teamdata as $leagueteam) { ?>
+      <option value='<?php echo esc_attr($leagueteam) ?>' <?php selected( $leagueteam , $fixture->opposition->name ) ?> >
         <?php echo esc_html($leagueteam) ?>
       </option>
     <?php } ?>
   </select>
   <?php // If no competition selected, present freeform textbox rather than select ?>
-  <input id='tm_fixture_leagueteam_text' name='tm_fixture_leagueteam_text' type='text' class='tm-meta-fullinput' <?php disabled($fixture->useautofetch, true, true ) ?> value='<?php echo esc_attr($saved_opposition) ?>' <?php if ( $saved_competition_id ) { ?> style='display:none;' <?php } ?> />
+  <input id='tm_fixture_leagueteam_text' name='tm_fixture_leagueteam_text' type='text' class='tm-meta-fullinput' <?php disabled($fixture->useautofetch, true, true ) ?> value='<?php echo esc_attr($saved_opposition) ?>' <?php if ( $competition->ID ) { ?> style='display:none;' <?php } ?> />
 
   <?php // Fixture date -------------------- ?>
   <div class="tm-meta-smallinput">
-    <label for="tm_fixture_date">Fixture Date</label>
+    <label for="tm_fixture_date"><?php echo esc_html__('Fixture Date','tm') ?></label>
     <input class="tm-meta-disableifautofetched" type="date" name="tm_fixture_date" <?php disabled($fixture->useautofetch, true, true ) ?> id="tm_fixture_date" value="<?php echo date('Y-m-d',$fixture->fixturedate) ?>"  />
   </div>
 
   <?php // Season -------------------- ?>
   <div class="tm-meta-smallinput">
-    <label for="tm_fixture_season"> Season </label>
+    <label for="tm_fixture_season"><?php echo esc_html__('Season','tm') ?></label>
     <select id='tm_fixture_season' class='tm-meta-disableifautofetched' name='tm_fixture_season'
     <?php disabled($fixture->useautofetch, true, true ) ?> >
       <?php foreach(TMSeason::getAll() as $season) { ?>
-        <option value='<?php echo esc_attr($season->ID) ?>' <?php selected( $season->ID , $fixture->season->term_id ) ?> >
+        <option value='<?php echo esc_attr($season->ID) ?>' <?php selected( $season->ID , $fixture->season->ID ) ?> >
           <?php echo esc_html($season->name) ?>
         </option>
       <?php } ?>
@@ -178,7 +165,7 @@ if ( is_admin() && ! function_exists( 'tm_fixture_inner_custom_box' )):
   );
   ?>
   <div class="tm-meta-smallinput">
-    <label for="tm_fixture_homeaway"> Home/Away </label>
+    <label for="tm_fixture_homeaway"><?php echo esc_html__('Home/Away','tm') ?></label>
     <select class="tm-meta-disableifautofetched" id='tm_fixture_homeaway' name='tm_fixture_homeaway' <?php disabled($fixture->useautofetch, true, true ) ?> >
       <?php foreach($homeaways as $key => $value) { ?>
         <option value='<?php echo esc_attr($key) ?>' <?php selected( $key, $fixture->homeaway , true ) ?> >
@@ -190,14 +177,14 @@ if ( is_admin() && ! function_exists( 'tm_fixture_inner_custom_box' )):
 
   <?php // Score for -------------------- ?>
   <div class="tm-meta-smallinput">
-    <label for="tm_fixture_scorefor">Team Score</label>
+    <label for="tm_fixture_scorefor"><?php echo esc_html__('Score For','tm') ?></label>
     <input class="tm-meta-disableifautofetched" type="number" name="tm_fixture_scorefor" id="tm_fixture_scorefor"
     value="<?php echo esc_attr($fixture->scorefor) ?>" <?php disabled($fixture->useautofetch, true, true ) ?> />
   </div>
 
   <?php // Score against -------------------- ?>
   <div class="tm-meta-smallinput">
-    <label for="tm_fixture_scoreagainst">Opposition Score</label>
+    <label for="tm_fixture_scoreagainst"><?php echo esc_html__('Opposition Score','tm') ?></label>
     <input class="tm-meta-disableifautofetched" type="number" name="tm_fixture_scoreagainst" id="tm_fixture_scoreagainst"
     value="<?php echo esc_attr($fixture->scoreagainst) ?>"  <?php disabled($fixture->useautofetch, true, true ) ?> />
   </div>

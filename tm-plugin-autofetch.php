@@ -1,4 +1,6 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
 // Autofetchers ===================================================
 $tm_autofetch_registeredplugins = Array (
   'none' => 'No Automatic Data Update'
@@ -35,6 +37,18 @@ if ( ! function_exists( 'tm_autofetch_fetch_results' ) ):
       return true;
     } else {
       return false;
+    }
+  }
+endif;
+
+/* == UPDATE ALL Competitions ============================================================ */
+if ( ! function_exists( 'tm_autofetch_update_all_competitions' ) ):
+  function tm_autofetch_update_all_competitions( $competitions  = Array() ) {
+    if ( sizeof($competitions) == 0 ) {
+      $competitions = TMCompetition::getAll();
+    }
+    foreach($competitions as $competition) {
+      $competition->autoFetch();
     }
   }
 endif;

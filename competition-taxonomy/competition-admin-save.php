@@ -13,7 +13,7 @@ if ( is_admin() && ! function_exists( 'tm_competition_save_values' ) ):
     }
 
     if ( isset($data['tm_competition_sortkey']) ) {
-      $autofetcheropts['tm_competition_sortkey'] = $data['tm_competition_sortkey'];
+      $competition->sortkey = $data['tm_competition_sortkey'];
     }
 
     $autofetcheropts = tm_autofetch_competition_saveoptions($competition->autofetcher, $data) + $autofetcheropts;

@@ -1,5 +1,7 @@
 <?php
-if ( ! function_exists( 'tm_team_save_postdata' ) ):
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
+if ( is_admin() && ! function_exists( 'tm_team_save_postdata' ) ):
   function tm_team_save_postdata( $post_id )
   {
 

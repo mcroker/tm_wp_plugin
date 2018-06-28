@@ -29,10 +29,10 @@ if ( is_admin() && ! function_exists( 'tm_fixture_save_postdata' ) ):
       $fixture->team_id = $_POST['tm_fixture_team'];
     }
     if ( isset($_POST['tm_fixture_competition']) ){
-      $fixture.setCompetition($_POST['tm_fixture_competition']);
+      $fixture->attachTerm(new TMCompetition($_POST['tm_fixture_competition']));
     }
     if ( isset($_POST['tm_fixture_season']) ){
-      $fixture->season = $_POST['tm_fixture_season'];
+      $fixture->attachTerm(new TMSeason($_POST['tm_fixture_season']));
     }
     if ( isset($_POST['tm_fixture_homeaway']) ){
       $fixture->homeaway = $_POST['tm_fixture_homeaway'];

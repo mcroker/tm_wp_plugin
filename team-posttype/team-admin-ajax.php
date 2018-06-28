@@ -1,5 +1,7 @@
 <?
-if ( ! function_exists( 'tm_team_ajax_update' ) ):
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
+if ( is_admin() && ! function_exists( 'tm_team_ajax_update' ) ):
   function tm_team_ajax_update() {
     // TODO : Really need to save the form before doing this
     tm_team_update_team_results($_POST['team_id']);

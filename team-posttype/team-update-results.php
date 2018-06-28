@@ -1,4 +1,6 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
 /* == UPDATE ALL Results ============================================================ */
 if ( ! function_exists('tm_team_update_all_results') ):
   function tm_team_update_all_results() {
@@ -80,8 +82,6 @@ if ( ! function_exists('tm_team_update_all_results') ):
                 )
               ),
             ));
-
-            //   echo $team_id, $result->opposition , $result->fixturedate->format('Y-m-d') . sizeof( $fixtures ); wp_die();
 
             // Create fixture if no existing fixture matches opposition, team and date
             // Add this to fixtures (as if found origionally) - to include in update Loop.

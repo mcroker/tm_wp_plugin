@@ -1,16 +1,18 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
-require_once('team-adminpostlist.php');
-require_once('team-metadatabox.php');
-require_once('team-metadatabox-coaches.php');
-require_once('team-metadatabox-players.php');
+
+is_admin() && require_once('team-admin-postlist.php');
+is_admin() && require_once('team-admin-metadatabox-autofetch.php');
+is_admin() && require_once('team-admin-metadatabox-coaches.php');
+is_admin() && require_once('team-admin-metadatabox-players.php');
+is_admin() && require_once('team-admin-ajax.php');
+is_admin() && require_once('team-admin-savemetadata.php');
 require_once('team-update-results.php');
-require_once('team-ajax.php');
-require_once('team-save-form-fields.php');
 
 // Our custom post type function
-if ( ! function_exists( 'tm_create_posttype_team' ) ):
-  function tm_create_posttype_team() {
+if ( ! function_exists( 'tm_team_create_posttype' ) ):
+  function tm_team_create_posttype() {
 
     // Set UI labels for Custom Post Type
     $labels = array(
@@ -56,7 +58,7 @@ if ( ! function_exists( 'tm_create_posttype_team' ) ):
     // Registering your Custom Post Type
     register_post_type( 'tm_team', $args );
   }
-  add_action( 'init', 'tm_create_posttype_team' );
+  add_action( 'init', 'tm_team_create_posttype' );
 endif;
 
 ?>

@@ -1,4 +1,5 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 require_once('leaguetable-content.php');
 require_once('leaguetable-shortcode.php');
 

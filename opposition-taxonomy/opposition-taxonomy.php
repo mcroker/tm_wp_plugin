@@ -1,4 +1,6 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
 require_once('opposition-logo-field.php');
 require_once('opposition-edit-form-fields.php');
 require_once('opposition-add-form-fields.php');

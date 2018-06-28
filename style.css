@@ -23,13 +23,14 @@ DIV.tm-meta-smallinput select
 .tm-meta-fullinput {
   width: 100%;
 }
-DIV.tm-fixture-competition-select,
-DIV.tm-leaguetabe-competition-select {
+DIV.tm-fixture-season-select,
+DIV.tm-leaguetable-competition-select {
   width: 100%;
   text-align: right;
 }
 
-DIV.tm-leaguetabe-competition-select select {
+DIV.tm-fixture-season-select select,
+DIV.tm-leaguetable-competition-select select {
   xx-width: 300px;
 }
 

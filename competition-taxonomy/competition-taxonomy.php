@@ -1,12 +1,9 @@
 <?php
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
-require_once('competition-add-form-fields.php');
-require_once('competition-edit-form-fields.php');
-require_once('competition-save-form-fields.php');
-require_once('competition-update-leaguetable.php');
-require_once('competition-functions.php');
-require_once('competition-ajax.php');
+is_admin() && require_once('competition-admin-form.php');
+is_admin() && require_once('competition-admin-save.php');
+is_admin() && require_once('competition-admin-ajax.php');
 
 if ( ! function_exists( 'tm_competition_registertaxonomy' ) ):
   function tm_competition_registertaxonomy() {
@@ -38,6 +35,4 @@ if ( ! function_exists( 'tm_competition_registertaxonomy' ) ):
   }
   add_action('init', 'tm_competition_registertaxonomy');
 endif;
-
-
 ?>

@@ -1,4 +1,6 @@
 <?
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
+
 require_once('TMFixture.php');
 require_once('TMTeam.php');
 require_once('TMSeason.php');
@@ -66,6 +68,14 @@ if ( ! class_exists('TMFixture')):
       parent::__construct($fixtureid);
     }
 
+    public static function sort_by_date_asc($a, $b) {
+      return ($a->fixturedate > $b->fixturedate);
+    }
+
+    public static function sort_by_date_desc($a, $b) {
+      return ($a->fixturedate < $b->fixturedate);
+    }
+
     public function __get ($key) {
       switch ($key) {
         case 'url': // ==================================================
@@ -73,7 +83,7 @@ if ( ! class_exists('TMFixture')):
         break;
 
         default:
-        return $this->get_cached_value( $key );
+        return $this->get_value( $key );
       }
     }
 

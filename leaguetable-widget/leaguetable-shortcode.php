@@ -1,4 +1,5 @@
 <?php
+defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 require_once('leaguetable-content.php');
 
 if ( ! function_exists( 'tm_leaguetable_shortcode' ) ):
