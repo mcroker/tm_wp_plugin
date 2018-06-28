@@ -39,7 +39,7 @@ if ( ! function_exists( 'tm_team_create_posttype' ) ):
       'description'         => __( 'Team news and reviews', 'tm' ),
       'labels'              => $labels,
       'supports'            => array( 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'revisions' ),
-      'hierarchical'        => true,
+      'hierarchical'        => false,
       'public'              => true,
       'show_ui'             => true,
       'show_in_menu'        => true,
@@ -51,7 +51,7 @@ if ( ! function_exists( 'tm_team_create_posttype' ) ):
       'exclude_from_search' => false,
       'publicly_queryable'  => true,
       'rewrite'             => array( 'slug' => $slug ),
-      'capability_type'     => 'page',
+      'capability_type'     => 'post',
     );
 
     // Registering your Custom Post Type

@@ -41,7 +41,7 @@ if ( ! function_exists( 'tm_fixture_create_posttype' )):
       * Parent and child items. A non-hierarchical CPT
       * is like Posts.
       */
-      'hierarchical'        => true,
+      'hierarchical'        => false,
       'public'              => true,
       'show_ui'             => true,
       'show_in_menu'        => true,
@@ -53,7 +53,7 @@ if ( ! function_exists( 'tm_fixture_create_posttype' )):
       'exclude_from_search' => false,
       'publicly_queryable'  => true,
       'rewrite'             => array( 'slug' => $slug ),
-      'capability_type'     => 'page',
+      'capability_type'     => 'post',
     );
 
     register_post_type( 'tm_fixture', $args );
