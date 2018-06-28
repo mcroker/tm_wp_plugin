@@ -56,18 +56,20 @@ if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
           <?php
           $even = false;
           uasort($competitions, Array('TMCompetition', 'sort_by_sortkey_asc'));
-          $defaultcompetition = reset($competitions);
+          $defaultcompetition = null;
           $populatedcompetitions = [];
           foreach($competitions as $competition) {
             $tableentries = $competition->leaguetable;
             if ( sizeof($tableentries) > 0 ) {
               $populatedcompetitions[]=$competition;
+              if ( is_null($defaultcompetition) ) {
+                $defaultcompetition = $competition->ID;
+              }
               ?>
-              <tbody id='leaguetable_competition_<?php echo esc_attr($competition->ID) ?>' class='tm-competition-leaguetable' <?php if ( $competition->ID != $defaultcompetition->ID ) { echo "style='display:none'"; } ?>>
+              <tbody id='leaguetable_competition_<?php echo esc_attr($competition->ID) ?>' class='tm-competition-leaguetable' <?php if ( $competition->ID != $defaultcompetition ) { echo "style='display:none'"; } ?>>
                 <?php
                 foreach($tableentries as $tableentry) {
-                  $entry = new TMLeagueTableEntry($tableentry);
-                  if ( $tableentry->team == $team ) {
+                  if ( $tableentry->team->title == $team ) {
                     $entryclass='tm-highlightedleagueentry';
                   } else {
                     $entryclass='tm-leagueentry';
@@ -79,20 +81,20 @@ if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
                   }
                   $even = ! $even;
                   ?>
-                  <tr class="<?php echo $entryclass ?> <?php echo esc_html($evenodd) ?>">
-                    <td class="tm-col-pri1"><?php echo esc_html($entry->position) ?></td>
-                    <td class="tm-col-pri1"><?php echo esc_html($entry->team) ?></td>
-                    <td class="tm-col-pri3"><?php echo esc_html($entry->played) ?></td>
-                    <td class="tm-col-pri3"><?php echo esc_html($entry->wins) ?></td>
-                    <td class="tm-col-pri3"><?php echo esc_html($entry->draws) ?></td>
-                    <td class="tm-col-pri3"><?php echo esc_html($entry->lost) ?></td>
-                    <td class="tm-col-pri5"><?php echo esc_html($entry->pointsfor) ?></td>
-                    <td class="tm-col-pri5"><?php echo esc_html($entry->pointsagainst) ?></td>
-                    <td class="tm-col-pri4"><?php echo esc_html($entry->pointsdiff) ?></td>
-                    <td class="tm-col-pri4"><?php echo esc_html($entry->trybonus) ?></td>
-                    <td class="tm-col-pri4"><?php echo esc_html($entry->losingbonus) ?></td>
-                    <td class="tm-col-alt4"><?php echo esc_html($entry->losingbonus + $entry->trybonus) ?></td>
-                    <td class="tm-col-pri2"><?php echo esc_html($entry->points) ?></td>
+                  <tr class="<?php echo esc_attr($entryclass) ?> <?php echo esc_attr($evenodd) ?>">
+                    <td class="tm-col-pri1"><?php echo esc_html($tableentry->position) ?></td>
+                    <td class="tm-col-pri1"><?php echo esc_html($tableentry->team) ?></td>
+                    <td class="tm-col-pri3"><?php echo esc_html($tableentry->played) ?></td>
+                    <td class="tm-col-pri3"><?php echo esc_html($tableentry->wins) ?></td>
+                    <td class="tm-col-pri3"><?php echo esc_html($tableentry->draws) ?></td>
+                    <td class="tm-col-pri3"><?php echo esc_html($tableentry->lost) ?></td>
+                    <td class="tm-col-pri5"><?php echo esc_html($tableentry->pointsfor) ?></td>
+                    <td class="tm-col-pri5"><?php echo esc_html($tableentry->pointsagainst) ?></td>
+                    <td class="tm-col-pri4"><?php echo esc_html($tableentry->pointsdiff) ?></td>
+                    <td class="tm-col-pri4"><?php echo esc_html($tableentry->trybonus) ?></td>
+                    <td class="tm-col-pri4"><?php echo esc_html($tableentry->losingbonus) ?></td>
+                    <td class="tm-col-alt4"><?php echo esc_html($tableentry->losingbonus + $entry->trybonus) ?></td>
+                    <td class="tm-col-pri2"><?php echo esc_html($tableentry->points) ?></td>
                   </tr>
                 <?php  } ?>
               </tbody>
@@ -100,7 +102,7 @@ if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
           <?php }  ?>
         </table>
         <div class="tm-leaguetable-competition-select">
-          <?php if ( sizeof($competitions) > 1) { ?>
+          <?php if ( sizeof($populatedcompetitions) > 1) { ?>
             <select name="tm_leaguetable_competitions" onchange="java_script_:tmLeaguetableSelectCompetition(this.options[this.selectedIndex].value)">
               <?php
                 uasort($populatedcompetitions, Array('TMCompetition', 'sort_by_sortkey_asc'));
@@ -110,7 +112,7 @@ if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
               <?php } ?>
             </select>
           <?php } else { ?>
-            <span><?php echo esc_html($competitions[0]->name) ?></span>
+            <span><?php echo esc_html($populatedcompetitions[0]->name) ?></span>
           <?php } ?>
         </div>
       </div>

@@ -6,12 +6,12 @@ function tm_test() {
 
 function tm_api_updateall() {
   tm_autofetch_update_all_competitions();
-  tm_team_update_all_results();
+  tm_autofetch_update_all_results();
   wp_send_json(null);
 };
 
 function tm_team_api_updateall() {
-  tm_team_update_all_results();
+  tm_autofetch_update_all_results();
   wp_send_json(null);
 };
 

@@ -143,21 +143,6 @@ if ( is_admin() && ! function_exists('tm_fixture_restrict_manage_posts') ):
     }
     if ('tm_fixture' == $type){
       ?>
-      <select name="tm_fixture_adminfilter_opposition">
-        <option value=""><?php _e('Filter by opposition:', 'tm'); ?></option>
-        <?php
-        $current_v = isset($_GET['tm_fixture_adminfilter_opposition']) ? $_GET['tm_fixture_adminfilter_opposition'] : '';
-        foreach (TMOpposition::getAll() as $value) {
-          printf
-          (
-            '<option value="%s"%s>%s</option>',
-            $value->ID,
-            $value->ID == $current_v? ' selected="selected"':'',
-            $value->name
-          );
-        }
-        ?>
-      </select>
 
       <select name="tm_fixture_adminfilter_team">
         <option value=""><?php _e('Filter by team:', 'tm'); ?></option>
@@ -169,6 +154,22 @@ if ( is_admin() && ! function_exists('tm_fixture_restrict_manage_posts') ):
             $value->ID,
             $value->ID == $current_v ? ' selected="selected"' : '',
             $value->title
+          );
+        }
+        ?>
+      </select>
+
+      <select name="tm_fixture_adminfilter_opposition">
+        <option value=""><?php _e('Filter by opposition:', 'tm'); ?></option>
+        <?php
+        $current_v = isset($_GET['tm_fixture_adminfilter_opposition']) ? $_GET['tm_fixture_adminfilter_opposition'] : '';
+        foreach (TMOpposition::getAll() as $value) {
+          printf
+          (
+            '<option value="%s"%s>%s</option>',
+            $value->ID,
+            $value->ID == $current_v? ' selected="selected"':'',
+            $value->name
           );
         }
         ?>

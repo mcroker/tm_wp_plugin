@@ -67,7 +67,7 @@ if ( ! class_exists('TMBaseTax')):
         $conf = $classname::$meta_keys[$stemkey];
         switch ( $conf['type'] ) {
           case 'related_posts':      return $this->get_related_posts($key, $conf['classname']); break;
-          default:                   parent::get_value($key);
+          default:                   return parent::get_value($key);
         }
       } else {
         switch ( $key ) {
@@ -82,7 +82,7 @@ if ( ! class_exists('TMBaseTax')):
           break;
 
           default:
-          parent::get_value($key);
+          return parent::get_value($key);
         }
       }
     }
@@ -110,7 +110,7 @@ if ( ! class_exists('TMBaseTax')):
     }
 
     protected function get_meta_value($meta_key) {
-      get_term_meta( $this->_id, $meta_key , true );
+      return get_term_meta( $this->_id, $meta_key , true );
     }
 
     // related_posts =================================================

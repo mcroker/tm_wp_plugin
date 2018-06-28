@@ -52,7 +52,9 @@ if ( ! function_exists( 'tm_fixturelist_block_row' ) ):
               <span class="team-logo logo-odd"><?php echo $homelogo ?></span>
               <span class="team-logo logo-even"><?php echo $awaylogo ?></span>
               <time class="tm-event-date"><a href="<?php echo esc_attr($fixture->url) ?>"><?php echo date('F d, Y', $fixture->fixturedate) ?></a></time><br>
-              <h5 class="tm-event-results"><?php echo esc_html($homescore) . __( ' - ' , 'tm' ) . esc_html($awayscore) ?></h5>
+              <?php if ( ! empty($homescore) || ! empty($awayscore) ) { ?>
+                <h5 class="tm-event-results"><?php echo esc_html($homescore) . __( ' - ' , 'tm' ) . esc_html($awayscore) ?></h5>
+              <?php } ?>
               <h4 class="tm-event-title"><?php echo esc_html($hometeam) . __( ' Vs. ' , 'tm' ) . esc_html($awayteam) ?></h4>
             </td>
           </tr>

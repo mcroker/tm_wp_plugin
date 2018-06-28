@@ -17,6 +17,7 @@ add_action( 'wp_enqueue_scripts', 'tm_load_plugin_css' );
 
 require_once('classes/TMCompetition.php');
 require_once('classes/TMFixture.php');
+require_once('classes/TMAutofetchFixture.php');
 require_once('classes/TMOpposition.php');
 require_once('classes/TMSeason.php');
 require_once('classes/TMSection.php');

@@ -46,7 +46,7 @@ if ( ! class_exists('TMBasePost')):
     public static function createPost($title) {
       $classname = get_called_class();
       $post_id  = wp_insert_post ( array(
-        'post_title'  => 'New Object',
+        'post_title'  => $title,
         'post_status' => 'publish',
         'post_type'   => $classname::$post_type
       ) );

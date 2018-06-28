@@ -91,8 +91,8 @@ if ( ! class_exists('TMBaseGeneric')):
 
     protected function get_attrib_seralizedobject($key, $meta_key) {
       if ( ! array_key_exists( $key, $this->cache ) ) {
-        $serialvalue = $this->get_meta_value($key, $meta_key);
-        $value = unserialize($value);
+        $serialvalue = $this->get_meta_value($meta_key);
+        $value = unserialize($serialvalue);
         $this->cache[$key] = $value;
       }
       return $this->cache[$key];

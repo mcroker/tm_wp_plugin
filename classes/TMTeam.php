@@ -79,7 +79,7 @@ if ( ! class_exists('TMTeam')):
       uasort( $displayfixtures, array('TMFixture','sort_by_date_desc'));
       foreach($displayfixtures as $fixture) {
         if ( function_exists($callbackstem . '_row') ) {
-          call_user_func($callbackstem . '_row', $this->ID, $fixture, $userargs);
+          call_user_func($callbackstem . '_row', $fixture, $userargs);
         }
       }
 
@@ -116,7 +116,7 @@ if ( ! class_exists('TMTeam')):
           call_user_func($callbackstem . '_seasonheader', $this->ID, $season, $isdefaultseason, $userargs);
         }
 
-        uasort($seasonfixtures[$seasonid], array('TMFixture','sort_by_date_desc'));
+        uasort($seasonfixtures[$seasonid], array('TMFixture','sort_by_date_asc'));
         foreach($seasonfixtures[$seasonid] as $fixturekey => $fixture) {
           if ( function_exists($callbackstem . '_row') ) {
             call_user_func($callbackstem . '_row', $this->ID, $fixture, $userargs);

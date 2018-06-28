@@ -8,7 +8,6 @@ is_admin() && require_once('team-admin-metadatabox-coaches.php');
 is_admin() && require_once('team-admin-metadatabox-players.php');
 is_admin() && require_once('team-admin-ajax.php');
 is_admin() && require_once('team-admin-savemetadata.php');
-require_once('team-update-results.php');
 
 // Our custom post type function
 if ( ! function_exists( 'tm_team_create_posttype' ) ):

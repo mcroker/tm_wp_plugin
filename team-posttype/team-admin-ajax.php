@@ -4,7 +4,7 @@ defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 if ( is_admin() && ! function_exists( 'tm_team_ajax_update' ) ):
   function tm_team_ajax_update() {
     // TODO : Really need to save the form before doing this
-    tm_team_update_team_results($_POST['team_id']);
+    tm_autofetch_update_team_results($_POST['team_id']);
     $team = new TMTeam($_POST['team_id']);
     $data->fixtures = $team->fixtures;
     // echo json_encode($data,true);
