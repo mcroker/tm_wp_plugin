@@ -30,8 +30,8 @@ if ( is_admin() && ! function_exists( 'tm_team_table_content' ) ):
       echo esc_html($team->leagueteam);
     }
     if ($column_name == 'tm_team_useautofetch') {
-      if ( $team->useautofetch == 1 ) {
-        echo _("Yes", 'tm');
+      if ( $team->useautofetch ) {
+        echo esc_html__("Yes", 'tm');
       }
     }
   }
