@@ -144,6 +144,7 @@ if ( ! function_exists('tm_autofetch_update_team_results') ):
             $fixture->fixturedate = $result->fixturedate->getTimestamp();
             $fixture->team_id = $team_id;
             $fixture->homeaway = $result->homeaway;
+            $fixture->author = $fixture->team->author;
             if ( $result->scoreagainst != '' ) {
               $fixture->scoreagainst = $result->scoreagainst;
             }
