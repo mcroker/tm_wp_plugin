@@ -25,7 +25,7 @@ if ( ! function_exists('tm_team_players_inner_custom_box')):
 
     // Get saved value, if none exists, "default" is selected
     $team = new TMTeam($post);
-    wp_editor( $team->playerstext, "tm_team_get_playerstext");
+    wp_editor( $team->playerstext, "tm_team_playerstext");
   }
 endif;
 
@@ -46,7 +46,7 @@ if ( ! function_exists('tm_team_save_metadatabox_players')):
     // because save_post can be triggered at other times
     if (! isset( $_POST['tm_team_players_nonce']) )
     return;
-    if ( !wp_verify_nonce( $_POST['tm_players_nonce'], 'tm_players_field_nonce' ) )
+    if ( !wp_verify_nonce( $_POST['tm_team_players_nonce'], 'tm_team_players_field_nonce' ) )
     return;
 
     if ( isset($_POST['tm_team_playerstext']) ) {

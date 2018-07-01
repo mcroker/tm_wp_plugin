@@ -98,8 +98,9 @@ if ( ! class_exists('TMBasePost')):
         }
       } else {
         switch ( $key ) {
-          case 'title': return $this->post->post_title; break;
+          case 'title':  return $this->post->post_title; break;
           case 'author': return $this->post->post_author; break;
+          case 'slug':   return $this->post->post_name; break;
 
           case 'post':
           if ( is_null($this->_obj) ) {
@@ -132,6 +133,11 @@ if ( ! class_exists('TMBasePost')):
 
           case 'author':
           $this->post->post_author = $value;
+          wp_update_post($this->post);
+          break;
+
+          case 'slug':
+          $this->post->post_name = $value;
           wp_update_post($this->post);
           break;
 

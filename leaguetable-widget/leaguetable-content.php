@@ -69,7 +69,7 @@ if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
               <tbody id='leaguetable_competition_<?php echo esc_attr($competition->ID) ?>' class='tm-competition-leaguetable' <?php if ( $competition->ID != $defaultcompetition ) { echo "style='display:none'"; } ?>>
                 <?php
                 foreach($tableentries as $tableentry) {
-                  if ( $tableentry->team->title == $team ) {
+                  if ( $tableentry->team == $team->leagueteam ) {
                     $entryclass='tm-highlightedleagueentry';
                   } else {
                     $entryclass='tm-leagueentry';
@@ -108,7 +108,7 @@ if ( ! function_exists( 'tm_leaguetable_widget_content' ) ):
                 uasort($populatedcompetitions, Array('TMCompetition', 'sort_by_sortkey_asc'));
                 foreach($populatedcompetitions as $competition) {
               ?>
-                <option value='<?php echo esc_attr($competition->ID) ?>' <?php selected( $competition->ID, $defaultcompetition->ID ) ?>><?php echo esc_html($competition->name) ?></option>
+                <option value='<?php echo esc_attr($competition->ID) ?>' <?php selected( $competition->ID, $defaultcompetition ) ?>><?php echo esc_html($competition->name) ?></option>
               <?php } ?>
             </select>
           <?php } else { ?>

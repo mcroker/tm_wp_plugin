@@ -49,15 +49,30 @@ if ( ! function_exists( 'tm_fixture_create_posttype' )):
       'show_in_admin_bar'   => true,
       'menu_position'       => 5,
       'can_export'          => true,
-      'has_archive'         => true,
+      'has_archive'         => false,
       'exclude_from_search' => false,
       'publicly_queryable'  => true,
-      'rewrite'             => array( 'slug' => $slug ),
+      'rewrite'             => array( 'slug' => 'fixture/%team%/%season%', 'with_front' => false ),
       'capability_type'     => 'post',
+    // 'has_archive' => 'shows',
     );
-
+    // 'rewrite'             => array( 'slug' => $slug ),
     register_post_type( 'tm_fixture', $args );
   }
   add_action( 'init', 'tm_fixture_create_posttype' );
 endif;
+
+function wpa_tm_fixture_permalinks( $post_link, $post ){
+    if ( is_object( $post ) && $post->post_type == 'tm_fixture' ) {
+        $fixture = new TMFixture($post);
+        if ( ( $fixture->team ) ) {
+            $post_link = str_replace( '%team%' , $fixture->team->slug , $post_link );
+        }
+        if ( ( $fixture->season ) ) {
+            $post_link = str_replace( '%season%' , $fixture->season->slug, $post_link );
+        }
+    }
+    return $post_link;
+}
+add_filter( 'post_type_link', 'wpa_tm_fixture_permalinks', 1, 2 );
 ?>
