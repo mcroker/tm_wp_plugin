@@ -31,7 +31,7 @@ if ( ! function_exists( 'tm_team_create_posttype' ) ):
     );
 
     // Set other options for Custom Post Type
-    $slug = get_theme_mod( 'fixture_permalink' );
+    $slug = get_theme_mod( 'team_permalink' );
     $slug = ( empty( $slug ) ) ? 'team' : $slug;
 
     $args = array(
@@ -50,7 +50,7 @@ if ( ! function_exists( 'tm_team_create_posttype' ) ):
       'has_archive'         => true,
       'exclude_from_search' => false,
       'publicly_queryable'  => true,
-      'rewrite'             => array( 'slug' => $slug ),
+      'rewrite'             => array( 'slug' => $slug, 'with_front' => false ),
       'capability_type'     => 'post',
     );
 
@@ -59,5 +59,27 @@ if ( ! function_exists( 'tm_team_create_posttype' ) ):
   }
   add_action( 'init', 'tm_team_create_posttype' );
 endif;
+
+if ( ! function_exists( 'tm_team_rewriteurl' ) ):
+  function tm_team_rewriteurl() {
+    // Set other options for Custom Post Type
+    $slug = get_theme_mod( 'team_permalink' );
+    $slug = ( empty( $slug ) ) ? 'team' : $slug;
+    add_rewrite_rule('^' . $slug . '/([^/]+)/(table|fixtures|coaches|players|details)/?','index.php?post_type=tm_team&name=$matches[1]&view=$matches[2]','top');
+    // Once you get working, remove this next line
+    global $wp_rewrite;
+     $wp_rewrite->flush_rules(true);
+  }
+  add_action('init', 'tm_team_rewriteurl');
+endif;
+
+if ( ! function_exists( 'tm_team_add_query_vars' ) ):
+  function tm_team_add_query_vars( $vars ) {
+    $vars[] = "view";
+    return $vars;
+  }
+add_filter( 'query_vars', 'tm_team_add_query_vars' );
+endif;
+
 
 ?>
