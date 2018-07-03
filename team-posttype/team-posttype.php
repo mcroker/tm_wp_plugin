@@ -66,9 +66,6 @@ if ( ! function_exists( 'tm_team_rewriteurl' ) ):
     $slug = get_theme_mod( 'team_permalink' );
     $slug = ( empty( $slug ) ) ? 'team' : $slug;
     add_rewrite_rule('^' . $slug . '/([^/]+)/(table|fixtures|coaches|players|details)/?','index.php?post_type=tm_team&name=$matches[1]&view=$matches[2]','top');
-    // Once you get working, remove this next line
-    global $wp_rewrite;
-     $wp_rewrite->flush_rules(true);
   }
   add_action('init', 'tm_team_rewriteurl');
 endif;
