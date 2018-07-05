@@ -47,7 +47,7 @@ if ( ! function_exists( 'tm_fixturelist_table_header' ) ):
             $opposition = $fixture->opposition;
             ?>
 
-            <td> <a href="<?php echo esc_attr($fixture->url) ?>"><?php echo date('F d, Y', $fixture->fixturedate) ?></a> </td>
+            <td> <a href="<?php echo esc_attr( $fixture->url ) ?>"><?php echo date('F d, Y', $fixture->fixturedate) ?></a> </td>
             <td> <?php echo esc_html($opposition->name) ?> </td>
             <td> <?php echo esc_html($fixture->homeaway) ?> </td>
             <td> <?php echo esc_html($fixture->scorefor) ?> </td>

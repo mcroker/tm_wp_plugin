@@ -65,7 +65,7 @@ if ( ! function_exists( 'tm_team_rewriteurl' ) ):
     // Set other options for Custom Post Type
     $slug = get_theme_mod( 'team_permalink' );
     $slug = ( empty( $slug ) ) ? 'team' : $slug;
-    add_rewrite_rule('^' . $slug . '/([^/]+)/(table|fixtures|coaches|players|details)/?','index.php?post_type=tm_team&name=$matches[1]&view=$matches[2]','top');
+    add_rewrite_rule('^' . $slug . '/([^/]+)/(table|fixtures|coaches|players|details)/?$','index.php?post_type=tm_team&name=$matches[1]&view=$matches[2]','top');
   }
   add_action('init', 'tm_team_rewriteurl');
 endif;

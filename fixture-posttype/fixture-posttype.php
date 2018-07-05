@@ -26,7 +26,7 @@ if ( ! function_exists( 'tm_fixture_create_posttype' )):
     );
 
     $slug = get_theme_mod( 'fixture_permalink' );
-    $slug = ( empty( $slug ) ) ? 'fixture' : $slug;
+    $slug = ( empty( $slug ) ) ? 'fixtures' : $slug;
 
     $args = array(
       'label'               => __( 'Fixtures', 'tm' ),
@@ -52,21 +52,32 @@ if ( ! function_exists( 'tm_fixture_create_posttype' )):
       'has_archive'         => false,
       'exclude_from_search' => false,
       'publicly_queryable'  => true,
-      'rewrite'             => array( 'slug' => 'fixture/%team%/%season%', 'with_front' => false ),
-      'capability_type'     => 'post',
-    // 'has_archive' => 'shows',
+      'rewrite'             => array( 'slug' => 'team/%teamname%/fixtures/%season%', 'with_front' => false ),
+      'capability_type'     => 'post'
     );
-    // 'rewrite'             => array( 'slug' => $slug ),
     register_post_type( 'tm_fixture', $args );
   }
   add_action( 'init', 'tm_fixture_create_posttype' );
 endif;
 
-function wpa_tm_fixture_permalinks( $post_link, $post ){
+/*
+      'rewrite'             => array( 'slug' => $slug, 'with_front' => false ),
+*/
+
+function tm_fixture_rewriteurl() {
+  $teamslug = get_theme_mod( 'team_permalink' );
+  $teamslug = ( empty( $slug ) ) ? 'team' : $slug;
+  add_rewrite_rule('^' . $teamslug . '/([^/]+)/fixtures/([^/]+)/([^/]+)/?','index.php?post_type=tm_fixture&teamname=$matches[1]&season=$matches[2]&name=$matches[3]','top');
+   global $wp_rewrite;
+   $wp_rewrite->flush_rules(false);
+}
+add_action('init', 'tm_fixture_rewriteurl');
+
+function tm_fixture_permalinks( $post_link, $post ){
     if ( is_object( $post ) && $post->post_type == 'tm_fixture' ) {
         $fixture = new TMFixture($post);
         if ( ( $fixture->team ) ) {
-            $post_link = str_replace( '%team%' , $fixture->team->slug , $post_link );
+            $post_link = str_replace( '%teamname%' , $fixture->team->slug , $post_link );
         }
         if ( ( $fixture->season ) ) {
             $post_link = str_replace( '%season%' , $fixture->season->slug, $post_link );
@@ -74,5 +85,5 @@ function wpa_tm_fixture_permalinks( $post_link, $post ){
     }
     return $post_link;
 }
-add_filter( 'post_type_link', 'wpa_tm_fixture_permalinks', 1, 2 );
+add_filter( 'post_type_link', 'tm_fixture_permalinks', 1, 2 );
 ?>

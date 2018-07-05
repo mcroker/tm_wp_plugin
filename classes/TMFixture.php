@@ -79,7 +79,8 @@ if ( ! class_exists('TMFixture')):
     public function __get ($key) {
       switch ($key) {
         case 'url': // ==================================================
-        return '/fixtures/' . $this->post->post_name;
+        return get_permalink($this->ID);
+        // return '/fixtures/' . $this->post->post_name;
         break;
 
         default:
