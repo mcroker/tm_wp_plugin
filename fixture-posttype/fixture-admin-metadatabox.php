@@ -128,7 +128,7 @@ if ( is_admin() && ! function_exists( 'tm_fixture_inner_custom_box' )):
   <?php // League teams (retrieve based on competition using ajax)-------------------- ?>
   <label for="tm_fixture_leagueteam_select"><?php echo esc_html__('Opposition','tm') ?></label><br>
   <?php
-  if ( ! $fixture->opposition ) {
+  if ( ! $fixture->competition ) {
     $oppositons = array_map(create_function('$opposition', 'return $opposition->name;') , TMOpposition::getAll());
   } else {
     $oppositons = $fixture->competition->teamdata;
