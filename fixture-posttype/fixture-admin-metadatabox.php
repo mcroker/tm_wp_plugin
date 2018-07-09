@@ -127,17 +127,22 @@ if ( is_admin() && ! function_exists( 'tm_fixture_inner_custom_box' )):
 
   <?php // League teams (retrieve based on competition using ajax)-------------------- ?>
   <label for="tm_fixture_leagueteam_select"><?php echo esc_html__('Opposition','tm') ?></label><br>
+  <?php
+  if ( ! $fixture->opposition ) {
+    $oppositons = array_map(create_function('$opposition', 'return $opposition->name;') , TMOpposition::getAll());
+  } else {
+    $oppositons = $fixture->competition->teamdata;
+  }
+  ?>
   <select id='tm_fixture_leagueteam_select' name='tm_fixture_leagueteam_select'
-  class='tm-meta-fullinput tm-meta-disableifautofetched' <?php disabled($fixture->useautofetch, true, true ) ?>
-  <?php if ( ! $competition->ID ) { ?> style='display:none;' <?php } ?> >
-    <?php foreach($fixture->competition->teamdata as $leagueteam) { ?>
+  class='tm-meta-fullinput tm-meta-disableifautofetched' <?php disabled($fixture->useautofetch, true, true ) ?> >
+    <?php foreach($oppositons as $leagueteam) { ?>
       <option value='<?php echo esc_attr($leagueteam) ?>' <?php selected( $leagueteam , $fixture->opposition->name ) ?> >
         <?php echo esc_html($leagueteam) ?>
       </option>
     <?php } ?>
   </select>
-  <?php // If no competition selected, present freeform textbox rather than select ?>
-  <input id='tm_fixture_leagueteam_text' name='tm_fixture_leagueteam_text' type='text' class='tm-meta-fullinput' <?php disabled($fixture->useautofetch, true, true ) ?> value='<?php echo esc_attr($saved_opposition) ?>' <?php if ( $competition->ID ) { ?> style='display:none;' <?php } ?> />
+
 
   <?php // Fixture date -------------------- ?>
   <div class="tm-meta-smallinput">

@@ -36,28 +36,23 @@ function tmfixturegetLeagueTeams(competitionid) {
   var useautofetch = document.getElementById('tm_fixture_useautofetch');
 
   if ( competitionid == '' ) {
-    oppselect.style.display = 'none';
-    opptext.style.display = 'inline';
     useautofetch.disabled = true;
     useautofetch.checked = false;
-    opptext.value = oppselect.options[oppselect.selectedIndex].value;
   } else {
-    oppselect.style.display = 'inline';
-    opptext.style.display = 'none';
     useautofetch.disabled = false;
+  }
 
-    if (tmfixtureleagueTeams[competitionid]) {
-      tmFixturePopulateTeamsDropdown(tmfixtureleagueTeams[competitionid]);
-    } else {
-      var data = {
-        'action': 'tm_competition_ajax_getteams',
-        'competition': competitionid
-      };
-      jQuery.post( tmphpobject.ajax_url , data, function(response) {
-        var responseObj = JSON.parse(response);
-        tmfixtureleagueTeams[competitionid] = responseObj.teams;
-        tmFixturePopulateTeamsDropdown(tmfixtureleagueTeams[competitionid]);
-      });
+  if (tmfixtureleagueTeams[competitionid]) {
+    tmFixturePopulateTeamsDropdown(tmfixtureleagueTeams[competitionid]);
+  } else {
+    var data = {
+      'action': 'tm_competition_ajax_getteams',
+      'competition': competitionid
     };
+    jQuery.post( tmphpobject.ajax_url , data, function(response) {
+      var responseObj = JSON.parse(response);
+      tmfixtureleagueTeams[competitionid] = responseObj.teams;
+      tmFixturePopulateTeamsDropdown(tmfixtureleagueTeams[competitionid]);
+    });
   };
 };

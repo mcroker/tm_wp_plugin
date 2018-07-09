@@ -34,6 +34,9 @@ if ( is_admin() && ! function_exists( 'tm_fixture_save_postdata' ) ):
     if ( isset($_POST['tm_fixture_season']) ){
       $fixture->attachTerm(new TMSeason($_POST['tm_fixture_season']));
     }
+    if ( isset($_POST['tm_fixture_leagueteam_select']) ){
+      $fixture->attachTerm(new TMOpposition($_POST['tm_fixture_leagueteam_select']));
+    }
     if ( isset($_POST['tm_fixture_homeaway']) ){
       $fixture->homeaway = $_POST['tm_fixture_homeaway'];
     }

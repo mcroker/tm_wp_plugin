@@ -32,10 +32,14 @@ endif;
 // tm_competition_ajax_getteams ==================================================
 if ( is_admin() && ! function_exists( 'tm_competition_ajax_getteams' ) ):
   function tm_competition_ajax_getteams() {
-    // TODO Remove current team from the list
     $data = new stdClass();
-    $competition = new TMCompetition($_POST['competition']);
-    $data->teams = $competition->teamdata;
+    if ( $_POST['competition'] != '' ) {
+      // TODO Remove current team from the list
+     $competition = new TMCompetition($_POST['competition']);
+     $data->teams = $competition->teamdata;
+   } else {
+     $data->teams = array_map(create_function('$opposition', 'return $opposition->name;') , TMOpposition::getAll());
+   }
     echo json_encode($data,true);
     wp_die();
   }
