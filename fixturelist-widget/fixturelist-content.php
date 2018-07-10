@@ -9,7 +9,7 @@
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 if ( ! function_exists( 'tm_fixturelist_widget_content' ) ):
-  function tm_fixturelist_widget_content( $displaystyle = 'block' , $title = '', $team_id = '', $maxrows = 6, $maxfuture = 3 ) {
+  function tm_fixturelist_widget_content( $displaystyle = 'block' , $title = '', $team_id = '', $maxrows = 6, $maxfuture = 3, $oldestfirst = false ) {
     if ( empty($maxrows) ) $maxrows = 6;
     if ( empty($maxfuture) ) $maxfuture = 3;
 
@@ -25,11 +25,11 @@ if ( ! function_exists( 'tm_fixturelist_widget_content' ) ):
       $userargs = Array('title' => $title);
       switch ( $displaystyle ) {
         case "block":
-        $team->loop_fixtures_now_and_next('tm_fixturelist_' . $displaystyle, $maxrows, $maxfuture, $userargs );
+        $team->loop_fixtures_now_and_next('tm_fixturelist_' . $displaystyle, $maxrows, $maxfuture, $userargs, $oldestfirst );
         break;
 
         case "table":
-        $team->loop_fixtures_by_season('tm_fixturelist_' . $displaystyle, $userargs);
+        $team->loop_fixtures_by_season('tm_fixturelist_' . $displaystyle, $userargs, $oldestfirst);
       }
       break;
 
@@ -47,11 +47,11 @@ if ( ! function_exists( 'tm_fixturelist_widget_content' ) ):
         $userargs = Array('title' => $title);
         switch ( $displaystyle ) {
           case "block":
-          $team->loop_fixtures_now_and_next('tm_fixturelist_' . $displaystyle, $maxrows, $maxfuture, $userargs );
+          $team->loop_fixtures_now_and_next('tm_fixturelist_' . $displaystyle, $maxrows, $maxfuture, $userargs, $oldestfirst );
           break;
 
           case "table":
-          $team->loop_fixtures_by_season('tm_fixturelist_' . $displaystyle, $userargs);
+          $team->loop_fixtures_by_season('tm_fixturelist_' . $displaystyle, $userargs, $oldestfirst );
         }
       }
     }

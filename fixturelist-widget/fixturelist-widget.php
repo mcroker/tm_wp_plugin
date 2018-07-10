@@ -51,9 +51,14 @@ if ( ! class_exists( 'TMFixturelist') ):
       } else {
         $maxfuture = '';
       }
+      if ( isset($instance['tm_oldestfirst']) ) {
+        $oldestfirst = apply_filters( 'tm_oldestfirst', $instance['tm_oldestfirst'] );
+      } else {
+        $oldestfirst = false;
+      }
 
       echo $args['before_widget'];
-      tm_fixturelist_widget_content($displaystyle, $title, $team, $maxrows, $maxfuture );
+      tm_fixturelist_widget_content($displaystyle, $title, $team, $maxrows, $maxfuture, $oldestfirst );
       echo $args['after_widget'];
     }
 
@@ -84,6 +89,11 @@ if ( ! class_exists( 'TMFixturelist') ):
         $maxfuture = $instance[ 'tm_maxfuture' ];
       } else {
         $maxfuture = 3;
+      }
+      if ( isset( $instance[ 'tm_oldestfirst' ] ) ) {
+        $oldestfirst = $instance[ 'tm_oldestfirst' ];
+      } else {
+        $oldestfirst = false;
       }
 
       // Widget admin form ==================================================
@@ -122,6 +132,18 @@ if ( ! class_exists( 'TMFixturelist') ):
         <label for="<?php echo $this->get_field_id( 'tm_maxfuture' ); ?>"><?php _e( 'Max Future:' ); ?></label>
         <input class="widefat" id="<?php echo $this->get_field_id( 'tm_maxfuture' ); ?>" name="<?php echo $this->get_field_name( 'tm_maxfuture' ); ?>" type="text" value="<?php echo esc_attr( $maxfuture ); ?>" />
       </p>
+      <p>
+        <label for="<?php echo $this->get_field_id( 'tm_oldestfirst' ); ?>"><?php _e( 'Sort order:' ); ?></label>
+        <select class="widefat" id="<?php echo $this->get_field_id( 'tm_oldestfirst' ); ?>" name="<?php echo $this->get_field_name( 'tm_oldestfirst' ); ?>">
+          <? $sortorders = Array (
+            false => 'Ascending',
+            true => 'Descending'
+          );
+          foreach ($sortorders as $sortorderid => $sortorderdesc) { ?>
+            <option value=<?php echo $sortorderid ?> <?php selected( $sortorderid , $oldestfirst ) ?> > <?php echo $sortorderdesc ?> </option>
+          <?php } ?>
+        </select>
+      </p>
       <?php
     }
 
@@ -133,6 +155,7 @@ if ( ! class_exists( 'TMFixturelist') ):
       $instance['tm_displaystyle'] = ( ! empty( $new_instance['tm_displaystyle'] ) ) ? strip_tags( $new_instance['tm_displaystyle'] ) : '';
       $instance['tm_maxrows'] = ( ! empty( $new_instance['tm_maxrows'] ) ) ? strip_tags( $new_instance['tm_maxrows'] ) : '';
       $instance['tm_maxfuture'] = ( ! empty( $new_instance['tm_maxfuture'] ) ) ? strip_tags( $new_instance['tm_maxfuture'] ) : '';
+      $instance['tm_oldestfirst'] = ( ! empty( $new_instance['tm_oldestfirst'] ) ) ? strip_tags( $new_instance['tm_oldestfirst'] ) : '';
       return $instance;
     }
   } // Class wpb_widget ends here

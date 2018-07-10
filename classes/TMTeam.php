@@ -48,7 +48,7 @@ if ( ! class_exists('TMTeam')):
       parent::__construct($teamid);
     }
 
-    public function loop_fixtures_now_and_next($callbackstem, $maxrows = null, $maxfuture = null, $userargs = [] ) {
+    public function loop_fixtures_now_and_next($callbackstem, $maxrows = null, $maxfuture = null, $userargs = [], $oldestfirst = false ) {
       if ( empty($maxrows) ) $maxrows = 6;
       if ( empty($maxfuture) ) $maxfuture = 3;
 
@@ -76,7 +76,13 @@ if ( ! class_exists('TMTeam')):
         }
       }
       // Display Fixtures
-      uasort( $displayfixtures, array('TMFixture','sort_by_date_desc'));
+      if ( $oldestfirst ) {
+        var_dump('old');
+        uasort( $displayfixtures, array('TMFixture','sort_by_date_asc'));
+      } else {
+        var_dump('new');
+        uasort( $displayfixtures, array('TMFixture','sort_by_date_desc'));
+      }
       foreach($displayfixtures as $fixture) {
         if ( function_exists($callbackstem . '_row') ) {
           call_user_func($callbackstem . '_row', $fixture, $userargs);
@@ -88,7 +94,7 @@ if ( ! class_exists('TMTeam')):
       }
     }
 
-    public function loop_fixtures_by_season($callbackstem, $userargs = [] ) {
+    public function loop_fixtures_by_season($callbackstem, $userargs = [], $oldestfirst = false ) {
       // Populate array of fixture $seasons
       $seasons = [];
       $seasonfixtures = [];
@@ -116,7 +122,11 @@ if ( ! class_exists('TMTeam')):
           call_user_func($callbackstem . '_seasonheader', $this->ID, $season, $isdefaultseason, $userargs);
         }
 
-        uasort($seasonfixtures[$seasonid], array('TMFixture','sort_by_date_asc'));
+        if ( $oldestfirst ) {
+          uasort($seasonfixtures[$seasonid], array('TMFixture','sort_by_date_desc'));
+        } else {
+          uasort($seasonfixtures[$seasonid], array('TMFixture','sort_by_date_asc'));
+        }
         foreach($seasonfixtures[$seasonid] as $fixturekey => $fixture) {
           if ( function_exists($callbackstem . '_row') ) {
             call_user_func($callbackstem . '_row', $this->ID, $fixture, $userargs);
