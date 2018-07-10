@@ -77,10 +77,8 @@ if ( ! class_exists('TMTeam')):
       }
       // Display Fixtures
       if ( $oldestfirst ) {
-        var_dump('old');
         uasort( $displayfixtures, array('TMFixture','sort_by_date_asc'));
       } else {
-        var_dump('new');
         uasort( $displayfixtures, array('TMFixture','sort_by_date_desc'));
       }
       foreach($displayfixtures as $fixture) {
