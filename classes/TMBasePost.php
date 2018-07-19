@@ -55,9 +55,10 @@ if ( ! class_exists('TMBasePost')):
     }
 
     public static function getRelatedToTax($taxonomy, $term_id) {
+      $classname = get_called_class();
       $posts = get_posts(array (
         'numberposts' => -1,
-        'post_type'	  => $this->_post_type,
+        'post_type'	  => $classname::$post_type,
         'tax_query'   => array(
           array(
             'taxonomy' => $taxonomy,
