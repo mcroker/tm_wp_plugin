@@ -75,6 +75,7 @@ if ( ! class_exists('TMBasePost')):
       $posts = get_posts(array (
         'numberposts' => -1,
         'post_type'	  => $classname::$post_type,
+        'post_status' => 'publish',
         'meta_query'	 => array(
           array(
             'key'	 	   => $meta_key,

@@ -20,6 +20,30 @@ function tm_competition_api_updateall() {
   wp_send_json(null);
 };
 
+function tm_team_ical($request_data) {
+  $parameters = $request_data->get_params();
+  $team = new TMTeam( $parameters['team'] );
+  header('Content-type: text/calendar; charset=utf-8');
+  header('Content-Disposition: inline; filename=twrfc-' . $team->slug . '-fixtures.ics');
+  echo "BEGIN:VCALENDAR\n";
+  echo "VERSION:2.0\n";
+  echo "PRODID:-//tm/team/" . $team->ID . "\n";
+  $team->fixtures_vevents();
+  echo "END:VCALENDAR\n";
+};
+
+function tm_all_ical($request_data){
+  //header('Content-type: text/calendar; charset=utf-8');
+  //header('Content-Disposition: inline; filename=twrfc-fixtures.ics');
+  echo "BEGIN:VCALENDAR\n";
+  echo "VERSION:2.0\n";
+  echo "PRODID:-//tm/team/all\n";
+  foreach(TMTeam::getAll() as $team) {
+    $team->fixtures_vevents();
+  }
+  echo "END:VCALENDAR\n";
+};
+
 add_action( 'rest_api_init', function () {
   register_rest_route( 'tm/v1', '/test', array(
     'methods' => 'GET',
@@ -37,5 +61,13 @@ add_action( 'rest_api_init', function () {
     'methods' => 'GET',
     'callback' => 'tm_competition_api_updateall',
   ) );
+  register_rest_route( 'tm/v1', '/ical/team/(?P<team>[a-zA-Z0-9-]+)', array(
+    'methods'  => WP_REST_Server::READABLE,
+    'callback' => 'tm_team_ical',
+  ));
+  register_rest_route( 'tm/v1', '/ical', array(
+    'methods'  => WP_REST_Server::READABLE,
+    'callback' => 'tm_all_ical',
+  ));
 } );
 ?>

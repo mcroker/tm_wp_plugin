@@ -36,7 +36,11 @@ if ( ! class_exists('TMBaseTax')):
     public static function getBySlug($term_slug) {
       $classname = get_called_class();
       $term = get_term_by('slug' , $term_slug, $classname::$taxonomy );
-      return new $classname($term->term_id);
+      if ($term) {
+        return new $classname($term->term_id);
+      } else {
+        return null;
+      }
     }
 
     public static function getByName($term_name) {
@@ -52,7 +56,8 @@ if ( ! class_exists('TMBaseTax')):
     }
 
     public static function insertTerm($term_slug) {
-      $resp = wp_insert_term( $term_slug, $this->taxonomy, $args = array() );
+      $classname = get_called_class();
+      $resp = wp_insert_term( $term_slug, $classname::$taxonomy, $args = array() );
       $classname = get_called_class();
       return new $classname($resp->term_id);
     }
