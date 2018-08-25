@@ -43,6 +43,22 @@ if ( ! class_exists('TMBasePost')):
       return $classname::WPPost_to_TMPost($posts);
     }
 
+    public static function getBySlug($slug) {
+      $classname = get_called_class();
+      $args = array(
+        'name'        => $slug,
+        'post_type'   => $classname::$post_type,
+        'post_status' => 'publish',
+        'numberposts' => 1
+      );
+      $posts = get_posts($args);
+      if( $posts ) {
+        return new $classname($posts[0]->ID);
+      } else {
+        return null;
+      }
+    }
+
     public static function createPost($title) {
       $classname = get_called_class();
       $post_id  = wp_insert_post ( array(

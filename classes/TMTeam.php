@@ -42,6 +42,10 @@ if ( ! class_exists('TMTeam')):
         'classname' => 'TMFixture',
         'meta_key'  => 'tm_fixture_team'
       ),
+      'googlegroup' => Array(
+        'type'      => 'meta_attrib',
+        'meta_key'  => 'tm_team_googlegroup'
+      ),
     );
 
     function __construct($teamid = 0) {

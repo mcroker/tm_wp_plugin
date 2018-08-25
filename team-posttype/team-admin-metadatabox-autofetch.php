@@ -5,7 +5,7 @@ if ( is_admin() && ! function_exists( 'tm_team_create_metadatabox_autofetch' ) )
   function tm_team_create_metadatabox_autofetch() {
     add_meta_box(
       'tm_team_autofetch',
-      'Team Autofetch',
+      'Team Metadata',
       'tm_team_inner_custom_box',
       'tm_team',
       'side',
@@ -50,6 +50,9 @@ if ( is_admin() && ! function_exists( 'tm_team_inner_custom_box' ) ):
     <input id='tm-team-autofetch' class='button' type='button' onclick='java_script_:execTeamAutoFetcher()' value='<?php echo esc_attr__('Fetch Fixtures','tm') ?>' >
     <div><span id='tm-update-status'></span></div>
 
+    <label for="tm_team_googlegroup"><?php echo esc_html__('Googlegroup','tm') ?></label><br>
+    <input id='tm_team_googlegroup' type="text" class="tm-meta-fullinput" name="tm_team_googlegroup" value="<?php echo esc_attr($team->googlegroup) ?>"/><br>
+
     <?php
   }
 endif;
@@ -82,6 +85,9 @@ if ( is_admin() && ! function_exists( 'tm_team_save_metadatabox_autofetch' ) ):
 
     $team->useautofetch = ( isset($_POST['tm_team_useautofetch']) );
 
+    if ( isset($_POST['tm_team_googlegroup']) ){
+      $team->googlegroup = $_POST['tm_team_googlegroup'];
+    }
   }
   add_action( 'save_post', 'tm_team_save_metadatabox_autofetch' );
 endif;
