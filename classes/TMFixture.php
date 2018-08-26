@@ -42,6 +42,10 @@ if ( ! class_exists('TMFixture')):
            'type'      => 'meta_attrib_date',
            'meta_key'  => 'tm_fixture_date'
       ),
+      'kickofftime' => Array(
+           'type'      => 'meta_attrib_time',
+           'meta_key'  => 'tm_fixture_kickofftime'
+      ),
       'team' => Array(
            'type'      => 'related_post',
            'classname' => 'TMTeam',
@@ -69,11 +73,11 @@ if ( ! class_exists('TMFixture')):
     }
 
     public static function sort_by_date_asc($a, $b) {
-      return ($a->fixturedate > $b->fixturedate);
+      return ($a->kickofftime > $b->kickofftime);
     }
 
     public static function sort_by_date_desc($a, $b) {
-      return ($a->fixturedate < $b->fixturedate);
+      return ($a->kickofftime < $b->kickofftime);
     }
 
     public function __get ($key) {
@@ -86,6 +90,43 @@ if ( ! class_exists('TMFixture')):
         default:
         return $this->get_value( $key );
       }
+    }
+
+    function vevent() {
+      echo "BEGIN:VEVENT\n";
+
+      echo "UID:" . get_site_url() . "/fixture/" . $this->ID . "\n";
+      $createuStampUTC = strtotime($this->post->post_date_gmt);
+      $createstamp  = date("Ymd\THis\Z", $createuStampUTC);
+      echo "DTSTAMP:" . $createstamp . "\n";
+
+      $modifieduStampUTC = strtotime($this->post->post_modified_gmt);
+      $modifiedstamp  = date("Ymd\THis\Z", $modifieduStampUTC);
+      echo "LAST-MODIFIED:" . $modifiedstamp . "\n";
+
+      echo "ORGANIZER;CN=TWRFC:MAILTO:noreply@twrfc.com\n";
+
+      if ( $this->homeaway == 'H') {
+        echo "LOCATION:Home\n";
+      } else if ( $this->homeaway == 'A' ) {
+        echo "LOCATION:Away\n";
+      }
+
+      if ( $kickofftime->format('H') != '00' ) {
+        $startuStampUTC = $this->kickofftime;
+        $startstamp  = date("Ymd\THis\Z", $startuStampUTC);
+        $enduStampUTC = $startuStampUTC + ( 90 * 60 );
+        $endstamp  = date("Ymd\THis\Z", $enduStampUTC);
+        echo "DTSTART:" . $startstamp . "\n";
+        echo "DTEND:" . $endstamp . "\n";
+      } else {
+         $uStampUTC = $this->fixturedate + (get_option('gmt_offset') * 3600);
+         echo "DTSTART;VALUE=DATE:" . $kickofftime->format("Ymd") . "\n";
+      }
+
+      echo "SUMMARY:" . $this->team->title . ":" . $this->title . "\n";
+
+      echo "END:VEVENT\n";
     }
 
   }

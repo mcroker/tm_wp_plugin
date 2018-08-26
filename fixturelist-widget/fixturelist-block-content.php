@@ -51,7 +51,18 @@ if ( ! function_exists( 'tm_fixturelist_block_row' ) ):
             <td>
               <span class="team-logo logo-odd"><?php echo $homelogo ?></span>
               <span class="team-logo logo-even"><?php echo $awaylogo ?></span>
-              <time class="tm-event-date"><a href="<?php echo esc_attr($fixture->url) ?>"><?php echo date('F d, Y', $fixture->fixturedate) ?></a></time><br>
+              <time class="tm-event-date">
+                <?php
+                $kickoff = $fixture->kickofftime;
+                if ( ! empty($kickoff) ) { ?>
+                  <a href="<?php echo esc_attr($fixture->url) ?>"><?php echo $fixture->kickofftime->format('F d, Y') ?></a>
+                  <?php if ( $fixture->kickofftime->format('H') != '00' && empty($homescore) && empty($awayscore) ) { ?>
+                    <br><a href="<?php echo esc_attr($fixture->url) ?>"><?php echo $fixture->kickofftime->format('H:i') ?></a>
+                  <?php } ?>
+                <?php } else { ?>
+                  <a href="<?php echo esc_attr($fixture->url) ?>"><?php echo $fixture->kickofftime->format('F d, Y') ?></a>
+                <?php } ?>
+              </time><br>
               <?php if ( ! empty($homescore) || ! empty($awayscore) ) { ?>
                 <h5 class="tm-event-results"><?php echo esc_html($homescore) . __( ' - ' , 'tm' ) . esc_html($awayscore) ?></h5>
               <?php } ?>

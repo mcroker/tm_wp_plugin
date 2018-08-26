@@ -86,7 +86,7 @@ if ( ! function_exists('tm_autofetch_update_team_results') ):
         // With each matched fixture updated based on fetched results
         foreach($fixturedata as $result) {
 
-          $fixtures = get_posts(array(
+          $query = array(
             'numberposts'	=> -1,
             'post_type'		=> 'tm_fixture',
             'post_status' => 'publish',
@@ -121,7 +121,9 @@ if ( ! function_exists('tm_autofetch_update_team_results') ):
                 'terms'    => $competition->slug
               )
             ),
-          ));
+          );
+
+          $fixtures = get_posts($query);
 
           // Create fixture if no existing fixture matches opposition, team and date
           // Add this to fixtures (as if found origionally) - to include in update Loop.
@@ -142,6 +144,7 @@ if ( ! function_exists('tm_autofetch_update_team_results') ):
           foreach ($fixtures as $fixturepost) {
             $fixture = new TMFixture($fixturepost);
             $fixture->fixturedate = $result->fixturedate->getTimestamp();
+            $fixture->kickofftime = $result->kickofftime->getTimestamp();
             $fixture->team_id = $team_id;
             $fixture->homeaway = $result->homeaway;
             $fixture->author = $fixture->team->author;

@@ -70,7 +70,7 @@ if ( ! class_exists('TMTeam')):
       // Next $maxfuture Future fixtures
       uasort( $fixtures, array('TMFixture','sort_by_date_asc'));
       foreach($fixtures as $fixture) {
-        if ( $rowsdisplayed < $maxfuture && $rowsdisplayed < $maxrows && $fixture->fixturedate >= $nowtimestamp) {
+        if ( $rowsdisplayed < $maxfuture && $rowsdisplayed < $maxrows && $fixture->kickofftime >= $nowtimestamp) {
           $rowsdisplayed += 1;
           $displayfixtures[] = $fixture;
         }
@@ -78,7 +78,7 @@ if ( ! class_exists('TMTeam')):
       // Past $maxrows-$maxfuture results
       uasort( $fixtures, array('TMFixture','sort_by_date_desc'));
       foreach($fixtures as $fixture) {
-        if ( $rowsdisplayed < $maxrows && $fixture->fixturedate < $nowtimestamp) {
+        if ( $rowsdisplayed < $maxrows && $fixture->kickofftime < $nowtimestamp) {
           $rowsdisplayed += 1;
           $displayfixtures[] = $fixture;
         }
@@ -150,32 +150,12 @@ if ( ! class_exists('TMTeam')):
 
     }
 
-    private static function fixture_vevent($fixture) {
-      echo "BEGIN:VEVENT\n";
-      echo "UID:" . get_site_url() . "/fixture/" . $fixture->ID . "\n";
-      echo "DTSTAMP:19970714T170000Z\n";
-      echo "ORGANIZER;CN=TWRFC:MAILTO:noreply@twrfc.com\n";
-      if ( $fixture->homeaway == 'H') {
-        echo "LOCATION:Home\n";
-      } else if ( $fixture->homeaway == 'A' ) {
-        echo "LOCATION:Away\n";
-      }
-      $uStampUTC = $fixture->fixturedate + (get_option('gmt_offset') * 3600);
-      echo "DTSTART;VALUE=DATE:" . date("Ymd", $uStampUTC) . "\n";
-      // $stamp  = date("Ymd\THis\Z", $uStampUTC);
-      // echo "DTSTART:" . $stamp . "\n";
-      // $uStampUTC = $uStampUTC + ( 90 * 60 );
-      // $stamp  = date("Ymd\THis\Z", $uStampUTC);
-      // echo "DTEND:" . $stamp . "\n";
-      echo "SUMMARY:" . $fixture->team->title . ":" . $fixture->title . "\n";
-      echo "END:VEVENT\n";
-    }
-
     public function fixtures_vevents() {
       foreach($this->fixtures as $fixture) {
-        TMTeam::fixture_vevent($fixture);
+        $fixture->vevent();
       }
     }
+
   }
 endif;
 ?>

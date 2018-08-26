@@ -87,7 +87,7 @@ if ( is_admin() && ! function_exists('tm_fixture_table_content') ):
   function tm_fixture_table_content( $column_name, $post_id ) {
     $fixture = new TMFixture($post_id);
     if ($column_name == 'tm_fixture_date') {
-      echo date('Y-m-d', $fixture->fixturedate);
+      echo $fixture->kickofftime->format('Y-m-d');
     }
     if ($column_name == 'tm_fixture_team') {
       echo esc_html($fixture->team->title);

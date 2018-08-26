@@ -143,11 +143,10 @@ if ( is_admin() && ! function_exists( 'tm_fixture_inner_custom_box' )):
     <?php } ?>
   </select>
 
-
-  <?php // Fixture date -------------------- ?>
+  <?php // Kick off time -------------------- ?>
   <div class="tm-meta-smallinput">
-    <label for="tm_fixture_date"><?php echo esc_html__('Fixture Date','tm') ?></label>
-    <input class="tm-meta-disableifautofetched" type="date" name="tm_fixture_date" <?php disabled($fixture->useautofetch, true, true ) ?> id="tm_fixture_date" value="<?php echo date('Y-m-d',$fixture->fixturedate) ?>"  />
+    <label for="tm_fixture_kickofftime"><?php echo esc_html__('Kick-off time','tm') ?></label>
+    <input class="tm-meta-disableifautofetched" type="datetime-local" name="tm_fixture_kickofftime" <?php disabled($fixture->useautofetch, true, true ) ?> id="tm_fixture_kickofftime" value="<?php echo $fixture->kickofftime->format('Y-m-d\TH:i') ?>"  />
   </div>
 
   <?php // Season -------------------- ?>
