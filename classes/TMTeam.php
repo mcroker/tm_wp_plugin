@@ -42,9 +42,13 @@ if ( ! class_exists('TMTeam')):
         'classname' => 'TMFixture',
         'meta_key'  => 'tm_fixture_team'
       ),
-      'googlegroup' => Array(
+      'mailshortcode' => Array(
         'type'      => 'meta_attrib',
-        'meta_key'  => 'tm_team_googlegroup'
+        'meta_key'  => 'tm_team_mailshortcode'
+      ),
+      'newsshortcode' => Array(
+        'type'      => 'meta_attrib',
+        'meta_key'  => 'tm_team_newsshortcode'
       ),
     );
 

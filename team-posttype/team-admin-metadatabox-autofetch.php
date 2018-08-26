@@ -50,8 +50,11 @@ if ( is_admin() && ! function_exists( 'tm_team_inner_custom_box' ) ):
     <input id='tm-team-autofetch' class='button' type='button' onclick='java_script_:execTeamAutoFetcher()' value='<?php echo esc_attr__('Fetch Fixtures','tm') ?>' >
     <div><span id='tm-update-status'></span></div>
 
-    <label for="tm_team_googlegroup"><?php echo esc_html__('Googlegroup','tm') ?></label><br>
-    <input id='tm_team_googlegroup' type="text" class="tm-meta-fullinput" name="tm_team_googlegroup" value="<?php echo esc_attr($team->googlegroup) ?>"/><br>
+    <label for="tm_team_mailshortcode"><?php echo esc_html__('Mail shortcode','tm') ?></label><br>
+    <input id='tm_team_mailshortcode' type="text" class="tm-meta-fullinput" name="tm_team_mailshortcode" value="<?php echo esc_attr($team->mailshortcode) ?>"/><br>
+
+    <label for="tm_team_newsshortcode"><?php echo esc_html__('News shortcode','tm') ?></label><br>
+    <input id='tm_team_newsshortcode' type="text" class="tm-meta-fullinput" name="tm_team_newsshortcode" value="<?php echo esc_attr($team->newsshortcode) ?>"/><br>
 
     <?php
   }
@@ -85,9 +88,14 @@ if ( is_admin() && ! function_exists( 'tm_team_save_metadatabox_autofetch' ) ):
 
     $team->useautofetch = ( isset($_POST['tm_team_useautofetch']) );
 
-    if ( isset($_POST['tm_team_googlegroup']) ){
-      $team->googlegroup = $_POST['tm_team_googlegroup'];
+    if ( isset($_POST['tm_team_mailshortcode']) ){
+      $team->mailshortcode = $_POST['tm_team_mailshortcode'];
     }
+
+    if ( isset($_POST['tm_team_newsshortcode']) ){
+      $team->newsshortcode = $_POST['tm_team_newsshortcode'];
+    }
+
   }
   add_action( 'save_post', 'tm_team_save_metadatabox_autofetch' );
 endif;
