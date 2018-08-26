@@ -70,7 +70,7 @@ if ( ! class_exists('TMTeam')):
       // Next $maxfuture Future fixtures
       uasort( $fixtures, array('TMFixture','sort_by_date_asc'));
       foreach($fixtures as $fixture) {
-        if ( $rowsdisplayed < $maxfuture && $rowsdisplayed < $maxrows && $fixture->kickofftime >= $nowtimestamp) {
+        if ( $rowsdisplayed < $maxfuture && $rowsdisplayed < $maxrows && $fixture->kickofftime->getTimestamp() >= $nowtimestamp) {
           $rowsdisplayed += 1;
           $displayfixtures[] = $fixture;
         }
@@ -78,7 +78,7 @@ if ( ! class_exists('TMTeam')):
       // Past $maxrows-$maxfuture results
       uasort( $fixtures, array('TMFixture','sort_by_date_desc'));
       foreach($fixtures as $fixture) {
-        if ( $rowsdisplayed < $maxrows && $fixture->kickofftime < $nowtimestamp) {
+        if ( $rowsdisplayed < $maxrows && $fixture->kickofftime->getTimestamp() < $nowtimestamp) {
           $rowsdisplayed += 1;
           $displayfixtures[] = $fixture;
         }

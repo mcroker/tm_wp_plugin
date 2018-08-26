@@ -73,11 +73,15 @@ if ( ! class_exists('TMFixture')):
     }
 
     public static function sort_by_date_asc($a, $b) {
-      return ($a->kickofftime > $b->kickofftime);
+      $atz = $a->kickofftime->getTimestamp();
+      $btz =  $b->kickofftime->getTimestamp();
+      return ( $atz > $btz );
     }
 
     public static function sort_by_date_desc($a, $b) {
-      return ($a->kickofftime < $b->kickofftime);
+      $atz = $a->kickofftime->getTimestamp();
+      $btz =  $b->kickofftime->getTimestamp();
+      return ( $atz < $btz );
     }
 
     public function __get ($key) {
@@ -87,15 +91,51 @@ if ( ! class_exists('TMFixture')):
         // return '/fixtures/' . $this->post->post_name;
         break;
 
+        case 'kickofftime': // ==================================================
+        $value = $this->get_value( $key );
+        if ($value->getTimestamp() == 0 ) {
+          $value = new DateTime();
+          $value->setTimestamp($this->get_value( 'fixturedate'));
+        }
+        return $value;
+        break;
+
+        case 'kickofftimeutc': // ===============================================
+        $kickofftimeutc = clone $this->kickofftime;
+        $kickofftimeutc->setTimezone(new DateTimeZone('UTC'));
+        return $kickofftimeutc;
+        break;
+
+        case 'endtimeutc': // ===============================================
+        $endutc = clone $this->kickofftime;
+        $endutc->setTimezone(new DateTimeZone('UTC'));
+        $endutc->add(new DateInterval("PT01H30M"));
+        return $endutc;
+        break;
+
         default:
         return $this->get_value( $key );
       }
+    }
+
+    public function __set ($key, $value) {
+      switch ($key) {
+        case 'kickofftime': // ==================================================
+        $this->update_value('kickofftime', $value);
+        $this->update_value('fixturedate', $this->kickofftime->format('Y-m-d'));
+        break;
+
+        default:
+        $this->update_value($key, $value);
+      }
+
     }
 
     function vevent() {
       echo "BEGIN:VEVENT\n";
 
       echo "UID:" . get_site_url() . "/fixture/" . $this->ID . "\n";
+
       $createuStampUTC = strtotime($this->post->post_date_gmt);
       $createstamp  = date("Ymd\THis\Z", $createuStampUTC);
       echo "DTSTAMP:" . $createstamp . "\n";
@@ -112,16 +152,11 @@ if ( ! class_exists('TMFixture')):
         echo "LOCATION:Away\n";
       }
 
-      if ( $kickofftime->format('H') != '00' ) {
-        $startuStampUTC = $this->kickofftime;
-        $startstamp  = date("Ymd\THis\Z", $startuStampUTC);
-        $enduStampUTC = $startuStampUTC + ( 90 * 60 );
-        $endstamp  = date("Ymd\THis\Z", $enduStampUTC);
-        echo "DTSTART:" . $startstamp . "\n";
-        echo "DTEND:" . $endstamp . "\n";
+      if ( $this->kickofftimeutc->format('H') != '00' ) {
+        echo "DTSTART:" . $this->kickofftimeutc->format("Ymd\THis\Z") . "\n";
+        echo "DTEND:" . $this->endtimeutc->format("Ymd\THis\Z") . "\n";
       } else {
-         $uStampUTC = $this->fixturedate + (get_option('gmt_offset') * 3600);
-         echo "DTSTART;VALUE=DATE:" . $kickofftime->format("Ymd") . "\n";
+         echo "DTSTART;VALUE=DATE:" . $this->kickofftimeutc->format("Ymd") . "\n";
       }
 
       echo "SUMMARY:" . $this->team->title . ":" . $this->title . "\n";

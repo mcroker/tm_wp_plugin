@@ -24,20 +24,21 @@ function tm_team_ical($request_data) {
   $parameters = $request_data->get_params();
   $team = TMTeam::getBySlug( $parameters['team'] );
   if ( $team ) {
-    header('Content-type: text/calendar; charset=utf-8');
+    //header('Content-type: text/calendar; charset=utf-8');
     header('Content-Disposition: inline; filename=twrfc-' . $team->slug . '-fixtures.ics');
     echo "BEGIN:VCALENDAR\n";
     echo "VERSION:2.0\n";
     echo "PRODID:-//tm/team/" . $team->slug . "\n";
     $team->fixtures_vevents();
     echo "END:VCALENDAR\n";
+    exit();
   } else {
     wp_die('Team ' . $parameters['team']. ' not found');
   }
 };
 
 function tm_all_ical($request_data){
-  header('Content-type: text/calendar; charset=utf-8');
+  //header('Content-type: text/calendar; charset=utf-8');
   header('Content-Disposition: inline; filename=twrfc-fixtures.ics');
   echo "BEGIN:VCALENDAR\n";
   echo "VERSION:2.0\n";
@@ -46,6 +47,7 @@ function tm_all_ical($request_data){
     $team->fixtures_vevents();
   }
   echo "END:VCALENDAR\n";
+  exit();
 };
 
 add_action( 'rest_api_init', function () {

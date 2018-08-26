@@ -42,7 +42,6 @@ if ( is_admin() && ! function_exists( 'tm_fixture_save_postdata' ) ):
     }
     if ( isset($_POST['tm_fixture_kickofftime']) ){
       $fixture->kickofftime = $_POST['tm_fixture_kickofftime'];
-      $fixture->fixturedate = $fixture->kickofftime->format('Y-m-d');
     }
     if ( isset($_POST['tm_fixture_scorefor']) ){
       $fixture->scorefor = $_POST['tm_fixture_scorefor'];

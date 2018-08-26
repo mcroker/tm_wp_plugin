@@ -53,10 +53,11 @@ if ( ! function_exists( 'tm_fixturelist_block_row' ) ):
               <span class="team-logo logo-even"><?php echo $awaylogo ?></span>
               <time class="tm-event-date">
                 <?php
-                $kickoff = $fixture->kickofftime;
-                if ( ! empty($kickoff) ) { ?>
+                $kickoffutc = clone $fixture->kickofftime;
+                $kickoffutc->setTimezone(new DateTimeZone('UTC'));
+                if ( ! empty($kickoffutc) ) { ?>
                   <a href="<?php echo esc_attr($fixture->url) ?>"><?php echo $fixture->kickofftime->format('F d, Y') ?></a>
-                  <?php if ( $fixture->kickofftime->format('H') != '00' && empty($homescore) && empty($awayscore) ) { ?>
+                  <?php if ( $kickoffutc->format('H') != '00' && empty($homescore) && empty($awayscore) ) { ?>
                     <br><a href="<?php echo esc_attr($fixture->url) ?>"><?php echo $fixture->kickofftime->format('H:i') ?></a>
                   <?php } ?>
                 <?php } else { ?>
