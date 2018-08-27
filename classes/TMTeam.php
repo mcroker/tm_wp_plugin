@@ -52,6 +52,10 @@ if ( ! class_exists('TMTeam')):
       ),
     );
 
+    public static function sort_by_title_asc($a, $b) {
+      return ( $a->title > $b->title );
+    }
+
     function __construct($teamid = 0) {
       parent::__construct($teamid);
     }

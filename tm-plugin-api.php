@@ -24,7 +24,7 @@ function tm_team_ical($request_data) {
   $parameters = $request_data->get_params();
   $team = TMTeam::getBySlug( $parameters['team'] );
   if ( $team ) {
-    //header('Content-type: text/calendar; charset=utf-8');
+    header('Content-type: text/calendar; charset=utf-8');
     header('Content-Disposition: inline; filename=twrfc-' . $team->slug . '-fixtures.ics');
     echo "BEGIN:VCALENDAR\n";
     echo "VERSION:2.0\n";
@@ -38,7 +38,7 @@ function tm_team_ical($request_data) {
 };
 
 function tm_all_ical($request_data){
-  //header('Content-type: text/calendar; charset=utf-8');
+  header('Content-type: text/calendar; charset=utf-8');
   header('Content-Disposition: inline; filename=twrfc-fixtures.ics');
   echo "BEGIN:VCALENDAR\n";
   echo "VERSION:2.0\n";
