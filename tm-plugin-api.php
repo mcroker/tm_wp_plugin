@@ -50,30 +50,41 @@ function tm_all_ical($request_data){
   exit();
 };
 
+function tm_festival_generateschedule($request_data){
+  $parameters = $request_data->get_params();
+  $festival = TMFestival::getBySlug( $parameters['festival'] );
+  $festival->generateschedule();
+  wp_send_json(null);
+}
+
 add_action( 'rest_api_init', function () {
   register_rest_route( 'tm/v1', '/test', array(
     'methods' => 'GET',
-    'callback' => 'tm_test',
+    'callback' => 'tm_test'
   ) );
   register_rest_route( 'tm/v1', '/updateall', array(
     'methods' => 'GET',
-    'callback' => 'tm_api_updateall',
+    'callback' => 'tm_api_updateall'
   ) );
   register_rest_route( 'tm/v1', '/team/updateall', array(
     'methods' => 'GET',
-    'callback' => 'tm_team_api_updateall',
+    'callback' => 'tm_team_api_updateall'
   ) );
   register_rest_route( 'tm/v1', '/competition/updateall', array(
     'methods' => 'GET',
-    'callback' => 'tm_competition_api_updateall',
+    'callback' => 'tm_competition_api_updateall'
   ) );
   register_rest_route( 'tm/v1', '/ical/(?P<team>[a-zA-Z0-9-]+)', array(
     'methods'  => WP_REST_Server::READABLE,
-    'callback' => 'tm_team_ical',
+    'callback' => 'tm_team_ical'
   ));
   register_rest_route( 'tm/v1', '/ical', array(
     'methods'  => WP_REST_Server::READABLE,
-    'callback' => 'tm_all_ical',
+    'callback' => 'tm_all_ical'
+  ));
+  register_rest_route( 'tm/v1', '/festival/(?P<festival>[a-zA-Z0-9-]+)/generate', array(
+    'methods'  => WP_REST_Server::READABLE,
+    'callback' => 'tm_festival_generateschedule'
   ));
 } );
 ?>

@@ -22,10 +22,6 @@ if ( ! class_exists('TMFixture')):
            'type'      => 'meta_attrib',
            'meta_key'  => 'tm_fixture_scoreagainst'
       ),
-      'scoreagainst' => Array(
-           'type'      => 'meta_attrib',
-           'meta_key'  => 'tm_fixture_scoreagainst'
-      ),
       'homeaway' => Array(
            'type'      => 'meta_attrib',
            'meta_key'  => 'tm_fixture_homeaway'

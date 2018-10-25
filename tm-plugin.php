@@ -8,6 +8,11 @@ Description: Sports club management developed by Martin Croker
 
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
+error_reporting(-1); // reports all errors
+ini_set("display_errors", "1"); // shows all errors
+ini_set("log_errors", 1);
+ini_set("error_log", "php-error.log");
+
 // CSS
 function tm_load_plugin_css() {
     $plugin_url = plugin_dir_url( __FILE__ );
@@ -34,6 +39,7 @@ require_once('leaguetable-widget/leaguetable-widget.php');
 // Post types
 require_once('fixture-posttype/fixture-posttype.php');
 require_once('team-posttype/team-posttype.php');
+require_once('festival-posttype/festival-posttype.php');
 
 // Taxonomy
 require_once('opposition-taxonomy/opposition-taxonomy.php');
@@ -45,6 +51,8 @@ require_once('competition-taxonomy/competition-taxonomy.php');
 require_once('tm-plugin-options.php');
 require_once('tm-plugin-autofetch.php');
 require_once('tm-plugin-api.php');
+
+do_action('tm_plugin_load_children');
 
 /* Stop Adding Functions Below this Line */
 ?>

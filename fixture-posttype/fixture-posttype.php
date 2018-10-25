@@ -64,6 +64,7 @@ endif;
       'rewrite'             => array( 'slug' => $slug, 'with_front' => false ),
 */
 
+if ( ! function_exists( 'tm_fixture_rewriteurl' )):
 function tm_fixture_rewriteurl() {
   $teamslug = get_theme_mod( 'team_permalink' );
   $teamslug = ( empty( $slug ) ) ? 'team' : $slug;
@@ -72,7 +73,10 @@ function tm_fixture_rewriteurl() {
    $wp_rewrite->flush_rules(false);
 }
 add_action('init', 'tm_fixture_rewriteurl');
+endif;
 
+
+if ( ! function_exists( 'tm_fixture_permalinks' )):
 function tm_fixture_permalinks( $post_link, $post ){
     if ( is_object( $post ) && $post->post_type == 'tm_fixture' ) {
         $fixture = new TMFixture($post);
@@ -86,4 +90,5 @@ function tm_fixture_permalinks( $post_link, $post ){
     return $post_link;
 }
 add_filter( 'post_type_link', 'tm_fixture_permalinks', 1, 2 );
+endif;
 ?>
