@@ -266,15 +266,18 @@ if ( ! class_exists('TMBasePost')):
     }
 
   // ==================================================
-    public static function inner_custom_field_button($key, $label, $onclick) {
+    public static function inner_custom_field_button($key, $label, $onclick, $status = '__NONE') {
       ?>
       <div class="tm-meta-button">
         <input
-        id=<?php echo $id ?>
+        id='<?php echo $key ?>'
         class='button'
         type='button'
         onclick='<?php echo esc_attr($onclick) ?>'
         value='<?php echo esc_attr__($label,'tm') ?>' />
+        <?php if ( $status != '__NONE' ) { ?>
+          <label id="<?php echo esc_attr($key) ?>_label" for="<?php echo $key ?>"><?php echo esc_html__($status,'tm') ?></label>
+        <?php } ?>
       </div>
       <?php
     }
@@ -298,7 +301,7 @@ if ( ! class_exists('TMBasePost')):
           case 'meta_attrib_time':   $classname::inner_custom_field_time($fieldkey, $fieldvalue, $fieldlabel); break;
           case 'meta_attrib_text':   $classname::inner_custom_field_text($fieldkey, $fieldvalue, $fieldlabel); break;
           case 'meta_attrib_code':   $classname::inner_custom_field_code($fieldkey, $fieldvalue, $fieldlabel); break;
-          default:                   $classname::inner_custom_field_string($fieldkey, $fieldvalue, $fieldlabel);
+          case 'meta_attrib_string': $classname::inner_custom_field_string($fieldkey, $fieldvalue, $fieldlabel);
         }
       }
     }

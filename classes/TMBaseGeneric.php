@@ -38,6 +38,7 @@ if ( ! class_exists('TMBaseGeneric')):
         $conf = $classname::$meta_keys[$stemkey];
         switch($conf['type']) {
           case 'meta_attrib':        $this->update_attrib_string($key, $conf['meta_key'], $value); break;
+          case 'meta_attrib_string': $this->update_attrib_string($key, $conf['meta_key'], $value); break;
           case 'meta_attrib_number': $this->update_attrib_string($key, $conf['meta_key'], $value); break;
           case 'meta_attrib_code':   $this->update_attrib_string($key, $conf['meta_key'], $value); break;
           case 'meta_attrib_text':   $this->update_attrib_string($key, $conf['meta_key'], $value); break;
@@ -61,6 +62,7 @@ if ( ! class_exists('TMBaseGeneric')):
         $conf = $classname::$meta_keys[$stemkey];
         switch($conf['type']) {
           case 'meta_attrib':        return $this->get_attrib_string($key, $conf['meta_key']); break;
+          case 'meta_attrib_string': return $this->get_attrib_string($key, $conf['meta_key']); break;
           case 'meta_attrib_number': return $this->get_attrib_string($key, $conf['meta_key']); break;
           case 'meta_attrib_code':   return $this->get_attrib_string($key, $conf['meta_key']); break;
           case 'meta_attrib_text':   return $this->get_attrib_string($key, $conf['meta_key']); break;
