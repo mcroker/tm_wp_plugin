@@ -10,6 +10,10 @@ if ( ! class_exists('TMTeam')):
   class TMTeam extends TMBasePost {
     protected static $post_type = 'tm_team';
 
+    protected static $tmargs = array(
+      'create_metadatabox' => false
+    );
+
     protected static $meta_keys = Array(
       'leagueteam' => Array(
         'type'      => 'meta_attrib',

@@ -10,6 +10,12 @@ if ( ! class_exists('TMBasePost')):
     protected static $args = [];
     protected static $meta_keys = [];
     protected static $setting_keys = [];
+    protected static $tmargs = [];
+    private static $default_tmargs = array(
+      'create_metadatabox' => true,
+      'enqueue_scripts'    => true,
+      'register_settings'  => true
+    );
     private $_post_type;
     protected $cache = [];
 
@@ -32,17 +38,24 @@ if ( ! class_exists('TMBasePost')):
   // ==================================================
     public static function init() {
       $classname = get_called_class();
+      $tmargs = array_replace( TMBasePost::$default_tmargs, $classname::$tmargs );
       add_action( 'init', $classname . '::register_post_type' );
       if ( is_admin() ) {
-        add_action( 'add_meta_boxes', $classname . '::create_metadatabox' );
-        add_action( 'save_post', $classname . '::save_metadatabox' );
-        if ( ! empty( $classname::$setting_keys ) ) {
+        if ( $tmargs['create_metadatabox'] ) {
+          add_action( 'add_meta_boxes', $classname . '::create_metadatabox' );
+          add_action( 'save_post', $classname . '::save_metadatabox' );
+        }
+        if ( ! empty( $classname::$setting_keys ) && $tmargs['register_settings'] ) {
           add_action('admin_menu', $classname . '::create_settings_menu');
           add_action('admin_init', $classname . '::register_settings' );
         }
-        add_action( 'admin_enqueue_scripts',  $classname . '::enqueue_adminscripts');
+        if ( $tmargs['enqueue_scripts']  ) {
+          add_action( 'admin_enqueue_scripts',  $classname . '::enqueue_adminscripts');
+        }
       }
-      add_action( 'wp_enqueue_scripts',  $classname . '::enqueue_scripts');
+      if ( $tmargs['enqueue_scripts']  ) {
+        add_action( 'wp_enqueue_scripts',  $classname . '::enqueue_scripts');
+      }
       if ( !empty($classname::$path_params) ) {
         // add_action('init', $classname . '::rewriteurl');
         // add_filter( 'post_type_link', $classname . '::permalinks', 1, 2 );
