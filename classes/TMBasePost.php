@@ -53,21 +53,7 @@ if ( ! class_exists('TMBasePost')):
     public static function enqueue_scripts() {
       $classname = get_called_class();
       if ( $classname::$post_type == get_post_type() ) {
-        $basefilename = (new ReflectionClass(static::class))->getFileName();
-        $plugin_dir = plugin_dir_path($basefilename);
-        $plugin_url = plugin_dir_url($basefilename);
-        if (file_exists($plugin_dir . '/assets/js/' . $classname . '.js')) {
-          wp_enqueue_script( $classname . '-script', $plugin_url . '/assets/js/' . $classname . '.js', array('jquery'), 'v4.0.0', false );
-          wp_localize_script( $classname . '-script', 'tmphpobj', array(
-            'ajax_url'  => admin_url( 'admin-ajax.php' ),
-            'post_id'   => get_the_id(),
-            'post_type' => $classname::$post_type,
-            'classname' => $classname
-          ) );
-        }
-        if (file_exists($plugin_dir . '/assets/css/' . $classname . '.css')) {
-          wp_enqueue_style( $classname . '-css', $plugin_url . '/assets/css/'. $classname . '.css', array(), 'v4.0.0');
-        }
+        parent::enqueue_scripts_helper( );
       }
     }
 
@@ -77,21 +63,7 @@ if ( ! class_exists('TMBasePost')):
       if( in_array($hook_suffix, array('post.php', 'post-new.php') ) ){
         $screen = get_current_screen();
         if( is_object( $screen ) && $classname::$post_type == $screen->post_type ){
-          $basefilename = (new ReflectionClass(static::class))->getFileName();
-          $plugin_dir = plugin_dir_path($basefilename);
-          $plugin_url = plugin_dir_url($basefilename);
-          if (file_exists($plugin_dir . '/assets/js/' . $classname . '-admin.js')) {
-            wp_enqueue_script( $classname . '-admin-script', $plugin_url . '/assets/js/' . $classname . '-admin.js', array('jquery'), 'v4.0.0', false );
-            wp_localize_script( $classname . '-admin-script', 'tmphpobj', array(
-              'ajax_url'  => admin_url( 'admin-ajax.php' ),
-              'post_id'   => get_the_id(),
-              'post_type' => $classname::$post_type,
-              'classname' => $classname
-            ) );
-          }
-          if (file_exists($plugin_dir . '/assets/css/' . $classname . '-admin.css')) {
-            wp_enqueue_style( $classname . '-admin-css', $plugin_url . '/assets/css/'. $classname . '-admin.css', array(), 'v4.0.0');
-          }
+          parent::enqueue_adminscripts_helper( $hook_suffix );
         }
       }
     }

@@ -43,7 +43,7 @@ if ( ! function_exists( 'tm_opposition_enqueue_adminscripts' )):
   function tm_opposition_enqueue_adminscripts($hook) {
     $plugin_url = plugin_dir_url(__FILE__);
 		wp_enqueue_media();
-    wp_enqueue_script( 'opposition-logo-field-js', $plugin_url . 'opposition-logo-field.js', array('jquery'), 'v4.0.0', false );
+    // wp_enqueue_script( 'opposition-logo-field-js', $plugin_url . 'opposition-logo-field.js', array('jquery'), 'v4.0.0', false );
   }
   add_action( 'admin_enqueue_scripts', 'tm_opposition_enqueue_adminscripts' );
 endif;

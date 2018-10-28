@@ -28,6 +28,10 @@ if ( ! class_exists('TMBaseTax')):
     public static function init() {
       $classname = get_called_class();
       add_action('init', $classname . '::register_taxonomy');
+      if ( is_admin() ) {
+        add_action( 'admin_enqueue_scripts',  $classname . '::enqueue_adminscripts');
+      }
+      add_action( 'wp_enqueue_scripts',  $classname . '::enqueue_scripts');
     }
 
     // ==================================================
@@ -61,6 +65,24 @@ if ( ! class_exists('TMBaseTax')):
       $default_args = array_replace( $default_args, $classname::$args );
 
       register_taxonomy($classname::$taxonomy, $classname::$associate_post_types, $default_args );
+    }
+    // ==================================================
+    public static function enqueue_scripts() {
+      $classname = get_called_class();
+      if ( is_object_in_taxonomy ( get_post_type() , $classname::$taxonomy ) ) {
+        parent::enqueue_scripts_helper();
+      }
+    }
+
+    // ==================================================
+    public static function enqueue_adminscripts( $hook_suffix ){
+      $classname = get_called_class();
+      if( in_array($hook_suffix, array('term.php', 'edit-tags.php') ) ){
+        $screen = get_current_screen();
+        if( is_object( $screen ) && $classname::$taxonomy == $screen->taxonomy ){
+          parent::enqueue_adminscripts_helper( $hook_suffix );
+        }
+      }
     }
 
     // ==================================================

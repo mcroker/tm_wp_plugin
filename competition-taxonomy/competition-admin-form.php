@@ -15,7 +15,7 @@ if ( is_admin() && ! function_exists( 'tm_competition_enqueue_adminscripts' )):
     $plugin_url = plugin_dir_url(__FILE__);
     wp_enqueue_script( 'competition-admin-form', $plugin_url . 'competition-admin-form.js', array(), 'v4.0.0', true );
   }
-  add_action( 'admin_enqueue_scripts', 'tm_competition_enqueue_adminscripts' );
+  // add_action( 'admin_enqueue_scripts', 'tm_competition_enqueue_adminscripts' );
 endif;
 
 // Add form fields ==================================================

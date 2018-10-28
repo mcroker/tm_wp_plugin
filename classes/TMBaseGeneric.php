@@ -47,6 +47,55 @@ if ( ! class_exists('TMBaseGeneric')):
     }
 
     // ==================================================
+    public static function enqueue_scripts_helper($obj = [] ) {
+      // Assumc child class has checked the post_type / tax
+      $classname = get_called_class();
+      $basefilename = (new ReflectionClass(static::class))->getFileName();
+      $plugin_dir = plugin_dir_path($basefilename);
+      $plugin_url = plugin_dir_url($basefilename);
+
+      $default_obj =  array(
+        'ajax_url'  => admin_url( 'admin-ajax.php' ),
+        'post_id'   => get_the_id(),
+        'post_type' => get_post_type(),
+        'classname' => $classname
+      );
+      $default_obj = array_replace( $default_obj, $obj );
+
+      if (file_exists($plugin_dir . '/assets/js/' . $classname . '.js')) {
+        wp_enqueue_script( $classname . '-script', $plugin_url . '/assets/js/' . $classname . '.js', array('jquery'), 'v4.0.0', false );
+        wp_localize_script( $classname . '-script', 'tmphpobj', $default_obj );
+      }
+      if (file_exists($plugin_dir . '/assets/css/' . $classname . '.css')) {
+        wp_enqueue_style( $classname . '-css', $plugin_url . '/assets/css/'. $classname . '.css', array(), 'v4.0.0');
+      }
+    }
+
+    // ==================================================
+    public static function enqueue_adminscripts_helper( $obj = [] ){
+      // Assumc child class has checked the post_type / tax
+      $classname = get_called_class();
+      $basefilename = (new ReflectionClass(static::class))->getFileName();
+      $plugin_dir = plugin_dir_path($basefilename);
+      $plugin_url = plugin_dir_url($basefilename);
+
+      $default_obj =  array(
+        'ajax_url'  => admin_url( 'admin-ajax.php' ),
+        'post_id'   => get_the_id(),
+        'classname' => $classname
+      );
+      $default_obj = array_replace( $default_obj, $default_obj );
+
+      if (file_exists($plugin_dir . '/assets/js/' . $classname . '-admin.js')) {
+        wp_enqueue_script( $classname . '-admin-script', $plugin_url . '/assets/js/' . $classname . '-admin.js', array('jquery'), 'v4.0.0', false );
+        wp_localize_script( $classname . '-admin-script', 'tmphpobj', $default_obj );
+      }
+      if (file_exists($plugin_dir . '/assets/css/' . $classname . '-admin.css')) {
+        wp_enqueue_style( $classname . '-admin-css', $plugin_url . '/assets/css/'. $classname . '-admin.css', array(), 'v4.0.0');
+      }
+    }
+
+    // ==================================================
     protected function update_value($key, $value) {
       $classname = get_called_class();
       $stemkey = TMBaseGeneric::get_stemkey($key);
