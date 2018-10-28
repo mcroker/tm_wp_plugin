@@ -7,6 +7,16 @@ require_once('TMFixture.php');
 if ( ! class_exists('TMCompetition')):
   class TMCompetition extends TMBaseTax {
     public static $taxonomy = 'tm_competition';
+
+    protected static $associate_post_types = array('tm_fixture','tm_team');
+
+    protected static $labels = Array(
+      'singular_name'       => 'Competition',
+    );
+
+    protected static $args = Array (
+    );
+
     protected static $meta_keys = Array(
       'sortkey' => Array(
         'type'      => 'meta_attrib',
@@ -87,4 +97,5 @@ if ( ! class_exists('TMCompetition')):
       }
 
     }
+    TMCompetition::init();
   endif;

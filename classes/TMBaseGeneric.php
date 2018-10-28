@@ -10,19 +10,34 @@ if ( ! class_exists('TMBaseGeneric')):
     abstract protected function update_meta_value($meta_key, $value);
     abstract protected function get_meta_value($meta_key);
 
+    // ==================================================
     function __construct($id, $obj = null) {
       $this->_id = $id;
       $this->_obj = $obj;
     }
 
+    // ==================================================
     public function __get ($key) {
       return $this->get_value($key);
     }
 
+    // ==================================================
     public function __set ($key, $value) {
       $this->update_value($key, $value);
     }
 
+    // ==================================================
+    public static function get_pluralname() {
+      $classname = get_called_class();
+      if (array_key_exists('name', $classname::$labels)) {
+        $plural_name = $classname::$labels['name'];
+      } else {
+        $plural_name = $classname::$labels['singular_name'] . 's';
+      }
+      return $plural_name;
+    }
+
+    // ==================================================
     protected static function get_stemkey($key) {
       if ( substr($key, -3) == '_id') {
         return substr($key, 0, strlen($key) - 3);
@@ -31,6 +46,7 @@ if ( ! class_exists('TMBaseGeneric')):
       }
     }
 
+    // ==================================================
     protected function update_value($key, $value) {
       $classname = get_called_class();
       $stemkey = TMBaseGeneric::get_stemkey($key);
@@ -55,6 +71,7 @@ if ( ! class_exists('TMBaseGeneric')):
       }
     }
 
+    // ==================================================
     protected function get_value($key) {
       $classname = get_called_class();
       $stemkey = TMBaseGeneric::get_stemkey($key);

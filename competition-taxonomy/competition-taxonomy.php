@@ -5,6 +5,7 @@ is_admin() && require_once('competition-admin-form.php');
 is_admin() && require_once('competition-admin-save.php');
 is_admin() && require_once('competition-admin-ajax.php');
 
+/*
 if ( ! function_exists( 'tm_competition_registertaxonomy' ) ):
   function tm_competition_registertaxonomy() {
     $labels = array(
@@ -35,4 +36,5 @@ if ( ! function_exists( 'tm_competition_registertaxonomy' ) ):
   }
   add_action('init', 'tm_competition_registertaxonomy');
 endif;
+*/
 ?>

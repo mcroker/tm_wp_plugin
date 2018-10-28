@@ -6,8 +6,8 @@ require_once('TMBaseGeneric.php');
 if ( ! class_exists('TMBasePost')):
   class TMBasePost extends TMBaseGeneric {
     protected static $post_type;
-    protected static $post_labels;
-    protected static $post_args = [];
+    protected static $labels;
+    protected static $args = [];
     protected static $meta_keys = [];
     protected static $setting_keys = [];
     private $_post_type;
@@ -101,27 +101,17 @@ if ( ! class_exists('TMBasePost')):
     $classname = get_called_class();
     $slug = get_theme_mod( $classname::$post_type . '_permalink' );
     if ( empty($slug) ) {
-      $slug = ( array_key_exists( 'slug' , $classname::$post_labels ) ) ? $classname::$post_labels['slug'] : $classname::get_pluralname();
+      $slug = ( array_key_exists( 'slug' , $classname::$labels ) ) ? $classname::$labels['slug'] : $classname::get_pluralname();
     }
     return strtolower($slug);
   }
 
-  // ==================================================
-  public static function get_pluralname() {
-    $classname = get_called_class();
-    if (array_key_exists('name', $classname::$post_labels)) {
-      $plural_name = $classname::$post_labels['name'];
-    } else {
-      $plural_name = $classname::$post_labels['singular_name'] . 's';
-    }
-    return $plural_name;
-  }
 
   // ==================================================
     public static function register_post_type() {
       $classname = get_called_class();
       if (! post_type_exists($classname::$post_type)) {
-        $singular_name = $classname::$post_labels['singular_name'];
+        $singular_name = $classname::$labels['singular_name'];
         $plural_name = $classname::get_pluralname();
 
         $default_labels = array(
@@ -139,7 +129,7 @@ if ( ! class_exists('TMBasePost')):
           'not_found'           => __( 'Not Found', 'tm' ),
           'not_found_in_trash'  => __( 'Not found in Trash', 'tm' ),
         );
-        $default_labels = array_replace( $default_labels, $classname::$post_labels );
+        $default_labels = array_replace( $default_labels, $classname::$labels );
         // TODO :: Need to internationalise here
 
         $slug = $classname::get_slug();
@@ -165,7 +155,7 @@ if ( ! class_exists('TMBasePost')):
           'rewrite'             => array( 'slug' => $slug, 'with_front' => false ),
           'capability_type'     => 'post'
         );
-        $default_args = array_replace( $default_args, $classname::$post_args );
+        $default_args = array_replace( $default_args, $classname::$args );
         register_post_type( $classname::$post_type , $default_args );
       }
     }
@@ -335,8 +325,8 @@ if ( ! class_exists('TMBasePost')):
       $classname = get_called_class();
       //create new top-level menu
       add_submenu_page('edit.php?post_type=' . $classname::$post_type,
-      $classname::$post_labels['name'] . ' Settings',
-      $classname::$post_labels['name'] . ' Settings',
+      $classname::$labels['name'] . ' Settings',
+      $classname::$labels['name'] . ' Settings',
       'administrator',
       __FILE__,
       $classname . '::settings_page',
@@ -364,7 +354,7 @@ if ( ! class_exists('TMBasePost')):
     $classname = get_called_class();
     ?>
     <div class="wrap">
-      <h1><? echo $classname::$post_labels['singular_name'] ?> Settings</h1>
+      <h1><? echo $classname::$labels['singular_name'] ?> Settings</h1>
 
       <form method="post" action="options.php">
         <?php settings_fields( $classname::$post_type . '-settings-group' ); ?>

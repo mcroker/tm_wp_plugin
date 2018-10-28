@@ -6,6 +6,7 @@ require_once('opposition-edit-form-fields.php');
 require_once('opposition-add-form-fields.php');
 require_once('opposition-save-form-fields.php');
 
+/*
 if ( ! function_exists( 'tm_registertaxonomy_opposition' ) ):
   function tm_registertaxonomy_opposition() {
     $labels = array(
@@ -34,4 +35,5 @@ if ( ! function_exists( 'tm_registertaxonomy_opposition' ) ):
   }
   add_action('init', 'tm_registertaxonomy_opposition');
 endif;
+*/
 ?>

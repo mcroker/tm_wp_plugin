@@ -43,8 +43,6 @@ require_once('festival-posttype/festival-posttype.php');
 
 // Taxonomy
 require_once('opposition-taxonomy/opposition-taxonomy.php');
-require_once('season-taxonomy/season-taxonomy.php');
-require_once('section-taxonomy/section-taxonomy.php');
 require_once('competition-taxonomy/competition-taxonomy.php');
 
 // require_once('tm-plugin-template.php');
