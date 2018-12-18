@@ -20,35 +20,9 @@ function tm_load_plugin_css() {
 }
 add_action( 'wp_enqueue_scripts', 'tm_load_plugin_css' );
 
-require_once('classes/TMCompetition.php');
-require_once('classes/TMFixture.php');
-require_once('classes/TMAutofetchFixture.php');
-require_once('classes/TMOpposition.php');
-require_once('classes/TMSeason.php');
-require_once('classes/TMSection.php');
-require_once('classes/TMTeam.php');
-require_once('classes/TMLeagueTableEntry.php');
-
-// Widgets
-require_once('fixturelist-widget/fixturelist-widget.php');
-require_once('leaguetable-widget/leaguetable-widget.php');
-
-// Shortcodes
-// require_once('leaguetable-widget/leaguetable-shortcode.php');
-
-// Post types
-require_once('fixture-posttype/fixture-posttype.php');
-require_once('team-posttype/team-posttype.php');
-require_once('festival-posttype/festival-posttype.php');
-
-// Taxonomy
-require_once('opposition-taxonomy/opposition-taxonomy.php');
-require_once('competition-taxonomy/competition-taxonomy.php');
-
-// require_once('tm-plugin-template.php');
-require_once('tm-plugin-options.php');
-require_once('tm-plugin-autofetch.php');
-require_once('tm-plugin-api.php');
+require_once('classes/TMBaseGeneric.php');
+require_once('classes/TMBasePost.php');
+require_once('classes/TMBaseTax.php');
 
 do_action('tm_plugin_load_children');
 
