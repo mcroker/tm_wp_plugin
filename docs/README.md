@@ -30,8 +30,8 @@ Load your plugin into wordpress as normal
 
 ## Usage
 
-[BASEPOST.md](https://github.com/mcroker/tm_wp_plugin/blob/master/BASEPOST.md)
-[BASETAX.md](https://github.com/mcroker/tm_wp_plugin/blob/master/BASETAX.md)
+* [BASEPOST.md](https://github.com/mcroker/tm_wp_plugin/docs/blob/master/BASEPOST.md)
+* [BASETAX.md](https://github.com/mcroker/tm_wp_plugin/docs/blob/master/BASETAX.md)
 
 ## Built With
 
