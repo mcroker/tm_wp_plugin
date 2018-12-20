@@ -269,14 +269,20 @@ if ( ! class_exists('TMBasePost')):
         $fieldkey = $classname . "_" . $key;
         $fieldvalue = $obj->$key;
         $fieldlabel = $value['label'];
-        switch($value['type']) {
-          case 'meta_attrib':        $classname::inner_custom_field_string($fieldkey, $fieldvalue, $fieldlabel); break;
-          case 'meta_attrib_number': $classname::inner_custom_field_number($fieldkey, $fieldvalue, $fieldlabel); break;
-          case 'meta_attrib_date':   $classname::inner_custom_field_date($fieldkey, $fieldvalue, $fieldlabel); break;
-          case 'meta_attrib_time':   $classname::inner_custom_field_time($fieldkey, $fieldvalue, $fieldlabel); break;
-          case 'meta_attrib_text':   $classname::inner_custom_field_text($fieldkey, $fieldvalue, $fieldlabel); break;
-          case 'meta_attrib_code':   $classname::inner_custom_field_code($fieldkey, $fieldvalue, $fieldlabel); break;
-          case 'meta_attrib_string': $classname::inner_custom_field_string($fieldkey, $fieldvalue, $fieldlabel);
+        $fielddisplay = true;
+        if ( array_key_exists('display', $value) ) {
+          $fielddisplay = $value['display'];
+        }
+        if ( $fielddisplay ) {
+          switch($value['type']) {
+            case 'meta_attrib':        $classname::inner_custom_field_string($fieldkey, $fieldvalue, $fieldlabel); break;
+            case 'meta_attrib_number': $classname::inner_custom_field_number($fieldkey, $fieldvalue, $fieldlabel); break;
+            case 'meta_attrib_date':   $classname::inner_custom_field_date($fieldkey, $fieldvalue, $fieldlabel); break;
+            case 'meta_attrib_time':   $classname::inner_custom_field_time($fieldkey, $fieldvalue, $fieldlabel); break;
+            case 'meta_attrib_text':   $classname::inner_custom_field_text($fieldkey, $fieldvalue, $fieldlabel); break;
+            case 'meta_attrib_code':   $classname::inner_custom_field_code($fieldkey, $fieldvalue, $fieldlabel); break;
+            case 'meta_attrib_string': $classname::inner_custom_field_string($fieldkey, $fieldvalue, $fieldlabel);
+          }
         }
       }
     }
