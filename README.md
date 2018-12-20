@@ -11,23 +11,10 @@ Within your plugin create class objects extendign TMBasePost or TMBaseTax superc
 ```
 if ( ! class_exists('TMSessionPlan')):
   class TMSessionPlan extends TMBasePost {
-    protected static $post_type = 'tm_sessionplan';
+    protected static $post_type = 'tm_sessionplan';   // Required
 
     protected static $labels = Array(
-      'singular_name'       => 'Session Plan',
-      'slug'                => 'sessionplans'
-    );
-
-    protected static $args = Array (
-      'supports'            => array( 'title', 'editor', 'author', 'revisions', 'thumbnail', 'revisions'),
-    );
-
-    protected static $meta_keys = Array(
-      'property1' => Array(
-        'type'      => 'meta_attrib',
-        'meta_key'  => 'agegroup',
-        'label'     => 'Age-group'
-      )
+      'singular_name'       => 'Session Plan'         // Required
     );
 
     function __construct($sessionid = 0) {
@@ -41,11 +28,12 @@ endif;
 
 Load your plugin into wordpress as normal
 
+## Usage
+
+[BASEPOST.md](https://github.com/mcroker/tm_wp_plugin/blob/master/BASEPOST.md)
+[BASETAX.md](https://github.com/mcroker/tm_wp_plugin/blob/master/BASETAX.md)
+
 ## Built With
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
