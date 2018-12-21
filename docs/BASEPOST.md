@@ -44,3 +44,24 @@ protected static $args = Array (
   'supports'            => array( 'title', 'editor', 'author', 'revisions', 'thumbnail', 'revisions'),
 );
 ```
+## meta_keys
+
+```
+protected static $meta_keys = Array(
+  'agegroup' => Array(
+    'type'      => 'meta_attrib',
+    'meta_key'  => 'agegroup',
+    'label'     => 'Age-group'
+  )
+);
+```
+
+### type
+
+* meta_attrib
+* meta_attrib_number
+* meta_attrib_date
+* meta_attrib_time
+* meta_attrib_text
+* meta_attrib_code
+* meta_attrib_string
