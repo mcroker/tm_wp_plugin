@@ -1,11 +1,3 @@
-.tm-teamlogo {
-  width: 10%
-}
-
-.tm-highlightedleagueentry TD {
-  background-color: yellow
-}
-
 DIV.tm-meta-smallinput {
   width: 100%;
   text-align: right;
@@ -22,94 +14,6 @@ DIV.tm-meta-smallinput select
 
 .tm-meta-fullinput {
   width: 100%;
-}
-DIV.tm-fixture-season-select,
-DIV.tm-leaguetable-competition-select {
-  width: 100%;
-  text-align: right;
-}
-
-DIV.tm-fixture-season-select select,
-DIV.tm-leaguetable-competition-select select {
-  xx-width: 300px;
-}
-
-
-/* ================== */
-	.team-logo {
-		max-width: 20%;
-    height: auto;
-		white-space: nowrap;
-		/* overflow: hidden; */
-		text-overflow: ellipsis;
-	}
-
-	.logo-odd {
-		text-align: left;
-		float: left;
-	}
-
-	.logo-even {
-		text-align: right;
-		float: right;
-	}
-
-	.logo-odd img {
-		margin-right: 10px;
-	}
-
-	.logo-even img {
-		margin-left: 10px;
-	}
-
-	.tm-team-name {
-		display: inline;
-		clear: none;
-	}
-
-  /* Event Blocks */
-.tm-event-blocks .tm-event-date,
-.tm-event-blocks .tm-event-time,
-.tm-event-blocks .tm-event-results,
-.tm-event-blocks .tm-event-title {
-	text-align: center;
-	display: block;
-	margin: 10px 0;
-	clear: none;
-}
-.tm-event-blocks .tm-event-league,
-.tm-event-blocks .tm-event-season,
-.tm-event-blocks .tm-event-venue {
-	text-align: center;
-	margin: 0 20%;
-	padding: 0 20px;
-}
-.tm-event-blocks .team-logo {
-	margin: 10px;
-	width: 20%;
-	height: 4em;
-	max-width: 6em;
-	text-align: center;
-}
-.tm-event-blocks .logo-odd {
-	float: left;
-}
-.tm-event-blocks .logo-even {
-	float: right;
-}
-.tm-event-blocks .team-logo img {
-	max-width: 100%;
-	max-height: 100%;
-	width: auto;
-	height: auto;
-}
-.tm-fixtures-results {
-	clear: both;
-}
-.widget .tm-event-blocks .tm-event-title {
-	margin: 10px;
-	padding: 0;
-	clear: both;
 }
 /* ================== */
 

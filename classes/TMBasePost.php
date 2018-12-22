@@ -14,12 +14,13 @@ if ( ! class_exists('TMBasePost')):
     private static $default_tmargs = array(
       'create_metadatabox' => true,
       'enqueue_scripts'    => true,
-      'register_settings'  => true
+      'register_settings'  => true,
+      'customise_list'     => true
     );
     private $_post_type;
     protected $cache = [];
 
-  // ==================================================
+    // ==================================================
     function __construct($post = 0) {
       $classname = get_called_class();
       if ($post instanceof WP_Post) {
@@ -35,7 +36,7 @@ if ( ! class_exists('TMBasePost')):
       $this->_post_type = $classname::$post_type;
     }
 
-  // ==================================================
+    // ==================================================
     public static function init() {
       $classname = get_called_class();
       $tmargs = array_replace( TMBasePost::$default_tmargs, $classname::$tmargs );
@@ -43,8 +44,8 @@ if ( ! class_exists('TMBasePost')):
       if ( is_admin() ) {
         if ( $tmargs['create_metadatabox'] ) {
           add_action( 'add_meta_boxes', $classname . '::create_metadatabox' );
-          add_action( 'save_post', $classname . '::save_metadatabox' );
         }
+        add_action( 'save_post', $classname . '::save_post' );
         if ( ! empty( $classname::$setting_keys ) && $tmargs['register_settings'] ) {
           add_action('admin_menu', $classname . '::create_settings_menu');
           add_action('admin_init', $classname . '::register_settings' );
@@ -52,17 +53,37 @@ if ( ! class_exists('TMBasePost')):
         if ( $tmargs['enqueue_scripts']  ) {
           add_action( 'admin_enqueue_scripts',  $classname . '::enqueue_adminscripts');
         }
+        if ( $tmargs['customise_list'] ) {
+          add_filter('manage_' . $classname::$post_type . '_posts_columns', $classname . '::table_head');
+          add_action('manage_' . $classname::$post_type . '_posts_custom_column', $classname . '::table_content', 10, 2 );
+        }
       }
       if ( $tmargs['enqueue_scripts']  ) {
         add_action( 'wp_enqueue_scripts',  $classname . '::enqueue_scripts');
       }
-      if ( !empty($classname::$path_params) ) {
-        // add_action('init', $classname . '::rewriteurl');
-        // add_filter( 'post_type_link', $classname . '::permalinks', 1, 2 );
-      }
+      add_action('init', $classname . '::add_rewrite_rule');
+      add_filter('query_vars', $classname . '::add_query_vars' );
     }
 
-  // ==================================================
+    // ==================================================
+    public static function add_rewrite_rule() {
+    }
+
+    // ==================================================
+    public static function add_query_vars( $vars ) {
+      return $vars;
+    }
+
+    // ==================================================
+    public static function table_head( $defaults ) {
+      return $defaults;
+    }
+
+    // ==================================================
+    public static function table_content( $column_name, $post_id ) {
+    }
+
+    // ==================================================
     public static function enqueue_scripts() {
       $classname = get_called_class();
       if ( $classname::$post_type == get_post_type() ) {
@@ -70,7 +91,7 @@ if ( ! class_exists('TMBasePost')):
       }
     }
 
-  // ==================================================
+    // ==================================================
     public static function enqueue_adminscripts( $hook_suffix ){
       $classname = get_called_class();
       if( in_array($hook_suffix, array('post.php', 'post-new.php') ) ){
@@ -81,18 +102,17 @@ if ( ! class_exists('TMBasePost')):
       }
     }
 
-  // ==================================================
-  public static function get_slug() {
-    $classname = get_called_class();
-    $slug = get_theme_mod( $classname::$post_type . '_permalink' );
-    if ( empty($slug) ) {
-      $slug = ( array_key_exists( 'slug' , $classname::$labels ) ) ? $classname::$labels['slug'] : $classname::get_pluralname();
+    // ==================================================
+    public static function get_slug() {
+      $classname = get_called_class();
+      $slug = get_theme_mod( $classname::$post_type . '_permalink' );
+      if ( empty($slug) ) {
+        $slug = ( array_key_exists( 'slug' , $classname::$labels ) ) ? $classname::$labels['slug'] : $classname::get_pluralname();
+      }
+      return strtolower($slug);
     }
-    return strtolower($slug);
-  }
 
-
-  // ==================================================
+    // ==================================================
     public static function register_post_type() {
       $classname = get_called_class();
       if (! post_type_exists($classname::$post_type)) {
@@ -145,173 +165,9 @@ if ( ! class_exists('TMBasePost')):
       }
     }
 
-  // ==================================================
-    public static function create_metadatabox() {
-      if ( is_admin() ) {
-        $classname = get_called_class();
-        $plural_name = $classname::get_pluralname();
-        add_meta_box(
-          $classname::$post_type . '_defaulttm',
-          $plural_name . ' Metadata',
-          $classname . '::inner_custom_box',
-          $classname::$post_type,
-          'normal',
-          'default'
-        );
-      }
-    }
 
-  // ==================================================
-    public static function inner_custom_field_number($key, $value, $label) {
-      ?>
-      <div class="tm-meta-number">
-        <label for="<?php echo $key ?>"><?php echo esc_html__($label,'tm') ?></label>
-        <input class=""
-        type="number"
-        name="<?php echo $key ?>"
-        id="<?php echo $key ?>"
-        value="<?php echo esc_attr($value) ?>"
-        />
-      </div>
-      <?php
-    }
 
-  // ==================================================
-    public static function inner_custom_field_date($key, $value, $label) {
-      ?>
-      <div class="tm-meta-text">
-        <label for="<?php echo $key ?>"><?php echo esc_html__($label,'tm') ?></label>
-        <input class=""
-        type="datetime-local"
-        name="<?php echo $key ?>"
-        id="<?php echo $key ?>"
-        value="<?php echo $value->format('Y-m-d\TH:i') ?>"
-        />
-      </div>
-      <?php
-    }
-
-  // ==================================================
-    public static function inner_custom_field_time($key, $value, $label) {
-      ?>
-      <div class="tm-meta-text">
-        <label for="<?php echo $key ?>"><?php echo esc_html__($label,'tm') ?></label>
-        <input class=""
-        type="datetime-local"
-        name="<?php echo $key ?>"
-        id="<?php echo $key ?>"
-        value="<?php echo $value->format('TH:i') ?>"
-        />
-      </div>
-      <?php
-    }
-
-  // ==================================================
-    public static function inner_custom_field_string($key, $value, $label) {
-      ?>
-      <div class="tm-meta-text">
-        <label for="<?php echo $key ?>"><?php echo esc_html__($label,'tm') ?></label>
-        <input class=""
-        type="text"
-        name="<?php echo $key ?>"
-        id="<?php echo $key ?>"
-        value="<?php echo esc_attr($value) ?>"
-        />
-      </div>
-      <?php
-    }
-
-  // ==================================================
-    public static function inner_custom_field_text($key, $value, $label) {
-      wp_editor($value , $key);
-    }
-
-  // ==================================================
-    public static function inner_custom_field_code($key, $value, $label) {
-      ?>
-      <div class="tm-meta-code" style="width:100%">
-        <label for="<?php echo $key ?>"><?php echo esc_html__($label,'tm') ?></label>
-        <textarea class=""
-        style="width:100%"
-        rows=15
-        name="<?php echo $key ?>"
-        id="<?php echo $key ?>"><?php echo esc_attr($value) ?></textarea>
-      </div>
-      <?php
-    }
-
-  // ==================================================
-    public static function inner_custom_field_button($key, $label, $onclick, $status = '__NONE') {
-      ?>
-      <div class="tm-meta-button">
-        <input
-        id='<?php echo $key ?>'
-        class='button'
-        type='button'
-        onclick='<?php echo esc_attr($onclick) ?>'
-        value='<?php echo esc_attr__($label,'tm') ?>' />
-        <?php if ( $status != '__NONE' ) { ?>
-          <label id="<?php echo esc_attr($key) ?>_label" for="<?php echo $key ?>"><?php echo esc_html__($status,'tm') ?></label>
-        <?php } ?>
-      </div>
-      <?php
-    }
-
-  // ==================================================
-    public static function inner_custom_box($post) {
-      $classname = get_called_class();
-      // Use nonce for verification
-      wp_nonce_field( $classname::$post_type . '_defaulttm_field_nonce', $classname::$post_type . '_defaulttm_nonce' );
-
-      // Get saved value, if none exists, "default" is selected
-      $obj = new $classname($post);
-      foreach ($classname::$meta_keys as $key => $value) {
-        $fieldkey = $classname . "_" . $key;
-        $fieldvalue = $obj->$key;
-        $fieldlabel = $value['label'];
-        $fielddisplay = true;
-        if ( array_key_exists('display', $value) ) {
-          $fielddisplay = $value['display'];
-        }
-        if ( $fielddisplay ) {
-          switch($value['type']) {
-            case 'meta_attrib':        $classname::inner_custom_field_string($fieldkey, $fieldvalue, $fieldlabel); break;
-            case 'meta_attrib_number': $classname::inner_custom_field_number($fieldkey, $fieldvalue, $fieldlabel); break;
-            case 'meta_attrib_date':   $classname::inner_custom_field_date($fieldkey, $fieldvalue, $fieldlabel); break;
-            case 'meta_attrib_time':   $classname::inner_custom_field_time($fieldkey, $fieldvalue, $fieldlabel); break;
-            case 'meta_attrib_text':   $classname::inner_custom_field_text($fieldkey, $fieldvalue, $fieldlabel); break;
-            case 'meta_attrib_code':   $classname::inner_custom_field_code($fieldkey, $fieldvalue, $fieldlabel); break;
-            case 'meta_attrib_string': $classname::inner_custom_field_string($fieldkey, $fieldvalue, $fieldlabel);
-          }
-        }
-      }
-    }
-
-  // ==================================================
-    public static function save_metadatabox( $post_id ) {
-      $classname = get_called_class();
-      $post_type = get_post_type($post_id);
-      if ( $classname::$post_type != $post_type ) return;
-
-      // verify if this is an auto save routine.
-      // If it is our form has not been submitted, so we dont want to do anything
-      if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
-
-      // verify this came from the our screen and with proper authorization,
-      // because save_post can be triggered at other times
-      if (! isset( $_POST[$classname::$post_type . '_defaulttm_nonce']) ) return;
-      if ( !wp_verify_nonce( $_POST[$classname::$post_type . '_defaulttm_nonce'], $classname::$post_type . '_defaulttm_field_nonce' ) ) return;
-
-      $obj = new $classname($post_id);
-      foreach ($classname::$meta_keys as $key => $value) {
-        $fieldkey = $classname . "_" . $key;
-        if ( isset($_POST[$fieldkey]) ) {
-          $obj->$key = $_POST[$fieldkey];
-        }
-      }
-    }
-
-  // ==================================================
+    // ==================================================
     public static function create_settings_menu() {
       $classname = get_called_class();
       //create new top-level menu
@@ -363,38 +219,215 @@ if ( ! class_exists('TMBasePost')):
     </div>
     <?php
   }
-
-  /*
   // ==================================================
-  public static function rewriteurl() {
-    $classname = get_called_class();
-    $matchstr = '^' . $classname::get_slug() . '/([^/]+)' ;
-    $replacestr = 'index.php?post_type='. $classname::$post_type . '&pagename=$matches[1]';
-    $i = 2;
-    foreach($classname::$path_params as $pathparam) {
-      $matchstr .= '/([^/]+)';
-      $replacestr .= '&' . $pathparam . '=$matches[' . $i++ . ']';
-    }
-    $matchstr .= '/?';
-    var_dump($matchstr, $replacestr);
-    add_rewrite_rule($matchstr,$replacestr,'top');
-    // add_rewrite_rule('^' . $slug . '/([^/]+)/fixtures/([^/]+)/([^/]+)/?','index.php?post_type=tm_fixture&teamname=$matches[1]&season=$matches[2]&name=$matches[3]','top');
-    global $wp_rewrite;
-    $wp_rewrite->flush_rules(false);
-  }
-
-  // ==================================================
-  public static function permalinks( $post_link, $post ){
+  public static function create_metadatabox() {
+    if ( is_admin() ) {
       $classname = get_called_class();
-      if ( is_object( $post ) && $classname::$post_type ) {
-        $postobj = new $classname($post);
-        foreach($classname::$path_params as $pathparam ) {
-          $post_link = str_replace( '%' . $pathparam . '%' , $postobj->$params[$pathparam] , $post_link );
-        }
-      }
-      return $post_link;
+      $plural_name = $classname::get_pluralname();
+      add_meta_box(
+        $classname::$post_type . '_defaulttm_metabox',
+        'Metadata',
+        $classname . '::inner_custom_box',
+        $classname::$post_type,
+        'normal',
+        'default'
+      );
+    }
   }
-  */
+
+  // ==================================================
+  public static function inner_custom_box($post) {
+    $classname = get_called_class();
+    // Use nonce for verification
+    $classname::inner_custom_field_nonce();
+
+    foreach ($classname::$meta_keys as $key => $fieldmeta) {
+      $fielddisplay = true;
+      if ( array_key_exists('display', $fieldmeta) ) {
+        $fielddisplay = $fieldmeta['display'];
+      }
+      if ( $fielddisplay ) {
+        $classname::inner_custom_field($post, $key);
+      }
+    }
+  }
+
+  // ==================================================
+  public static function inner_custom_field($post, $key, $value = "_AUTO", $label = "_AUTO", $type = "_AUTO", $settings = "_AUTO") {
+    $classname = get_called_class();
+    $fieldkey = $classname . "_" . $key;
+    if ( $value == "_AUTO" ) {
+      $obj = new $classname($post);
+      $value = $obj->$key;
+    }
+    if ( $label  == "_AUTO" ) {
+      $label = $classname::$meta_keys[$key]['label'];
+    }
+    if ( $type == "_AUTO" ) {
+      $type = $classname::$meta_keys[$key]['type'];
+    }
+    if ( $settings == "_AUTO" ) {
+      $settings = $classname::$meta_keys[$key]['settings'];
+    }
+    switch($type) {
+      case 'meta_attrib':        $classname::inner_custom_field_string($fieldkey, $value, $label, $settings); break;
+      case 'meta_attrib_number': $classname::inner_custom_field_number($fieldkey, $value, $label, $settings); break;
+      case 'meta_attrib_date':   $classname::inner_custom_field_date($fieldkey, $value, $label, $settings); break;
+      case 'meta_attrib_time':   $classname::inner_custom_field_time($fieldkey, $value, $label, $settings); break;
+      case 'meta_attrib_text':   $classname::inner_custom_field_editor($fieldkey, $value, $label, $settings); break;
+      case 'meta_attrib_code':   $classname::inner_custom_field_code($fieldkey, $value, $label, $settings); break;
+      case 'meta_attrib_string': $classname::inner_custom_field_string($fieldkey, $value, $label, $settings); break;
+      case 'meta_attrib_check':  $classname::inner_custom_field_check($fieldkey, $value, $label, $settings);
+    }
+  }
+
+  // ==================================================
+  public static function inner_custom_field_number($fieldkey, $value, $label = "", $settings = []) {
+    ?>
+    <div class="tm-meta-number <?php echo esc_attr($settings['outerclass']) ?>">
+      <label class="<?php echo esc_attr($settings['labelclass'])?>" for="<?php echo $fieldkey ?>"><?php echo esc_html__($label,'tm') ?></label>
+      <input class="<?php echo esc_attr($settings['inputclass'])?>"
+      type="number"
+      name="<?php echo $fieldkey ?>"
+      id="<?php echo $fieldkey ?>"
+      value="<?php echo esc_attr($value) ?>"
+      />
+    </div>
+    <?php
+  }
+
+  // ==================================================
+  public static function inner_custom_field_check($fieldkey, $value, $label = "", $settings = []) {
+    ?>
+    <div class="tm-meta-check <?php echo esc_attr($settings['outerclass']) ?>">
+      <label class="<?php echo esc_attr($settings['labelclass'])?>" for="<?php echo $fieldkey ?>"><?php echo esc_html__($label,'tm') ?></label>
+      <input class="<?php echo esc_attr($settings['inputclass'])?>"
+      type="checkbox"
+      name="<?php echo $fieldkey ?>"
+      id="<?php echo $fieldkey ?>"
+      <?php checked($value) ?>
+      />
+    </div>
+    <?php
+  }
+
+  // ==================================================
+  public static function inner_custom_field_date($fieldkey, $value, $label = "", $settings = []) {
+    ?>
+    <div class="tm-meta-text <?php echo esc_attr($settings['outerclass']) ?>">
+      <label class="<?php echo esc_attr($settings['labelclass'])?>" for="<?php echo $fieldkey ?>"><?php echo esc_html__($label,'tm') ?></label>
+      <input class="<?php echo esc_attr($settings['inputclass'])?>"
+      type="datetime-local"
+      name="<?php echo $fieldkey ?>"
+      id="<?php echo $fieldkey ?>"
+      value="<?php echo $value->format('Y-m-d\TH:i') ?>"
+      />
+    </div>
+    <?php
+  }
+
+  // ==================================================
+  public static function inner_custom_field_time($fieldkey, $value, $label = "", $settings = []) {
+    ?>
+    <div class="tm-meta-time <?php echo esc_attr($settings['outerclass']) ?>">
+      <label class="<?php echo esc_attr($settings['labelclass'])?>" for="<?php echo $fieldkey ?>"><?php echo esc_html__($label,'tm') ?></label>
+      <input class="<?php echo esc_attr($settings['inputclass'])?>"
+      type="datetime-local"
+      name="<?php echo $fieldkey ?>"
+      id="<?php echo $fieldkey ?>"
+      value="<?php echo $value->format('TH:i') ?>"
+      />
+    </div>
+    <?php
+  }
+
+  // ==================================================
+  public static function inner_custom_field_string($fieldkey, $value, $label = "", $settings = []) {
+    ?>
+    <div class="tm-meta-string <?php echo esc_attr($settings['outerclass']) ?>">
+      <label class="<?php echo esc_attr($settings['labelclass'])?>" for="<?php echo $fieldkey ?>"><?php echo esc_html__($label,'tm') ?></label>
+      <input class="<?php echo esc_attr($settings['inputclass'])?>"
+      type="text"
+      name="<?php echo $fieldkey ?>"
+      id="<?php echo $fieldkey ?>"
+      value="<?php echo esc_attr($value) ?>"
+      />
+    </div>
+    <?php
+  }
+
+  // ==================================================
+  public static function inner_custom_field_editor($fieldkey, $value, $label = "", $settings = []) {
+    ?>
+    <div class="tm-meta-editor <?php echo esc_attr($settings['outerclass']) ?>">
+    <?php if ( $label != "" ) { ?>
+      <label class="<?php echo esc_attr($settings['labelclass'])?>" for="<?php echo $fieldkey ?>"><?php echo esc_html__($label,'tm') ?></label><BR>
+    <?php }
+    wp_editor($value , $fieldkey, $settings);
+  }
+
+  // ==================================================
+  public static function inner_custom_field_code($fieldkey, $value, $label = "", $settings = []) {
+    ?>
+    <div class="tm-meta-code <?php echo esc_attr($settings['outerclass']) ?>" style="width:100%">
+      <label class="<?php echo esc_attr($settings['labelclass'])?>" for="<?php echo $fieldkey ?>"><?php echo esc_html__($label,'tm') ?></label>
+      <textarea class="<?php echo esc_attr($settings['inputclass'])?>"
+      style="width:100%"
+      rows=15
+      name="<?php echo $fieldkey ?>"
+      id="<?php echo $fieldkey ?>"><?php echo esc_attr($value) ?></textarea>
+    </div>
+    <?php
+  }
+
+  // ==================================================
+  public static function inner_custom_field_button($fieldkey, $label, $onclick, $status = '__NONE') {
+    ?>
+    <div class="tm-meta-button <?php echo esc_attr($settings['outerclass']) ?>">
+      <input
+      id='<?php echo $key ?>'
+      class='button <?php echo esc_attr($settings['inputclass'])?>'
+      type='button'
+      onclick='<?php echo esc_attr($onclick) ?>'
+      value='<?php echo esc_attr__($label,'tm') ?>' />
+      <?php if ( $status != '__NONE' ) { ?>
+        <label class="<?php echo esc_attr($settings['labelclass'])?>" id="<?php echo esc_attr($fieldkey) ?>_label" for="<?php echo $fieldkey ?>"><?php echo esc_html__($status,'tm') ?></label>
+      <?php } ?>
+    </div>
+    <?php
+  }
+
+  // ==================================================
+  public static function inner_custom_field_nonce($boxid = 'defaulttm') {
+    $classname = get_called_class();
+    // Use nonce for verification
+    wp_nonce_field( $classname::$post_type . '_' .$boxid . '_field_nonce', $classname::$post_type . '_' . $boxid . '_nonce' );
+  }
+
+
+  // ==================================================
+  public static function save_post( $post_id ) {
+    $classname = get_called_class();
+    $post_type = get_post_type($post_id);
+    if ( $classname::$post_type != $post_type ) return;
+
+    // verify if this is an auto save routine.
+    // If it is our form has not been submitted, so we dont want to do anything
+    if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) return;
+
+    // verify this came from the our screen and with proper authorization,
+    // because save_post can be triggered at other times
+    if (! isset( $_POST[$classname::$post_type . '_defaulttm_nonce']) ) return;
+    if ( !wp_verify_nonce( $_POST[$classname::$post_type . '_defaulttm_nonce'], $classname::$post_type . '_defaulttm_field_nonce' ) ) return;
+
+    $obj = new $classname($post_id);
+    foreach ($classname::$meta_keys as $key => $value) {
+      $fieldkey = $classname . "_" . $key;
+      if ( isset($_POST[$fieldkey]) ) {
+        $obj->$key = $_POST[$fieldkey];
+      }
+    }
+  }
 
   // ==================================================
   public static function WPPost_to_TMPost($wpposts) {
@@ -566,6 +599,7 @@ if ( ! class_exists('TMBasePost')):
     }
   }
 
+  // get_related_post ==================================================
   protected function get_related_post($key, $meta_key, $postclass) {
     if ( substr($meta_key, -3) == '_id') {
       $objkey = substr($key, 0, strlen($key) - 3);
@@ -589,17 +623,12 @@ if ( ! class_exists('TMBasePost')):
     }
   }
 
-  // related_post ==================================================
-  // protected function update_related_posts($meta_key, $value) {
-  // }
-
+  // get_related_posts ==================================================
   protected function get_related_posts($key, $meta_key, $postclass) {
     return $postclass::getWithMetaValue($meta_key, $this->_id );
   }
 
-  // related_tax ==================================================
-  // protected function update_related_tax($meta_key, $value) {
-  // }
+  // get_related_tax ==================================================
   protected function get_related_tax($key, $meta_key, $taxclass, $single = true) {
     $terms = wp_get_object_terms( $this->_id, $taxclass::$taxonomy);
     if ( $single ) {

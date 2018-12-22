@@ -61,7 +61,6 @@ if ( ! class_exists('TMBaseGeneric')):
         'classname' => $classname
       );
       $default_obj = array_replace( $default_obj, $obj );
-
       if (file_exists($plugin_dir . '/assets/js/' . $classname . '.js')) {
         wp_enqueue_script( $classname . '-script', $plugin_url . '/assets/js/' . $classname . '.js', array('jquery'), 'v4.0.0', false );
         wp_localize_script( $classname . '-script', 'tmphpobj', $default_obj );
@@ -102,15 +101,10 @@ if ( ! class_exists('TMBaseGeneric')):
       if ( array_key_exists($stemkey, $classname::$meta_keys) ) {
         $conf = $classname::$meta_keys[$stemkey];
         switch($conf['type']) {
-          case 'meta_attrib':        $this->update_attrib_string($key, $conf['meta_key'], $value); break;
-          case 'meta_attrib_string': $this->update_attrib_string($key, $conf['meta_key'], $value); break;
-          case 'meta_attrib_number': $this->update_attrib_string($key, $conf['meta_key'], $value); break;
-          case 'meta_attrib_code':   $this->update_attrib_string($key, $conf['meta_key'], $value); break;
-          case 'meta_attrib_text':   $this->update_attrib_string($key, $conf['meta_key'], $value); break;
           case 'meta_attrib_date':   $this->update_attrib_date($key, $conf['meta_key'], $value); break;
           case 'meta_attrib_time':   $this->update_attrib_time($key, $conf['meta_key'], $value); break;
           case 'meta_attrib_object': $this->update_attrib_serializedobject($key, $conf['meta_key'], $value); break;
-          default:                   throw(new Exception('Type of meta config not recognised or invalid for update'));
+          default:                   $this->update_attrib_string($key, $conf['meta_key'], $value);
         }
       } else {
         switch ( $key ) {
@@ -127,15 +121,10 @@ if ( ! class_exists('TMBaseGeneric')):
       if ( array_key_exists($stemkey, $classname::$meta_keys) ) {
         $conf = $classname::$meta_keys[$stemkey];
         switch($conf['type']) {
-          case 'meta_attrib':        return $this->get_attrib_string($key, $conf['meta_key']); break;
-          case 'meta_attrib_string': return $this->get_attrib_string($key, $conf['meta_key']); break;
-          case 'meta_attrib_number': return $this->get_attrib_string($key, $conf['meta_key']); break;
-          case 'meta_attrib_code':   return $this->get_attrib_string($key, $conf['meta_key']); break;
-          case 'meta_attrib_text':   return $this->get_attrib_string($key, $conf['meta_key']); break;
           case 'meta_attrib_date':   return $this->get_attrib_date($key, $conf['meta_key']); break;
           case 'meta_attrib_time':   return $this->get_attrib_time($key, $conf['meta_key']); break;
           case 'meta_attrib_object': return $this->get_attrib_seralizedobject($key, $conf['meta_key']); break;
-          default:                   throw(new Exception('Type of meta config not recognised or invalid for get'));
+          default:                   return $this->get_attrib_string($key, $conf['meta_key']);
         }
       } else {
         switch ( $key ) {

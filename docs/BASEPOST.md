@@ -1,17 +1,28 @@
 # Usage guide - BasePost
 
-## Fields
+## Initiation
 
 ```
-protected static $post_type;
-protected static $labels;
-protected static $args = [];
-protected static $meta_keys = [];
-protected static $setting_keys = [];
-protected static $tmargs = [];
+if ( ! class_exists('TMSessionPlan')):
+  class TMSessionPlan extends TMBasePost {
+    protected static $post_type = 'tm_sessionplan';   // Required
+
+    protected static $labels = Array(
+      'singular_name'       => 'Session Plan'         // Required
+    );
+
+    function __construct($sessionid = 0) {
+      parent::__construct($sessionid);
+    }
+
+  }
+  TMSessionPlan::init();
+endif;
 ```
 
-## post_type (Required)
+### Fields
+
+### post_type (Required)
 
 Provides the post_type name.
 
@@ -19,7 +30,7 @@ Provides the post_type name.
 protected static $post_type = 'tm_sessionplan';
 ```
 
-## labels
+### labels
 
 Array of labels which are merged with default values based on singular_name.
 
@@ -34,7 +45,7 @@ protected static $labels = Array(
 );
 ```
 
-## args
+### args
 
 Array of arguments for post_type as specified in [wordpress docs](https://codex.wordpress.org/Function_Reference/register_post_type)
 Where nothing specified default values are taken
@@ -44,7 +55,18 @@ protected static $args = Array (
   'supports'            => array( 'title', 'editor', 'author', 'revisions', 'thumbnail', 'revisions'),
 );
 ```
-## meta_keys
+
+### tmargs
+
+```
+private static $tmargs = array(
+  'create_metadatabox' => true,
+  'enqueue_scripts'    => true,
+  'register_settings'  => true
+);
+```
+
+### meta_keys
 
 Array of additional metafields to include for the object in wordpress.  These are all exposed as properties on the object and persisted as meta_data within wordpress database.
 
@@ -59,7 +81,7 @@ protected static $meta_keys = Array(
 );
 ```
 
-### type
+#### type
 
 * meta_attrib
 * meta_attrib_number
@@ -68,3 +90,7 @@ protected static $meta_keys = Array(
 * meta_attrib_text
 * meta_attrib_code
 * meta_attrib_string
+
+## Methods
+
+###
