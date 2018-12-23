@@ -56,12 +56,17 @@ if ( ! class_exists('TMBasePost')):
         if ( $tmargs['customise_list'] ) {
           add_filter('manage_' . $classname::$post_type . '_posts_columns', $classname . '::table_head');
           add_action('manage_' . $classname::$post_type . '_posts_custom_column', $classname . '::table_content', 10, 2 );
+          add_filter('manage_edit-' . $classname::$post_type . '_sortable_columns', $classname . '::sortable_columns' );
+          add_action('restrict_manage_posts', $classname . '::restrict_manage_posts' );
+          add_filter('parse_query', $classname . '::parse_query' );
         }
+        add_action('admin_head', $classname . '::admin_head_wrapper' );
       }
       if ( $tmargs['enqueue_scripts']  ) {
         add_action( 'wp_enqueue_scripts',  $classname . '::enqueue_scripts');
       }
       add_action('init', $classname . '::add_rewrite_rule');
+      add_filter('post_type_link', $classname . '::post_type_link_wrapper' );
       add_filter('query_vars', $classname . '::add_query_vars' );
     }
 
@@ -70,17 +75,239 @@ if ( ! class_exists('TMBasePost')):
     }
 
     // ==================================================
+    public static function post_type_link( $post_link, $post ) {
+      return $post_link;
+    }
+
+    // ==================================================
+    public static function post_type_link_wrapper( $post_link, $post ) {
+      $classname = get_called_class();
+      if ( is_object( $post ) && $post->post_type == $classname::$post_type ) {
+        $post_link = $classname::post_type_link($post_link, $post);
+      }
+      return $post_link;
+    }
+
+    // ==================================================
     public static function add_query_vars( $vars ) {
       return $vars;
     }
 
     // ==================================================
+    static function admin_head() {
+    }
+
+    // ==================================================
+    static function admin_head_wrapper() {
+      $classname = get_called_class();
+      $screen = get_current_screen();
+      if ( $classname::$post_type == $screen->post_type ) {
+        $classname::admin_head();
+      }
+    }
+
+    // ==================================================
     public static function table_head( $defaults ) {
+      $classname = get_called_class();
+      $columns = $classname::$meta_keys;
+      uasort( $columns, array('TMBasePost','table_head_sort'));
+      return $classname::table_head_helper( array_keys ( $columns ), $defaults );
+    }
+
+    // ==================================================
+    public static function table_head_sort( $a, $b ) {
+      if (array_key_exists( 'postlist' , $a )) {
+        if (array_key_exists( 'index', $a['postlist'] )) {
+          $indexa=$a['postlist']['index'];
+        } else {
+          $indexa=999998;
+        }
+      } else {
+        $indexa=999999;
+      }
+      if (array_key_exists( 'postlist' , $b )) {
+        if (array_key_exists( 'index', $b['postlist'] )) {
+          $indexb=$b['postlist']['index'];
+        } else {
+          $indexb=999998;
+        }
+      } else {
+        $indexb=999999;
+      }
+      return ( $indexa > $indexb );
+    }
+
+    // ==================================================
+    public static function table_head_helper( $columns, $defaults ) {
+      $classname = get_called_class();
+      foreach ($columns as $key) {
+        $fieldmeta = $classname::$meta_keys[$key];
+        if (array_key_exists( 'postlist' , $fieldmeta )) {
+          $columntitle = $key;
+          if ( array_key_exists( 'title' , $fieldmeta['postlist'] ) ) {
+            $columntitle = $fieldmeta['postlist']['title'];
+          } else {
+            if ( array_key_exists( 'label' , $fieldmeta ) ) {
+              $columntitle = $fieldmeta['label'];
+            }
+          }
+          $defaults[$classname . '_' . $key] = _($columntitle , 'tm' );
+        } else {
+        }
+      }
       return $defaults;
     }
 
     // ==================================================
     public static function table_content( $column_name, $post_id ) {
+      $classname = get_called_class();
+      $classname::table_content_helper($classname::$meta_keys, $column_name, $post_id);
+    }
+
+    // ==================================================
+    public static function table_content_helper($columns, $column_name, $post_id ) {
+      $classname = get_called_class();
+      $obj = new $classname($post_id);
+      foreach ($columns as $key) {
+        if ($column_name == $classname . '_' . $key) {
+          $fieldmeta = $classname::$meta_keys[$key];
+          switch($fieldmeta['type']) {
+            case 'related_post':
+            echo esc_html($obj->$key->title);
+            break;
+
+            case 'related_tax':
+            echo esc_html($obj->$key->name);
+            break;
+
+            default:
+            echo esc_html($obj->$key);
+          }
+        }
+      }
+    }
+
+    // ==================================================
+    public static function sortable_columns( $columns ) {
+      $classname = get_called_class();
+      foreach ($classname::$meta_keys as $key => $fieldmeta) {
+        if (array_key_exists( 'postlist' , $fieldmeta )) {
+          if ( $fieldmeta['postlist']['sortable'] ) {
+            $columns[$classname . '_' . $key] = $classname . '_' . $key;
+          }
+        }
+      };
+      return $columns;
+    }
+
+    // ==================================================
+    public static function restrict_manage_posts() {
+      $classname = get_called_class();
+      $type = 'post';
+      if (isset($_GET['post_type'])) {
+        $type = $_GET['post_type'];
+      }
+      if ($classname::$post_type == $type){
+        foreach ($classname::$meta_keys as $key => $fieldmeta) {
+          if (array_key_exists( 'postlist' , $fieldmeta )) {
+            if ( $fieldmeta['postlist']['filter'] ) {
+              $fieldkey = $classname . '_' . $key;
+              ?>
+              <select name="<?php echo $fieldkey ?>">
+              <option value=""><?php _e('Filter by ' . $key . ':', 'tm'); ?></option>
+              <?php
+              $current_v = isset($_GET[$fieldkey]) ? $_GET[$fieldkey] :  '';
+              // TODO - this won't work for meta_attib values
+              switch($fieldmeta['type']) {
+
+                case 'related_post':
+                foreach ($fieldmeta['classname']::getAll() as $value) {
+                  printf(
+                    '<option value="%s"%s>%s</option>',
+                    $value->ID,
+                    $value->ID == $current_v ? ' selected="selected"' : '',
+                    $value->title
+                  );
+                };
+                break;
+
+                case 'related_tax':
+                foreach ($fieldmeta['classname']::getAll() as $value) {
+                  printf(
+                    '<option value="%s"%s>%s</option>',
+                    $value->ID,
+                    $value->ID == $current_v ? ' selected="selected"' : '',
+                    $value->name
+                  );
+                };
+                break;
+
+                default:
+                throw(new Exception('Not implemented'));
+
+              }
+              ?>
+              </select>
+              <?php
+             }
+          }
+        }
+      }
+    }
+
+    // ==================================================
+    static function parse_query( $query ){
+      $classname = get_called_class();
+      global $pagenow;
+      $type = isset($_GET['post_type']) ? $_GET['post_type'] : 'post';
+      if ( $classname::$post_type == $type && $pagenow=='edit.php' && $query->is_main_query() ) {
+
+        $tax_query = [];
+        $meta_query = [];
+
+        foreach ($classname::$meta_keys as $key => $fieldmeta) {
+          if (array_key_exists( 'postlist' , $fieldmeta )) {
+            if ( $fieldmeta['postlist']['filter'] ) {
+              $fieldkey = $classname . '_' . $key;
+                if ( isset($_GET[$fieldkey]) && $_GET[$fieldkey] != '' ) {
+
+                  switch($fieldmeta['type']) {
+
+                    case 'related_post':
+                    $meta_query[] = array(
+                      'key'	 	   => $fieldmeta['meta_key'],
+                      'value'	   => $_GET[$fieldkey] ,
+                      'compare'  => '='
+                    );
+                    break;
+
+                    case 'related_tax':
+                    $tax_query[] = array(
+                      'taxonomy' => $fieldmeta['classname']::$taxonomy,   // taxonomy name
+                      'field'    => 'term_id',                            // term_id, slug or name
+                      'terms'    => $_GET[$fieldkey]                      // term id, term slug or term name
+                    );
+                    break;
+
+                  }
+               }
+            }
+          }
+        }
+
+        switch ( sizeof($meta_query) ) {
+          case 0:  break; // Do nothing
+          case 1:  $query->query_vars['meta_query'] =  Array ( $meta_query ); break; // Nest n array
+          default: $query->query_vars['meta_query'] =  array_merge ( Array ( 'relation' => 'AND' ) , $meta_query ); break;
+        }
+
+        switch ( sizeof($tax_query) ) {
+          case 0:  break; // Do nothing
+          case 1:  $query->query_vars['tax_query'] =  Array ( $tax_query ); break; // Nest n array
+          default: $query->query_vars['tax_query'] =  array_merge ( Array ( 'relation' => 'AND' ) , $tax_query ); break;
+        }
+
+      }
     }
 
     // ==================================================
@@ -94,7 +321,7 @@ if ( ! class_exists('TMBasePost')):
     // ==================================================
     public static function enqueue_adminscripts( $hook_suffix ){
       $classname = get_called_class();
-      if( in_array($hook_suffix, array('post.php', 'post-new.php') ) ){
+      if( in_array($hook_suffix, array('edit.php', 'post.php', 'post-new.php') ) ){
         $screen = get_current_screen();
         if( is_object( $screen ) && $classname::$post_type == $screen->post_type ){
           parent::enqueue_adminscripts_helper( $hook_suffix );
@@ -423,8 +650,28 @@ if ( ! class_exists('TMBasePost')):
     $obj = new $classname($post_id);
     foreach ($classname::$meta_keys as $key => $value) {
       $fieldkey = $classname . "_" . $key;
-      if ( isset($_POST[$fieldkey]) ) {
-        $obj->$key = $_POST[$fieldkey];
+      switch($value['type']) {
+        case 'meta_attrib_check':
+          $obj->$key = isset($_POST[$fieldkey]);
+          break;
+
+        case 'related_post':
+          if ( isset($_POST[$fieldkey]) ) {
+            $obj->{$key . '_id'} = $_POST[$fieldkey];
+          };
+          break;
+
+        case 'related_tax':
+          if ( isset($_POST[$fieldkey]) ) {
+            $obj->attachTerm(new $value['classname']($_POST[$fieldkey]));
+          };
+          break;
+
+        default:
+          if ( isset($_POST[$fieldkey]) ) {
+            $obj->$key = $_POST[$fieldkey];
+          };
+
       }
     }
   }
