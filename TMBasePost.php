@@ -61,6 +61,7 @@ if ( ! class_exists('TMBasePost')):
           add_filter('parse_query', $classname . '::parse_query' );
         }
         add_action('admin_head', $classname . '::admin_head_wrapper' );
+        add_action('admin_menu' , $classname . '::admin_menu' );
       }
       if ( $tmargs['enqueue_scripts']  ) {
         add_action( 'wp_enqueue_scripts',  $classname . '::enqueue_scripts');
@@ -95,6 +96,10 @@ if ( ! class_exists('TMBasePost')):
 
     // ==================================================
     static function admin_head() {
+    }
+
+    // ==================================================
+    static function admin_menu($hook) {
     }
 
     // ==================================================
@@ -314,7 +319,8 @@ if ( ! class_exists('TMBasePost')):
     public static function enqueue_scripts() {
       $classname = get_called_class();
       if ( $classname::$post_type == get_post_type() ) {
-        parent::enqueue_scripts_helper( );
+        parent::enqueue_script_helper( $classname . '-script', $classname . '.js' );
+        parent::enqueue_style_helper( $classname . '-css', $classname . '.css' );
       }
     }
 
@@ -324,7 +330,8 @@ if ( ! class_exists('TMBasePost')):
       if( in_array($hook_suffix, array('edit.php', 'post.php', 'post-new.php') ) ){
         $screen = get_current_screen();
         if( is_object( $screen ) && $classname::$post_type == $screen->post_type ){
-          parent::enqueue_adminscripts_helper( $hook_suffix );
+          parent::enqueue_script_helper( $classname . '-admin-script', $classname . '-admin.js' );
+          parent::enqueue_style_helper( $classname . '-admin-css', $classname . '-admin.css');
         }
       }
     }
