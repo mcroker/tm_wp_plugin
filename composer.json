@@ -1,0 +1,16 @@
+{
+    "name": "crokerltd/tm-wp-plugin",
+    "type": "project",
+    "require": {
+    },
+    "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "*",
+        "phpcompatibility/phpcompatibility-wp" :"*",
+        "wp-coding-standards/wpcs": "^2.0"
+    },
+    "scripts": {
+        "install-codestandards": [
+            "Dealerdirect\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run"
+        ]
+    }
+}

@@ -1,0 +1,27 @@
+version: "2"
+services:
+  db:
+    image: mariadb
+    ports:
+      - "8081:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ChangeMeIfYouWant
+    volumes:
+      - ./backup:/backup
+  wordpress:
+    image: wpunit:5.6
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html/wp-content/plugins/tm_wp_plugin
+      - for-testing:/tmp
+    links:
+      - db:mysql
+    environment:
+      WORDPRESS_DB_PASSWORD: ChangeMeIfYouWant
+
+volumes:
+    for-testing:
+        driver: local

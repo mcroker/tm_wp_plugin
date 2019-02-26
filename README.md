@@ -9,13 +9,13 @@ Install tm_wp_plugin as wordpress plugin.
 Within your plugin create class objects extendign TMBasePost or TMBaseTax superclass.
 
 ```
-if ( ! class_exists('TMSessionPlan')):
+if (! class_exists('TMSessionPlan')):
   class TMSessionPlan extends TMBasePost {
     protected static $post_type = 'tm_sessionplan';   // Required
 
     protected static $labels = Array(
       'singular_name'       => 'Session Plan'         // Required
-    );
+   );
 
     function __construct($sessionid = 0) {
       parent::__construct($sessionid);
