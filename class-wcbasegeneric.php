@@ -14,12 +14,7 @@ defined( 'ABSPATH' ) || die( 'No script kiddies please!' );
 // TODO - Need to implement readonly text field.
 if ( ! class_exists( 'WCBaseGeneric' ) ) :
 	/**
-	 * TMBaseTax
-	 *
-	 * @package TMWPPlugin
-	 * @author  Martin Croker <martin@croker.family>
-	 * @license Apache2
-	 * @link
+	 * WCBaseGeneric
 	 */
 	abstract class WCBaseGeneric {
 

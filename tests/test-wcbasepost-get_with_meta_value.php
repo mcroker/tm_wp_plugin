@@ -49,47 +49,46 @@ class WCBasePostGetWithMetaValueTest extends WP_UnitTestCase {
 	}
 
 	public function test_get_with_meta_value_multiplematch() {
-		$p1                       = $this->factory->post->create(
-			array(
-				'post_title' => 'Test Post 1',
-				'post_type'  => 'testpost',
-			)
-		);
-		$p2                       = $this->factory->post->create(
-			array(
-				'post_title' => 'Test Post 2',
-				'post_type'  => 'testpost',
-			)
-		);
-		$p3                       = $this->factory->post->create(
-			array(
-				'post_title' => 'Test Post 3',
-				'post_type'  => 'testpost',
-			)
-		);
-		$p4                       = $this->factory->post->create(
-			array(
-				'post_title' => 'Test Post 4',
-			)
-		);
-		$obj1                     = new WCPost( $p1 );
-		$obj1->meta_attrib_number = 50;
-		$this->assertInstanceOf( WCPost::class, $obj1 );
-		$obj2                     = new WCPost( $p2 );
-		$obj2->meta_attrib_number = 50;
-		$this->assertInstanceOf( WCPost::class, $obj2 );
-		$obj3                     = new WCPost( $p3 );
-		$obj3->meta_attrib_number = 10;
-		$this->assertInstanceOf( WCPost::class, $obj3 );
-		$obj4                     = new WCPost( $p4 );
-		$obj4->meta_attrib_number = 50;
-		$this->assertInstanceOf( WCPost::class, $obj3 );
+
+		$count_no = 5;
+		$count_yes = 3;
+
+		$p_no = [];
+		for ($p = 1; $p <= $count_no; $p++) {
+			$wpobj = $this->factory->post->create(
+				array(
+					'post_title' => 'Test Post No ' . $p,
+					'post_type'  => 'testpost',
+				)
+			);
+			$p_no[$p]               = $wpobj;
+		};
+
+		$p_yes = [];
+		for ($p = 1; $p <= $count_yes; $p++) {
+			$wpobj = $this->factory->post->create(
+				array(
+					'post_title' => 'Test Post Yes ' . $p,
+					'post_type'  => 'testpost',
+				)
+			);
+			$p_yes[$p]               = $wpobj;
+			$obj                     =  new WCPost( $wpobj );
+		    $this->assertInstanceOf( WCPost::class, $obj );
+			$obj->meta_attrib_number = 50;
+		};
+
 		$result = WCPost::get_with_meta_value( 'meta_attrib_number', 50 );
-		$this->assertSame( count( $result ), 2 );
-		$this->assertInstanceOf( WCPost::class, $result[0] );
-		$this->assertSame( $result[0]->ID, $p1 );
-		$this->assertInstanceOf( WCPost::class, $result[1] );
-		$this->assertSame( $result[1]->ID, $p2 );
+
+		$this->assertSame( count( $result ), $count_yes );
+		foreach ( $result as $r ) {
+			$this->assertInstanceOf( WCPost::class, $r );
+			$this->assertContains( $r->ID, $p_yes );
+			// Remove from list of yes's so we match exactly once.
+			if (($key = array_search($r->ID, $p_yes)) !== false) {
+    			unset($p_yes[$key]);
+			}
+		}
 	}
 
 	public function test_get_with_meta_value_onlyposttype() {

@@ -16,11 +16,6 @@ require_once 'class-wcbasegeneric.php';
 if ( ! class_exists( 'WCBasePost' ) ) :
 	/**
 	 * WCBasePost
-	 *
-	 * @package TMWPPlugin
-	 * @author  Martin Croker <martin@croker.family>
-	 * @license Apache2
-	 * @link
 	 */
 	abstract class WCBasePost extends WCBaseGeneric {
 
@@ -357,7 +352,7 @@ if ( ! class_exists( 'WCBasePost' ) ) :
 				&& array_key_exists( 'content', $fieldmeta['postlist'] ) ) {
 					$showcontent = $fieldmeta['postlist']['content'];
 				}
-				if ( $showcontent && $column_name === static::get_elem_name( $key ) ) {
+				if ( $showcontent && static::get_elem_name( $key ) === $column_name ) {
 					$obj->echo_html( $key );
 				}
 			}
