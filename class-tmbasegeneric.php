@@ -295,7 +295,8 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 		 * @return void
 		 */
 		protected function update_attrib_object( $key, $meta_key, $value ) {
-			$serialvalue = serialize( $value );
+			// TODO: Switch serialise to JSON.
+			$serialvalue = serialize( $value ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
 			$this->update_meta_value( $meta_key, $serialvalue );
 			$this->cache[ $key ] = $value;
 		}
@@ -311,7 +312,7 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 		protected function get_attrib_object( $key, $meta_key ) {
 			if ( ! array_key_exists( $key, $this->cache ) ) {
 				$serialvalue         = $this->get_meta_value( $meta_key );
-				$value               = unserialize( $serialvalue );
+				$value               = unserialize( $serialvalue ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize
 				$this->cache[ $key ] = $value;
 			}
 			return $this->cache[ $key ];
@@ -472,7 +473,6 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 		 */
 		public static function formfield_date( $fieldkey, $value = '', $label = '', $settings = [] ) {
 			$inputclass = isset( $settings['inputclass'] ) ? $settings['inputclass'] : '';
-			var_dump( $value );
 			if ( is_string( $value ) ) {
 				$value = strtotime( $value );
 			}
@@ -561,127 +561,122 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 		public static function formfield_code( $fieldkey, $value = '', $label = '', $settings = [] ) {
 			$inputclass = isset( $settings['inputclass'] ) ? $settings['inputclass'] : '';
 			?>
-			<textarea class="<?php echo esc_attr( $inputclass ); ?>"
-				style="width:100%"
-				rows=15
-				name="<?php echo esc_attr( $fieldkey ); ?>"
-				id="<?php echo esc_attr( $fieldkey ); ?>"><?php echo esc_attr( $value ); ?></textarea>
-
-				<?php
+			<textarea class="<?php echo esc_attr( $inputclass ); ?>" style="width:100%" rows=15 name="<?php echo esc_attr( $fieldkey ); ?>" id="<?php echo esc_attr( $fieldkey ); ?>"><?php echo esc_attr( $value ); ?></textarea>
+			<?php
 		}
 
-			/**
-			 * Create a String form field
-			 *
-			 * @param string   $fieldkey (Required) ID&Name for field - conventially
-			 *                           Classname_MetaKey.
-			 * @param string   $value    Field value to display.
-			 * @param string   $label    Textual label to display.
-			 * @param string[] $settings Additional settings to pass to display.
-			 *
-			 * @return void
-			 */
+		/**
+		 * Create a String form field
+		 *
+		 * @param string   $fieldkey (Required) ID&Name for field - conventially
+		 *                           Classname_MetaKey.
+		 * @param string   $value    Field value to display.
+		 * @param string   $label    Textual label to display.
+		 * @param string[] $settings Additional settings to pass to display.
+		 *
+		 * @return void
+		 */
 		public static function formfield_select( $fieldkey, $value = '', $label = '', $settings = [] ) {
 			$inputclass = isset( $settings['inputclass'] ) ? $settings['inputclass'] : '';
 			?>
-				<select class="<?php echo esc_attr( $inputclass ); ?>"
-					id="<?php echo esc_attr( $fieldkey ); ?>"
-					name="<?php echo esc_attr( $fieldkey ); ?>" >
-					<option value=''>Page default</option>
+			<select class="<?php echo esc_attr( $inputclass ); ?>"
+				id="<?php echo esc_attr( $fieldkey ); ?>"
+				name="<?php echo esc_attr( $fieldkey ); ?>" >
+				<option value=''>Page default</option>
 				<?php foreach ( $settings['options'] as $optionkey => $optiontext ) { ?>
-						<option value=<?php echo esc_attr( $optionkey ); ?> <?php selected( $value, $optionkey ); ?> > <?php echo esc_attr( $optiontext ); ?> </option>
-					<?php } ?>
-				</select>
-				<?php
+					<option value=<?php echo esc_attr( $optionkey ); ?> <?php selected( $value, $optionkey ); ?> > <?php echo esc_attr( $optiontext ); ?> </option>
+				<?php } ?>
+			</select>
+			<?php
 		}
 
-			/**
-			 * Create a String form field
-			 *
-			 * @param string   $fieldkey (Required) ID&Name for field - conventially
-			 *                           Classname_MetaKey.
-			 * @param string   $value    Field value to display.
-			 * @param string   $label    Textual label to display.
-			 * @param string[] $settings Additional settings to pass to display.
-			 *
-			 * @return void
-			 */
+		/**
+		 * Create a String form field
+		 *
+		 * @param string   $fieldkey (Required) ID&Name for field - conventially
+		 *                           Classname_MetaKey.
+		 * @param string   $value    Field value to display.
+		 * @param string   $label    Textual label to display.
+		 * @param string[] $settings Additional settings to pass to display.
+		 *
+		 * @return void
+		 */
 		public static function formfield_label( $fieldkey, $value = '', $label = '', $settings = [] ) {
 			$labelclass = isset( $settings['labelclass'] ) ? $settings['labelclass'] : '';
 			?>
 			<?php if ( '_NONE' !== $label ) { ?>
-					<label class="<?php echo esc_attr( $labelclass ); ?>" for="<?php echo esc_attr( $fieldkey ); ?>"><?php echo esc_html( $label ); ?></label>
-					<?php
+				<label class="<?php echo esc_attr( $labelclass ); ?>" for="<?php echo esc_attr( $fieldkey ); ?>"><?php echo esc_html( $label ); ?></label>
+				<?php
 			}
 		}
 
-			/**
-			 * Throw an exception if somebody tries to create a logo field
-			 *
-			 * It is expected if this field type is required it is implemented by the subclass
-			 *
-			 * @param string   $fieldkey (Required) ID&Name for field - conventially
-			 *                           Classname_MetaKey.
-			 * @param string   $value    Field value to display.
-			 * @param string   $label    Textual label to display.
-			 * @param string[] $settings Additional settings to pass to display.
-			 *
-			 * @return void
-			 * @throws Exception Not implemented.
-			 */
+		/**
+		 * Throw an exception if somebody tries to create a logo field
+		 *
+		 * It is expected if this field type is required it is implemented by the subclass
+		 *
+		 * @param string   $fieldkey (Required) ID&Name for field - conventially
+		 *                           Classname_MetaKey.
+		 * @param string   $value    Field value to display.
+		 * @param string   $label    Textual label to display.
+		 * @param string[] $settings Additional settings to pass to display.
+		 *
+		 * @return void
+		 * @throws Exception Not implemented.
+		 */
 		public static function formfield_logo( $fieldkey, $value = '', $label = '', $settings = [] ) {
 			throw( new Exception( 'Not implemented ' . $type ) ); // May be implemented in child.
 		}
 
-			/**
-			 * Throw an exception if somebody tries to create a Object field
-			 *
-			 * It is expected if this field type is required it is implemented by the subclass
-			 *
-			 * @param string   $fieldkey (Required) ID&Name for field - conventially
-			 *                           Classname_MetaKey.
-			 * @param string   $value    Field value to display.
-			 * @param string   $label    Textual label to display.
-			 * @param string[] $settings Additional settings to pass to display.
-			 *
-			 * @return void
-			 * @throws Exception Not implemented.
-			 */
+		/**
+		 * Throw an exception if somebody tries to create a Object field
+		 *
+		 * It is expected if this field type is required it is implemented by the subclass
+		 *
+		 * @param string   $fieldkey (Required) ID&Name for field - conventially
+		 *                           Classname_MetaKey.
+		 * @param string   $value    Field value to display.
+		 * @param string   $label    Textual label to display.
+		 * @param string[] $settings Additional settings to pass to display.
+		 *
+		 * @return void
+		 * @throws Exception Not implemented.
+		 */
 		public static function formfield_object( $fieldkey, $value = '', $label = '', $settings = [] ) {
 			throw( new Exception( 'Not implemented ' . $fieldkey ) ); // May be implemented in child.
 		}
 
-			/**
-			 * Create a button formfield
-			 *
-			 * @param string $fieldkey (Required) ID&Name for field - conventially
-			 *                         Classname_MetaKey.
-			 * @param string $label    (Required) Field Label to display.
-			 * @param string $onclick  (Required) Action to perform on button click.
-			 * @param string $status   Default contents of status field.
-			 *
-			 * @return void
-			 */
+		/**
+		 * Create a button formfield
+		 *
+		 * @param string $fieldkey (Required) ID&Name for field - conventially
+		 *                         Classname_MetaKey.
+		 * @param string $label    (Required) Field Label to display.
+		 * @param string $onclick  (Required) Action to perform on button click.
+		 * @param string $status   Default contents of status field.
+		 *
+		 * @return void
+		 */
 		public static function formfield_button( $fieldkey, $label, $onclick, $status = '' ) {
 			$inputclass = isset( $settings['inputclass'] ) ? $settings['inputclass'] : '';
 			?>
-				<input
-				id='<?php echo esc_attr( $fieldkey ); ?>'
-				class='button <?php echo esc_attr( $inputclass ); ?>'
-				type='button'
-				onclick='<?php echo esc_attr( $onclick ); ?>'
-				value='<?php echo esc_attr( $label ); ?>' />
-				<label class="<?php echo esc_attr( $settings['labelclass'] ); ?>" id="<?php echo esc_attr( $fieldkey ); ?>_status" for="<?php echo esc_attr( $fieldkey ); ?>"><?php echo esc_html( $status ); ?></label>
-				<?php
+			<input
+			id='<?php echo esc_attr( $fieldkey ); ?>'
+			class='button <?php echo esc_attr( $inputclass ); ?>'
+			type='button'
+			onclick='<?php echo esc_attr( $onclick ); ?>'
+			value='<?php echo esc_attr( $label ); ?>' />
+			<label class="<?php echo esc_attr( $settings['labelclass'] ); ?>" id="<?php echo esc_attr( $fieldkey ); ?>_status" for="<?php echo esc_attr( $fieldkey ); ?>"><?php echo esc_html( $status ); ?></label>
+			<?php
 		}
 
-			/**
-			 * Create a nonce form field
-			 *
-			 * @param string $boxid Override nonce name.
-			 *
-			 * @return void
-			 */
+		/**
+		 * Create a nonce form field
+		 *
+		 * @param string $boxid Override nonce name.
+		 *
+		 * @return void
+		 */
 		public static function formfield_nonce( $boxid = 'default' ) {
 			$classname   = get_called_class();
 			$nonceaction = $classname . '_' . $boxid . '_nonce';
@@ -690,29 +685,80 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 			wp_nonce_field( $nonceaction, $noncename );
 		}
 
-			/**
-			 * Create a nonce form field
-			 *
-			 * @param string $boxid Override nonce name.
-			 *
-			 * @return boolean True if nonce is valid
-			 */
+		/**
+		 * Gets a field from $_GET.
+		 *
+		 * @param String  $fieldkey     (required) The key name for the field.
+		 * @param String  $default      Default value (default='').
+		 * @param Boolean $check_nonce  Check the default nonce is set (default=true).
+		 *
+		 * @return String Value or '' if not set/no-nonce.
+		 */
+		public static function http_get_param( $fieldkey, $default = '', $check_nonce = true ) {
+			global $_GET; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$classname = get_called_class();
+			$value     = $default;
+			if ( $classname::verify_nonce() || ! $check_nonce ) {
+				if ( isset( $_GET[ $fieldkey ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					$value = sanitize_text_field( wp_unslash( $_GET[ $fieldkey ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				}
+			}
+			// TODO - Should this convert based on type?
+			return $value;
+		}
+
+		/**
+		 * Gets a field from $_GET.
+		 *
+		 * @param String $fieldkey     (required) The key name for the field.
+		 * @param String $default      Default value (default='').
+		 *
+		 * @return String Value or '' if not set/no-nonce.
+		 */
+		public static function http_post_param( $fieldkey, $default = '' ) {
+			global $_POST; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$classname = get_called_class();
+			$value     = $default;
+			if ( $classname::verify_nonce() ) {
+				if ( isset( $_POST[ $fieldkey ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+					$value = sanitize_text_field( wp_unslash( $_POST[ $fieldkey ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				}
+			}
+			// TODO - Should this convert based on type?
+			return $value;
+		}
+
+		/**
+		 * Create a nonce form field
+		 *
+		 * @param string $boxid Override nonce name.
+		 *
+		 * @return boolean True if nonce is valid
+		 */
 		public static function verify_nonce( $boxid = 'default' ) {
+			global $_POST; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			global $_GET; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$classname   = get_called_class();
 			$nonceaction = $classname . '_' . $boxid . '_nonce';
 			$noncename   = $classname . '_' . $boxid . '_field_nonce';
-			return ( isset( $_POST[ $noncename ] ) && wp_verify_nonce( sanitize_key( $_POST[ $noncename ] ), $nonceaction ) );
+			if ( isset( $_GET[ $noncename ] ) ) {
+				return wp_verify_nonce( sanitize_key( $_GET[ $noncename ] ), $nonceaction );
+			} elseif ( isset( $_POST[ $noncename ] ) ) {
+				return wp_verify_nonce( sanitize_key( $_POST[ $noncename ] ), $nonceaction );
+			} else {
+				return false;
+			}
 		}
 
-			/**
-			 * Create a form field based on the meta_key config for the fieldkey
-			 *
-			 * @param string $key      (Required) key index from meta_keys.
-			 *
-			 * @return void
-			 *
-			 * @throws Exception Invalid or unknown key.
-			 */
+		/**
+		 * Create a form field based on the meta_key config for the fieldkey
+		 *
+		 * @param string $key      (Required) key index from meta_keys.
+		 *
+		 * @return void
+		 *
+		 * @throws Exception Invalid or unknown key.
+		 */
 		public function formfield( $key ) {
 			$classname  = get_called_class();
 			$metafields = [];
@@ -742,9 +788,8 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 				throw( new Exception( 'Meta value type not set' ) );
 			}
 			$fieldkey = $classname . '_' . $key;
-
 			?>
-				<div class="tm_<?php echo esc_attr( $type ); ?> <?php echo esc_attr( $outerclass ); ?>">
+			<div class="tm_<?php echo esc_attr( $type ); ?> <?php echo esc_attr( $outerclass ); ?>">
 				<?php
 				if ( method_exists( __CLASS__, 'formfield_' . $type ) ) {
 					call_user_func( array( $classname, 'formfield_' . $type ), $fieldkey, $value, $label, $settings );
@@ -752,19 +797,19 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 					self::formfield_string( $fieldkey, $value, $label, $settings );
 				}
 				?>
-				</div>
-				<?php
+			</div>
+			<?php
 		}
 
-			/**
-			 * Fomats a field for output as html (not as a field)
-			 *
-			 * @param string $key      (Required) key index from meta_keys.
-			 *
-			 * @return void
-			 *
-			 * @throws Exception Type not set in meta structure, or invalid key.
-			 */
+		/**
+		 * Fomats a field for output as html (not as a field)
+		 *
+		 * @param string $key      (Required) key index from meta_keys.
+		 *
+		 * @return void
+		 *
+		 * @throws Exception Type not set in meta structure, or invalid key.
+		 */
 		public function echo_html( $key ) {
 			$classname = get_called_class();
 			if ( array_key_exists( $key, $classname::$meta_keys ) ) {
@@ -790,4 +835,4 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 		}
 
 	}
-	endif;
+endif;

@@ -72,6 +72,10 @@ class TMBasePostRestrictManagePostsTest extends WP_UnitTestCase {
 		global $_GET;
 		$backup_GET = $_GET;
 
+		$author1 = $this->factory->user->create_and_get( array( 'user_login' => 'jdoe', 'user_pass' => NULL, 'role' => 'author' ));
+		$this->assertTrue( 0 !== $author1->ID );
+ 		wp_set_current_user( $author1->ID );
+
 		$this->factory->post->create(
 			array(
 				'post_title' => 'Test Post 1',
@@ -93,6 +97,9 @@ class TMBasePostRestrictManagePostsTest extends WP_UnitTestCase {
 
 		$_GET['post_type']                              = 'tm_testpost_withcols';
 		$_GET['TMPostWithCols_meta_attrib_relatedpost'] = $p;
+
+		$_GET['TMPostWithCols_default_field_nonce']     = wp_create_nonce( 'TMPostWithCols_default_nonce' );
+
 		TMPostWithCols::restrict_manage_posts();
 		$_GET = $backup_GET;
 

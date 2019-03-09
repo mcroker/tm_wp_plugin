@@ -121,7 +121,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 					add_filter( 'parse_query', $classname . '::parse_query' );
 				}
 				add_action( 'admin_head', $classname . '::admin_head_wrapper' );
-				add_action( 'admin_menu', $classname . '::admin_menu' );
+				add_action( 'admin_menu', $classname . '::admin_menu_wrapper' );
 			}
 			if ( $tmargs['enqueue_scripts'] ) {
 				add_action( 'wp_enqueue_scripts', $classname . '::enqueue_scripts' );
@@ -137,37 +137,36 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @return void
 		 */
 		public static function add_rewrite_rule() {
-			// TODO - I'd like to see this removed and unit check for it's exsitence.
 		}
 
 		/**
-		 * TODO - What does this do?
+		 *  Filter applied to the permalink URL prior to being returned by the function get_post_permalink.
 		 *
-		 * @param string  $post_link (Required) TODO - I don't know.
-		 * @param WP_Post $post      (Required) TODO - I don't knew.
+		 * @param string  $url  (Required) The post URL.
+		 * @param WP_Post $post The post object.
 		 *
 		 * @return string post_link I don't know what this is TODO
 		 */
-		public static function post_type_link( $post_link, $post ) {
-			return $post_link;
+		public static function post_type_link( $url, $post ) {
+			return $url;
 		}
 
 		/**
-		 * Wraps postTypelink function and only calls for this post_type
+		 * Wraps post_type_link function and only calls for this post_type
 		 *
 		 * Added into post_type_link filter
 		 *
-		 * @param string  $post_link (Required) TODO - I don't know.
-		 * @param WP_Post $post      TODO - I don't knew.
+		 * @param string  $url  (Required) The post URL.
+		 * @param WP_Post $post The post object.
 		 *
 		 * @return string post_link I don't know what this is TODO.
 		 */
-		public static function post_type_link_wrapper( $post_link, $post = null ) {
+		public static function post_type_link_wrapper( $url, $post = null ) {
 			$classname = get_called_class();
 			if ( is_object( $post ) && $post->post_type === $classname::$post_type ) {
-				$post_link = $classname::post_type_link( $post_link, $post );
+				$url = $classname::post_type_link( $url, $post );
 			}
-			return $post_link;
+			return $url;
 		}
 
 		/**
@@ -184,7 +183,9 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		}
 
 		/**
-		 * TODO - Not entirely sure what this does
+		 * Creates admin page headers.
+		 *
+		 * Called by admin_head_wrapper when on relevant admin pages for the post_type.
 		 *
 		 * @return void
 		 */
@@ -198,20 +199,55 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 */
 		public static function admin_head_wrapper() {
 			$classname = get_called_class();
-			$screen    = get_current_screen();
-			if ( $classname::$post_type === $screen->post_type ) {
+			if ( $classname::is_admin_screen() ) {
+				$classname::base_form_field_nonce();
 				$classname::admin_head();
 			}
 		}
 
 		/**
-		 * TODO - Not entirely sure what this does
+		 * Returns true if on admin screen for post_type.
 		 *
-		 * @param string $hook (Requried) TODO.
+		 * @return Boolean true if on admin screen for post_type.
+		 */
+		public static function is_admin_screen() {
+			$classname = get_called_class();
+			$screen    = get_current_screen();
+			return ( $classname::$post_type === $screen->post_type );
+		}
+
+		/**
+		 * Gets the type of the current post
+		 *
+		 * @return String Post type
+		 */
+		public static function is_current_posttype() {
+			$classname = get_called_class();
+			return ( $classname::$post_type === $classname::http_get_param( 'post_type', 'post', false ) );
+		}
+
+		/**
+		 * Creates admin page menu.
+		 *
+		 * @param string $context (Requried) Empty context.
 		 *
 		 * @return void
 		 */
-		public static function admin_menu( $hook ) {
+		public static function admin_menu( $context ) {
+		}
+
+		/**
+		 * Wraps admin_menu calling only if for this post_type.
+		 *
+		 * @param string $context (Requried) Empty context.
+		 *
+		 * @return void
+		 */
+		public static function admin_menu_wrapper( $context ) {
+			$classname = get_called_class();
+			if ( $classname::is_admin_screen() ) {
+				$classname::admin_menu();
+			}
 		}
 
 		/**
@@ -300,19 +336,6 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		}
 
 		/**
-		 * Gets the type of the current post
-		 *
-		 * @return String Post type
-		 */
-		public static function current_posttype() {
-			$type = 'post';
-			if ( isset( $_GET['post_type'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$type = sanitize_text_field( wp_unslash( $_GET['post_type'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			}
-			return $type;
-		}
-
-		/**
 		 * Echos the content field for each item in a post list.
 		 *
 		 * Attached to the manage_post_custom_column filter.
@@ -374,8 +397,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 */
 		public static function restrict_manage_posts() {
 			$classname = get_called_class();
-			$type      = self::current_posttype();
-			if ( $classname::$post_type === $type ) {
+			if ( $classname::is_current_posttype() ) {
 				foreach ( $classname::$meta_keys as $key => $fieldmeta ) {
 					if ( array_key_exists( 'postlist', $fieldmeta ) ) {
 						if ( array_key_exists( 'filter', $fieldmeta['postlist'] )
@@ -385,8 +407,8 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 							<select name="<?php echo esc_attr( $fieldkey ); ?>">
 								<option value=""><?php echo esc_html( 'Filter by ' . $key . ':' ); ?></option>
 								<?php
-								$current_v = isset( $_GET[ $fieldkey ] ) ? sanitize_text_field( wp_unslash( $_GET[ $fieldkey ] ) ) : '';
-								// TODO - Promote creatiomn of a select htmlthis to genericbase
+								$current_v = $classname::http_get_param( $fieldkey );
+								// TODO - Promote creation of a select htmlthis to genericbase.
 								switch ( $fieldmeta['type'] ) {
 									case 'related_post':
 										foreach ( $fieldmeta['classname']::get_all() as $value ) {
@@ -430,7 +452,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		public static function parse_query( $query ) {
 			$classname = get_called_class();
 			global $pagenow;
-			if ( self::current_posttype() === $classname::$post_type && 'edit.php' === $pagenow && $query->is_main_query() ) {
+			if ( $classname::is_current_posttype() && 'edit.php' === $pagenow && $query->is_main_query() ) {
 				$tax_query  = [];
 				$meta_query = [];
 
@@ -438,12 +460,12 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 					if ( array_key_exists( 'postlist', $fieldmeta ) ) {
 						if ( array_key_exists( 'filter', $fieldmeta['postlist'] ) ) {
 							$fieldkey = $classname . '_' . $key;
-							if ( isset( $_GET[ $fieldkey ] ) && sanitize_text_field( wp_unslash( $_GET[ $fieldkey ] ) ) !== '' ) {
+							if ( $classname::http_get_param( $fieldkey ) !== '' ) {
 								switch ( $fieldmeta['type'] ) {
 									case 'related_post':
 										$meta_query[] = array(
 											'key'     => $fieldmeta['meta_key'],
-											'value'   => sanitize_text_field( wp_unslash( $_GET[ $fieldkey ] ) ),
+											'value'   => $classname::http_get_param( $fieldkey ),
 											'compare' => '=',
 										);
 										break;
@@ -451,7 +473,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 										$tax_query[] = array(
 											'taxonomy' => $fieldmeta['classname']::$taxonomy,                      // taxonomy name.
 											'field'    => 'term_id',                                               // term_id, slug or name.
-											'terms'    => sanitize_text_field( wp_unslash( $_GET[ $fieldkey ] ) ), // term id, term slug or term name.
+											'terms'    => $classname::http_get_param( $fieldkey ), // term id, term slug or term name.
 										);
 										break;
 								}
@@ -464,10 +486,10 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 					case 0:
 						break; // Do nothing.
 					case 1:
-						$query->query_vars['meta_query'] = $meta_query;
+						$query->query_vars['meta_query'] = $meta_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 						break; // Nest n array.
 					default:
-						$query->query_vars['meta_query'] = array_merge( array( 'relation' => 'AND' ), $meta_query );
+						$query->query_vars['meta_query'] = array_merge( array( 'relation' => 'AND' ), $meta_query ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 						break;
 				}
 
@@ -475,10 +497,10 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 					case 0:
 						break; // Do nothing.
 					case 1:
-						$query->query_vars['tax_query'] = $tax_query;
+						$query->query_vars['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 						break; // Nest n array.
 					default:
-						$query->query_vars['tax_query'] = array_merge( array( 'relation' => 'AND' ), $tax_query );
+						$query->query_vars['tax_query'] = array_merge( array( 'relation' => 'AND' ), $tax_query ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 						break;
 				}
 			}
@@ -539,7 +561,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		/**
 		 * Registers the post type in WordPress
 		 *
-		 * @return void
+		 * @return (WP_Post_Type|WP_Error) The registered post type object, or an error object.
 		 */
 		public static function register_post_type() {
 			$classname = get_called_class();
@@ -716,9 +738,6 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 */
 		public static function inner_custom_box( $post ) {
 			$classname = get_called_class();
-			// Use nonce for verification.
-			$classname::base_form_field_nonce();
-
 			foreach ( $classname::$meta_keys as $key => $fieldmeta ) {
 				$fielddisplay = true;
 				if ( array_key_exists( 'display', $fieldmeta ) ) {
@@ -861,34 +880,32 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 
 			// verify this came from the our screen and with proper authorization,
 			// because save_fields can be triggered at other times.
-			if ( ! self::verify_nonce() ) {
-				return;
-			}
+			if ( $classname::verify_nonce() ) {
+				$obj = new $classname( $post_id );
+				foreach ( $classname::$meta_keys as $key => $value ) {
+					$fieldkey = $classname . '_' . $key;
+					switch ( $value['type'] ) {
+						case 'meta_attrib_check':
+							$obj->$key = isset( $_POST[ $fieldkey ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+							break;
 
-			$obj = new $classname( $post_id );
-			foreach ( $classname::$meta_keys as $key => $value ) {
-				$fieldkey = $classname . '_' . $key;
-				switch ( $value['type'] ) {
-					case 'meta_attrib_check':
-						$obj->$key = isset( $_POST[ $fieldkey ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-						break;
+						case 'related_post':
+							if ( isset( $_POST[ $fieldkey ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+								$obj->{$key . '_id'} = sanitize_key( wp_unslash( $_POST[ $fieldkey ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+							};
+							break;
 
-					case 'related_post':
-						if ( isset( $_POST[ $fieldkey ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-							$obj->{$key . '_id'} = sanitize_key( wp_unslash( $_POST[ $fieldkey ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-						};
-						break;
+						case 'related_tax':
+							if ( isset( $_POST[ $fieldkey ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+								$obj->attach_term( new $value['classname']( sanitize_key( wp_unslash( $_POST[ $fieldkey ] ) ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+							};
+							break;
 
-					case 'related_tax':
-						if ( isset( $_POST[ $fieldkey ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-							$obj->attach_term( new $value['classname']( sanitize_key( wp_unslash( $_POST[ $fieldkey ] ) ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-						};
-						break;
-
-					default:
-						if ( isset( $_POST[ $fieldkey ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-							$obj->$key = sanitize_text_field( wp_unslash( $_POST[ $fieldkey ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-						};
+						default:
+							if ( isset( $_POST[ $fieldkey ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+								$obj->$key = sanitize_text_field( wp_unslash( $_POST[ $fieldkey ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+							};
+					}
 				}
 			}
 		}
@@ -982,7 +999,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 				array(
 					'numberposts' => -1,
 					'post_type'   => $classname::$post_type,
-					'tax_query'   => array(
+					'tax_query'   => array(  // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 						array(
 							'taxonomy' => $taxonomy,
 							'field'    => 'term_id',
@@ -1009,7 +1026,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 					'numberposts' => -1,
 					'post_type'   => $classname::$post_type,
 					'post_status' => 'publish',
-					'meta_query'  => array(
+					'meta_query'  => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 						array(
 							'key'     => $meta_key,
 							'value'   => $meta_value,

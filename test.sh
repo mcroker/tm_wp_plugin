@@ -1,3 +1,6 @@
+phpcbf class-*
+phpcs class-*
+
 ## Install
 docker-compose up -d
 docker-compose exec wordpress /usr/local/bin/exec-phpunit.sh tm_wp_plugin $1

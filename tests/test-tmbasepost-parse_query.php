@@ -29,11 +29,12 @@ class TMBasePostParseQueryTest extends WP_UnitTestCase {
 
 	public function test_no_filters() {
 		global $_GET, $wp_the_query, $pagenow;
-		$backup_GET        = $_GET;
-		$backup_query      = $wp_the_query;
-		$backup_pagename   = $pagenow;
-		$_GET['post_type'] = 'tm_testpost_withcols';
-		$pagenow           = 'edit.php';
+		$backup_GET                                 = $_GET;
+		$backup_query                               = $wp_the_query;
+		$backup_pagename                            = $pagenow;
+		$_GET['post_type']                          = 'tm_testpost_withcols';
+		$pagenow                                    = 'edit.php';
+
 		TMPostWithCols::parse_query( $wp_the_query );
 		$_GET         = $backup_GET;
 		$wp_the_query = $backup_query;
@@ -49,6 +50,12 @@ class TMBasePostParseQueryTest extends WP_UnitTestCase {
 		$backup_pagename                                = $pagenow;
 		$_GET['post_type']                              = 'tm_testpost_withcols';
 		$_GET['TMPostWithCols_meta_attrib_relatedpost'] = 'TESTMETA';
+
+		$author1 = $this->factory->user->create_and_get( array( 'user_login' => 'jdoe', 'user_pass' => NULL, 'role' => 'author' ));
+		$this->assertTrue( 0 !== $author1->ID );
+ 		wp_set_current_user( $author1->ID );
+		$_GET['TMPostWithCols_default_field_nonce']     = wp_create_nonce( 'TMPostWithCols_default_nonce' );
+
 		$pagenow                                        = 'edit.php';
 		TMPostWithCols::parse_query( $wp_the_query );
 		$_GET                = $backup_GET;
@@ -75,6 +82,12 @@ class TMBasePostParseQueryTest extends WP_UnitTestCase {
 		$_GET['TMPostWithCols_meta_attrib_relatedpost']  = 'TESTMETA';
 		$_GET['TMPostWithCols_meta_attrib_relatedpost2'] = 'TESTMETA2';
 		$pagenow = 'edit.php';
+
+		$author1 = $this->factory->user->create_and_get( array( 'user_login' => 'jdoe', 'user_pass' => NULL, 'role' => 'author' ));
+		$this->assertTrue( 0 !== $author1->ID );
+ 		wp_set_current_user( $author1->ID );
+		$_GET['TMPostWithCols_default_field_nonce']     = wp_create_nonce( 'TMPostWithCols_default_nonce' );
+		
 		TMPostWithCols::parse_query( $wp_the_query );
 		$_GET                = $backup_GET;
 		$pagenow             = $backup_pagename;

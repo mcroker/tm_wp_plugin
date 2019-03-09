@@ -52,7 +52,7 @@ class TMBasePostInitTest extends WP_UnitTestCase {
 		$this->assertInternalType( 'int', has_action( 'restrict_manage_posts', 'TMPost::restrict_manage_posts' ) );
 		$this->assertInternalType( 'int', has_action( 'parse_query', 'TMPost::parse_query' ) );
 		$this->assertInternalType( 'int', has_action( 'admin_head', 'TMPost::admin_head_wrapper' ) );
-		$this->assertInternalType( 'int', has_action( 'admin_menu', 'TMPost::admin_menu' ) );
+		$this->assertInternalType( 'int', has_action( 'admin_menu', 'TMPost::admin_menu_wrapper' ) );
 		$this->assertInternalType( 'int', has_action( 'wp_enqueue_scripts', 'TMPost::enqueue_scripts' ) );
 		$this->assertInternalType( 'int', has_action( 'init', 'TMPost::add_rewrite_rule' ) );
 		$this->assertInternalType( 'int', has_action( 'post_type_link', 'TMPost::post_type_link_wrapper' ) );
@@ -76,7 +76,7 @@ class TMBasePostInitTest extends WP_UnitTestCase {
 		$this->assertInternalType( 'int', has_action( 'restrict_manage_posts', 'TMPostWithNoMetaBox::restrict_manage_posts' ) );
 		$this->assertInternalType( 'int', has_action( 'parse_query', 'TMPostWithNoMetaBox::parse_query' ) );
 		$this->assertInternalType( 'int', has_action( 'admin_head', 'TMPostWithNoMetaBox::admin_head_wrapper' ) );
-		$this->assertInternalType( 'int', has_action( 'admin_menu', 'TMPostWithNoMetaBox::admin_menu' ) );
+		$this->assertInternalType( 'int', has_action( 'admin_menu', 'TMPostWithNoMetaBox::admin_menu_wrapper' ) );
 		$this->assertInternalType( 'int', has_action( 'wp_enqueue_scripts', 'TMPostWithNoMetaBox::enqueue_scripts' ) );
 		$this->assertInternalType( 'int', has_action( 'init', 'TMPostWithNoMetaBox::add_rewrite_rule' ) );
 		$this->assertInternalType( 'int', has_action( 'post_type_link', 'TMPostWithNoMetaBox::post_type_link_wrapper' ) );
@@ -100,7 +100,7 @@ class TMBasePostInitTest extends WP_UnitTestCase {
 		$this->assertInternalType( 'int', has_action( 'restrict_manage_posts', 'TMPostWithSettings::restrict_manage_posts' ) );
 		$this->assertInternalType( 'int', has_action( 'parse_query', 'TMPostWithSettings::parse_query' ) );
 		$this->assertInternalType( 'int', has_action( 'admin_head', 'TMPostWithSettings::admin_head_wrapper' ) );
-		$this->assertInternalType( 'int', has_action( 'admin_menu', 'TMPostWithSettings::admin_menu' ) );
+		$this->assertInternalType( 'int', has_action( 'admin_menu', 'TMPostWithSettings::admin_menu_wrapper' ) );
 		$this->assertInternalType( 'int', has_action( 'wp_enqueue_scripts', 'TMPostWithSettings::enqueue_scripts' ) );
 		$this->assertInternalType( 'int', has_action( 'init', 'TMPostWithSettings::add_rewrite_rule' ) );
 		$this->assertInternalType( 'int', has_action( 'post_type_link', 'TMPostWithSettings::post_type_link_wrapper' ) );
