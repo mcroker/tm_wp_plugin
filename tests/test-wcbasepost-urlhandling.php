@@ -5,11 +5,11 @@
  * @package Tm_wp_plugin
  */
 
-require_once 'testobjs/class-tmpost.php';
+require_once 'testobjs/class-wcpost.php';
 /**
  * Sample test case.
  */
-class TMBasePostURLHandlingTest extends WP_UnitTestCase {
+class WCBasePostURLHandlingTest extends WP_UnitTestCase {
 
 	public function test_add_query_vars() {
 	}

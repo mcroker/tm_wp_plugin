@@ -10,7 +10,7 @@
  */
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
-require_once 'class-tmbasegeneric.php';
+require_once 'class-wcbasegeneric.php';
 
 if ( ! class_exists( 'TMBaseTax' ) ) :
 	/**
@@ -21,7 +21,7 @@ if ( ! class_exists( 'TMBaseTax' ) ) :
 	 * @license Apache2
 	 * @link
 	 */
-	abstract class TMBaseTax extends TMBaseGeneric {
+	abstract class TMBaseTax extends WCBaseGeneric {
 
 		public static $taxonomy;
 

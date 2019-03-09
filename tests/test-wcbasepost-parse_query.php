@@ -5,21 +5,21 @@
  * @package Tm_wp_plugin
  */
 
-require_once 'testobjs/class-tmpost.php';
-require_once 'testobjs/class-tmpostwithcols.php';
+require_once 'testobjs/class-wcpost.php';
+require_once 'testobjs/class-wcpostwithcols.php';
 /**
  * Sample test case.
  */
-class TMBasePostParseQueryTest extends WP_UnitTestCase {
+class WCBasePostParseQueryTest extends WP_UnitTestCase {
 
 	public function test_no_cols() {
 		global $_GET, $wp_the_query, $pagenow;
 		$backup_GET        = $_GET;
 		$backup_query      = $wp_the_query;
 		$backup_pagename   = $pagenow;
-		$_GET['post_type'] = 'tm_testpost';
+		$_GET['post_type'] = 'testpost';
 		$pagenow           = 'edit.php';
-		TMPost::parse_query( $wp_the_query );
+		WCPost::parse_query( $wp_the_query );
 		$_GET         = $backup_GET;
 		$wp_the_query = $backup_query;
 		$pagenow      = $backup_pagename;
@@ -32,10 +32,10 @@ class TMBasePostParseQueryTest extends WP_UnitTestCase {
 		$backup_GET                                 = $_GET;
 		$backup_query                               = $wp_the_query;
 		$backup_pagename                            = $pagenow;
-		$_GET['post_type']                          = 'tm_testpost_withcols';
+		$_GET['post_type']                          = 'testpost_withcols';
 		$pagenow                                    = 'edit.php';
 
-		TMPostWithCols::parse_query( $wp_the_query );
+		WCPostWithCols::parse_query( $wp_the_query );
 		$_GET         = $backup_GET;
 		$wp_the_query = $backup_query;
 		$pagenow      = $backup_pagename;
@@ -48,22 +48,22 @@ class TMBasePostParseQueryTest extends WP_UnitTestCase {
 		$backup_GET                                     = $_GET;
 		$backup_query                                   = $wp_the_query;
 		$backup_pagename                                = $pagenow;
-		$_GET['post_type']                              = 'tm_testpost_withcols';
-		$_GET['TMPostWithCols_meta_attrib_relatedpost'] = 'TESTMETA';
+		$_GET['post_type']                              = 'testpost_withcols';
+		$_GET['WCPostWithCols_meta_attrib_relatedpost'] = 'TESWCETA';
 
 		$author1 = $this->factory->user->create_and_get( array( 'user_login' => 'jdoe', 'user_pass' => NULL, 'role' => 'author' ));
 		$this->assertTrue( 0 !== $author1->ID );
  		wp_set_current_user( $author1->ID );
-		$_GET['TMPostWithCols_default_field_nonce']     = wp_create_nonce( 'TMPostWithCols_default_nonce' );
+		$_GET['WCPostWithCols_default_field_nonce']     = wp_create_nonce( 'WCPostWithCols_default_nonce' );
 
 		$pagenow                                        = 'edit.php';
-		TMPostWithCols::parse_query( $wp_the_query );
+		WCPostWithCols::parse_query( $wp_the_query );
 		$_GET                = $backup_GET;
 		$pagenow             = $backup_pagename;
 		$expected_meta_query = array(
 			0 => array(
 				'key'     => 'meta_attrib_relatedpost',
-				'value'   => 'TESTMETA',
+				'value'   => 'TESWCETA',
 				'compare' => '=',
 			),
 		);
@@ -78,28 +78,28 @@ class TMBasePostParseQueryTest extends WP_UnitTestCase {
 		$backup_GET                                      = $_GET;
 		$backup_query                                    = $wp_the_query;
 		$backup_pagename                                 = $pagenow;
-		$_GET['post_type']                               = 'tm_testpost_withcols';
-		$_GET['TMPostWithCols_meta_attrib_relatedpost']  = 'TESTMETA';
-		$_GET['TMPostWithCols_meta_attrib_relatedpost2'] = 'TESTMETA2';
+		$_GET['post_type']                               = 'testpost_withcols';
+		$_GET['WCPostWithCols_meta_attrib_relatedpost']  = 'TESWCETA';
+		$_GET['WCPostWithCols_meta_attrib_relatedpost2'] = 'TESWCETA2';
 		$pagenow = 'edit.php';
 
 		$author1 = $this->factory->user->create_and_get( array( 'user_login' => 'jdoe', 'user_pass' => NULL, 'role' => 'author' ));
 		$this->assertTrue( 0 !== $author1->ID );
  		wp_set_current_user( $author1->ID );
-		$_GET['TMPostWithCols_default_field_nonce']     = wp_create_nonce( 'TMPostWithCols_default_nonce' );
+		$_GET['WCPostWithCols_default_field_nonce']     = wp_create_nonce( 'WCPostWithCols_default_nonce' );
 		
-		TMPostWithCols::parse_query( $wp_the_query );
+		WCPostWithCols::parse_query( $wp_the_query );
 		$_GET                = $backup_GET;
 		$pagenow             = $backup_pagename;
 		$expected_meta_query = array(
 			0          => array(
 				'key'     => 'meta_attrib_relatedpost',
-				'value'   => 'TESTMETA',
+				'value'   => 'TESWCETA',
 				'compare' => '=',
 			),
 			1          => array(
 				'key'     => 'meta_attrib_relatedpost2',
-				'value'   => 'TESTMETA2',
+				'value'   => 'TESWCETA2',
 				'compare' => '=',
 			),
 			'relation' => 'AND',

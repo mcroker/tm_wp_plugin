@@ -5,19 +5,19 @@
  * @package Tm_wp_plugin
  */
 
-require_once 'testobjs/class-tmpostwithcols.php';
-require_once 'testobjs/class-tmpostwithinvalidfilter.php';
-require_once 'testobjs/class-tmpost.php';
+require_once 'testobjs/class-wcpostwithcols.php';
+require_once 'testobjs/class-wcpostwithinvalidfilter.php';
+require_once 'testobjs/class-wcpost.php';
 
-class TMBasePostRestrictManagePostsTest extends WP_UnitTestCase {
+class WCBasePostRestrictManagePostsTest extends WP_UnitTestCase {
 
 	public function test_restrict_manage_posts_emptypost() {
 		global $_GET;
 		$backup_GET        = $_GET;
-		$_GET['post_type'] = 'tm_testpost_withcols';
-		TMPostWithCols::restrict_manage_posts();
+		$_GET['post_type'] = 'testpost_withcols';
+		WCPostWithCols::restrict_manage_posts();
 		$_GET = $backup_GET;
-		$this->expectOutputRegex( '!<select name="TMPostWithCols_meta_attrib_relatedpost">\s+<option value="">Filter by meta_attrib_relatedpost:</option>\s+</select>!m' );
+		$this->expectOutputRegex( '!<select name="WCPostWithCols_meta_attrib_relatedpost">\s+<option value="">Filter by meta_attrib_relatedpost:</option>\s+</select>!m' );
 	}
 
 	public function test_restrict_manage_posts_singlepost() {
@@ -27,15 +27,15 @@ class TMBasePostRestrictManagePostsTest extends WP_UnitTestCase {
 		$this->factory->post->create(
 			array(
 				'post_title' => 'Test Post',
-				'post_type'  => 'tm_testpost',
+				'post_type'  => 'testpost',
 			)
 		);
 
-		$_GET['post_type'] = 'tm_testpost_withcols';
-		TMPostWithCols::restrict_manage_posts();
+		$_GET['post_type'] = 'testpost_withcols';
+		WCPostWithCols::restrict_manage_posts();
 		$_GET = $backup_GET;
 
-		$this->expectOutputRegex( '!<select name="TMPostWithCols_meta_attrib_relatedpost">\s+<option value="">Filter by meta_attrib_relatedpost:</option>\s+<option value="[0-9]+"\s*>Test Post</option>\s+</select>!m' );
+		$this->expectOutputRegex( '!<select name="WCPostWithCols_meta_attrib_relatedpost">\s+<option value="">Filter by meta_attrib_relatedpost:</option>\s+<option value="[0-9]+"\s*>Test Post</option>\s+</select>!m' );
 	}
 
 	public function test_restrict_manage_posts_multiplepost() {
@@ -45,27 +45,27 @@ class TMBasePostRestrictManagePostsTest extends WP_UnitTestCase {
 		$this->factory->post->create(
 			array(
 				'post_title' => 'Test Post 1',
-				'post_type'  => 'tm_testpost',
+				'post_type'  => 'testpost',
 			)
 		);
 		$this->factory->post->create(
 			array(
 				'post_title' => 'Test Post 2',
-				'post_type'  => 'tm_testpost',
+				'post_type'  => 'testpost',
 			)
 		);
 		$this->factory->post->create(
 			array(
 				'post_title' => 'Test Post 3',
-				'post_type'  => 'tm_testpost',
+				'post_type'  => 'testpost',
 			)
 		);
 
-		$_GET['post_type'] = 'tm_testpost_withcols';
-		TMPostWithCols::restrict_manage_posts();
+		$_GET['post_type'] = 'testpost_withcols';
+		WCPostWithCols::restrict_manage_posts();
 		$_GET = $backup_GET;
 
-		$this->expectOutputRegex( '!<select name="TMPostWithCols_meta_attrib_relatedpost">\s+<option value="">Filter by meta_attrib_relatedpost:</option>\s+(<option value="[0-9]+">Test Post [0-9]+</option>\s*)+\s+</select>!m' );
+		$this->expectOutputRegex( '!<select name="WCPostWithCols_meta_attrib_relatedpost">\s+<option value="">Filter by meta_attrib_relatedpost:</option>\s+(<option value="[0-9]+">Test Post [0-9]+</option>\s*)+\s+</select>!m' );
 	}
 
 	public function test_restrict_manage_posts_selectedpost() {
@@ -79,28 +79,28 @@ class TMBasePostRestrictManagePostsTest extends WP_UnitTestCase {
 		$this->factory->post->create(
 			array(
 				'post_title' => 'Test Post 1',
-				'post_type'  => 'tm_testpost',
+				'post_type'  => 'testpost',
 			)
 		);
 		$p = $this->factory->post->create(
 			array(
 				'post_title' => 'Test Post 2',
-				'post_type'  => 'tm_testpost',
+				'post_type'  => 'testpost',
 			)
 		);
 		$this->factory->post->create(
 			array(
 				'post_title' => 'Test Post 3',
-				'post_type'  => 'tm_testpost',
+				'post_type'  => 'testpost',
 			)
 		);
 
-		$_GET['post_type']                              = 'tm_testpost_withcols';
-		$_GET['TMPostWithCols_meta_attrib_relatedpost'] = $p;
+		$_GET['post_type']                              = 'testpost_withcols';
+		$_GET['WCPostWithCols_meta_attrib_relatedpost'] = $p;
 
-		$_GET['TMPostWithCols_default_field_nonce']     = wp_create_nonce( 'TMPostWithCols_default_nonce' );
+		$_GET['WCPostWithCols_default_field_nonce']     = wp_create_nonce( 'WCPostWithCols_default_nonce' );
 
-		TMPostWithCols::restrict_manage_posts();
+		WCPostWithCols::restrict_manage_posts();
 		$_GET = $backup_GET;
 
 		$this->expectOutputRegex( '!<option value="[0-9]+" selected=\'selected\'>Test Post 2</option>!m' );
@@ -122,10 +122,10 @@ class TMBasePostRestrictManagePostsTest extends WP_UnitTestCase {
 		global $_GET;
 		$backup_GET = $_GET;
 
-		$_GET['post_type'] = 'tm_testpost_withinvalidfilter';
+		$_GET['post_type'] = 'testpost_withinvalidfilter';
 		$this->expectException( Exception::class );
-		$this->expectOutputRegex( '!<select name="TMPostWithInvalidFilter_meta_attrib_1">!m' );
-		TMPostWithInvalidFilter::restrict_manage_posts();
+		$this->expectOutputRegex( '!<select name="WCPostWithInvalidFilter_meta_attrib_1">!m' );
+		WCPostWithInvalidFilter::restrict_manage_posts();
 		$_GET = $backup_GET;
 	}
 }

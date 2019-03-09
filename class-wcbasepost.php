@@ -1,28 +1,28 @@
 <?php
 /**
- * TMBasePost
+ * WCBasePost
  *
  * @category
- * @package  TMWPPlugin
- * @author   Martin Croker <martin@croker.family>
+ * @package  WordCider
+ * @author   Martin Croker <oss@croker.ltd>
  * @license  Apache2
  * @link
  */
 
 defined( 'ABSPATH' ) || die( 'No script kiddies please!' );
 
-require_once 'class-tmbasegeneric.php';
+require_once 'class-wcbasegeneric.php';
 
-if ( ! class_exists( 'TMBasePost' ) ) :
+if ( ! class_exists( 'WCBasePost' ) ) :
 	/**
-	 * TMBasePost
+	 * WCBasePost
 	 *
 	 * @package TMWPPlugin
 	 * @author  Martin Croker <martin@croker.family>
 	 * @license Apache2
 	 * @link
 	 */
-	abstract class TMBasePost extends TMBaseGeneric {
+	abstract class WCBasePost extends WCBaseGeneric {
 
 		/**
 		 * $post_type
@@ -54,17 +54,17 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		/**
 		 * $id
 		 *
-		 * @var string[] $tmargs
+		 * @var string[] $wcargs
 		 */
 
-		protected static $tmargs = [];
+		protected static $wcargs = [];
 		/**
 		 * $id
 		 *
 		 * @var number $id
 		 */
 
-		private static $default_tmargs = array(
+		private static $default_wcargs = array(
 			'create_metadatabox' => true,
 			'enqueue_scripts'    => true,
 			'register_settings'  => true,
@@ -99,31 +99,31 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 */
 		public static function init() {
 			$classname = get_called_class();
-			$tmargs    = array_replace( self::$default_tmargs, $classname::$tmargs );
+			$wcargs    = array_replace( self::$default_wcargs, static::$wcargs );
 			add_action( 'init', $classname . '::register_post_type' );
 			if ( is_admin() ) {
-				if ( $tmargs['create_metadatabox'] ) {
+				if ( $wcargs['create_metadatabox'] ) {
 					add_action( 'add_meta_boxes', $classname . '::create_metadata_box' );
 				}
 				add_action( 'save_post', $classname . '::save_post' );
-				if ( ! empty( $classname::$setting_keys ) && $tmargs['register_settings'] ) {
+				if ( ! empty( static::$setting_keys ) && $wcargs['register_settings'] ) {
 					add_action( 'admin_menu', $classname . '::create_settings_menu' );
 					add_action( 'admin_init', $classname . '::register_settings' );
 				}
-				if ( $tmargs['enqueue_scripts'] ) {
+				if ( $wcargs['enqueue_scripts'] ) {
 					add_action( 'admin_enqueue_scripts', $classname . '::enqueue_admin_scripts' );
 				}
-				if ( $tmargs['customise_list'] ) {
-					add_filter( 'manage_' . $classname::$post_type . '_posts_columns', $classname . '::manage_post_columns' );
-					add_action( 'manage_' . $classname::$post_type . '_posts_custom_column', $classname . '::manage_posts_custom_column', 10, 2 );
-					add_filter( 'manage_edit-' . $classname::$post_type . '_sortable_columns', $classname . '::sortable_columns' );
+				if ( $wcargs['customise_list'] ) {
+					add_filter( 'manage_' . static::$post_type . '_posts_columns', $classname . '::manage_post_columns' );
+					add_action( 'manage_' . static::$post_type . '_posts_custom_column', $classname . '::manage_posts_custom_column', 10, 2 );
+					add_filter( 'manage_edit-' . static::$post_type . '_sortable_columns', $classname . '::sortable_columns' );
 					add_action( 'restrict_manage_posts', $classname . '::restrict_manage_posts' );
 					add_filter( 'parse_query', $classname . '::parse_query' );
 				}
 				add_action( 'admin_head', $classname . '::admin_head_wrapper' );
 				add_action( 'admin_menu', $classname . '::admin_menu_wrapper' );
 			}
-			if ( $tmargs['enqueue_scripts'] ) {
+			if ( $wcargs['enqueue_scripts'] ) {
 				add_action( 'wp_enqueue_scripts', $classname . '::enqueue_scripts' );
 			}
 			add_action( 'init', $classname . '::add_rewrite_rule' );
@@ -163,8 +163,8 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 */
 		public static function post_type_link_wrapper( $url, $post = null ) {
 			$classname = get_called_class();
-			if ( is_object( $post ) && $post->post_type === $classname::$post_type ) {
-				$url = $classname::post_type_link( $url, $post );
+			if ( is_object( $post ) && $post->post_type === static::$post_type ) {
+				$url = static::post_type_link( $url, $post );
 			}
 			return $url;
 		}
@@ -198,10 +198,9 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @return void
 		 */
 		public static function admin_head_wrapper() {
-			$classname = get_called_class();
-			if ( $classname::is_admin_screen() ) {
-				$classname::base_form_field_nonce();
-				$classname::admin_head();
+			if ( static::is_admin_screen() ) {
+				static::base_form_field_nonce();
+				static::admin_head();
 			}
 		}
 
@@ -211,9 +210,8 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @return Boolean true if on admin screen for post_type.
 		 */
 		public static function is_admin_screen() {
-			$classname = get_called_class();
-			$screen    = get_current_screen();
-			return ( $classname::$post_type === $screen->post_type );
+			$screen = get_current_screen();
+			return ( static::$post_type === $screen->post_type );
 		}
 
 		/**
@@ -222,8 +220,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @return String Post type
 		 */
 		public static function is_current_posttype() {
-			$classname = get_called_class();
-			return ( $classname::$post_type === $classname::http_get_param( 'post_type', 'post', false ) );
+			return ( static::http_get_param( 'post_type', 'post', false ) === static::$post_type );
 		}
 
 		/**
@@ -244,9 +241,8 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @return void
 		 */
 		public static function admin_menu_wrapper( $context ) {
-			$classname = get_called_class();
-			if ( $classname::is_admin_screen() ) {
-				$classname::admin_menu();
+			if ( static::is_admin_screen() ) {
+				static::admin_menu();
 			}
 		}
 
@@ -265,12 +261,11 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @return string[] Updated orray f table head columns.
 		 */
 		public static function manage_post_columns( $defaults ) {
-			$classname = get_called_class();
-			$columns   = $classname::$meta_keys;
-			uasort( $columns, array( 'TMBasePost', 'post_columns_sort' ) );
+			$columns = static::$meta_keys;
+			uasort( $columns, array( 'WCBasePost', 'post_columns_sort' ) );
 
 			foreach ( array_keys( $columns ) as $key ) {
-				$fieldmeta = $classname::$meta_keys[ $key ];
+				$fieldmeta = static::$meta_keys[ $key ];
 				if ( array_key_exists( 'postlist', $fieldmeta ) ) {
 					$columntitle = $key;
 					if ( array_key_exists( 'title', $fieldmeta['postlist'] ) ) {
@@ -280,7 +275,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 							$columntitle = $fieldmeta['label'];
 						}
 					}
-					$defaults[ $classname . '_' . $key ] = $columntitle;
+					$defaults[ static::get_elem_name( $key ) ] = $columntitle;
 				}
 			}
 			return $defaults;
@@ -355,14 +350,14 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		public static function manage_posts_custom_column( $column_name, $post_id ) {
 			$classname = get_called_class();
 			$obj       = new $classname( $post_id );
-			foreach ( $classname::$meta_keys as $key => $fieldmeta ) {
+			foreach ( static::$meta_keys as $key => $fieldmeta ) {
 				$showcontent = true;
 				if ( array_key_exists( 'postlist', $fieldmeta )
 				&& is_array( $fieldmeta['postlist'] )
 				&& array_key_exists( 'content', $fieldmeta['postlist'] ) ) {
 					$showcontent = $fieldmeta['postlist']['content'];
 				}
-				if ( $showcontent && $column_name === $classname . '_' . $key ) {
+				if ( $showcontent && $column_name === static::get_elem_name( $key ) ) {
 					$obj->echo_html( $key );
 				}
 			}
@@ -377,7 +372,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 */
 		public static function sortable_columns( $columns ) {
 			$classname = get_called_class();
-			foreach ( $classname::$meta_keys as $key => $fieldmeta ) {
+			foreach ( static::$meta_keys as $key => $fieldmeta ) {
 				if ( array_key_exists( 'postlist', $fieldmeta ) ) {
 					if ( array_key_exists( 'sortable', $fieldmeta['postlist'] )
 					&& true === $fieldmeta['postlist']['sortable'] ) {
@@ -397,8 +392,8 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 */
 		public static function restrict_manage_posts() {
 			$classname = get_called_class();
-			if ( $classname::is_current_posttype() ) {
-				foreach ( $classname::$meta_keys as $key => $fieldmeta ) {
+			if ( static::is_current_posttype() ) {
+				foreach ( static::$meta_keys as $key => $fieldmeta ) {
 					if ( array_key_exists( 'postlist', $fieldmeta ) ) {
 						if ( array_key_exists( 'filter', $fieldmeta['postlist'] )
 						&& true === $fieldmeta['postlist']['filter'] ) {
@@ -407,7 +402,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 							<select name="<?php echo esc_attr( $fieldkey ); ?>">
 								<option value=""><?php echo esc_html( 'Filter by ' . $key . ':' ); ?></option>
 								<?php
-								$current_v = $classname::http_get_param( $fieldkey );
+								$current_v = static::http_get_param( $fieldkey );
 								// TODO - Promote creation of a select htmlthis to genericbase.
 								switch ( $fieldmeta['type'] ) {
 									case 'related_post':
@@ -450,58 +445,26 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @param WP_Query $query (Required) Default php query object.
 		 */
 		public static function parse_query( $query ) {
-			$classname = get_called_class();
 			global $pagenow;
-			if ( $classname::is_current_posttype() && 'edit.php' === $pagenow && $query->is_main_query() ) {
-				$tax_query  = [];
-				$meta_query = [];
-
-				foreach ( $classname::$meta_keys as $key => $fieldmeta ) {
+			if ( static::is_current_posttype() && 'edit.php' === $pagenow && $query->is_main_query() ) {
+				$filters = [];
+				foreach ( static::$meta_keys as $key => $fieldmeta ) {
 					if ( array_key_exists( 'postlist', $fieldmeta ) ) {
 						if ( array_key_exists( 'filter', $fieldmeta['postlist'] ) ) {
-							$fieldkey = $classname . '_' . $key;
-							if ( $classname::http_get_param( $fieldkey ) !== '' ) {
-								switch ( $fieldmeta['type'] ) {
-									case 'related_post':
-										$meta_query[] = array(
-											'key'     => $fieldmeta['meta_key'],
-											'value'   => $classname::http_get_param( $fieldkey ),
-											'compare' => '=',
-										);
-										break;
-									case 'related_tax':
-										$tax_query[] = array(
-											'taxonomy' => $fieldmeta['classname']::$taxonomy,                      // taxonomy name.
-											'field'    => 'term_id',                                               // term_id, slug or name.
-											'terms'    => $classname::http_get_param( $fieldkey ), // term id, term slug or term name.
-										);
-										break;
-								}
+							$fieldkey = static::get_elem_name( $key );
+							if ( static::http_get_param( $fieldkey ) !== '' ) {
+								$filters[ $key ] = static::http_get_param( $fieldkey );
 							}
 						}
 					}
 				}
 
-				switch ( count( $meta_query ) ) {
-					case 0:
-						break; // Do nothing.
-					case 1:
-						$query->query_vars['meta_query'] = $meta_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-						break; // Nest n array.
-					default:
-						$query->query_vars['meta_query'] = array_merge( array( 'relation' => 'AND' ), $meta_query ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-						break;
+				$queryargs = static::create_filter_query( $filters );
+				if ( array_key_exists( 'tax_query', $queryargs ) ) {
+					$query->query_vars['tax_query'] = $queryargs['tax_query']; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 				}
-
-				switch ( count( $tax_query ) ) {
-					case 0:
-						break; // Do nothing.
-					case 1:
-						$query->query_vars['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-						break; // Nest n array.
-					default:
-						$query->query_vars['tax_query'] = array_merge( array( 'relation' => 'AND' ), $tax_query ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-						break;
+				if ( array_key_exists( 'meta_query', $queryargs ) ) {
+					$query->query_vars['meta_query'] = $queryargs['meta_query']; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 				}
 			}
 		}
@@ -516,7 +479,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 */
 		public static function enqueue_scripts() {
 			$classname = get_called_class();
-			if ( get_post_type() === $classname::$post_type ) {
+			if ( get_post_type() === static::$post_type ) {
 				parent::enqueue_script_helper( $classname . '-script', $classname . '.js' );
 				parent::enqueue_style_helper( $classname . '-css', $classname . '.css' );
 			}
@@ -537,7 +500,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 			$classname = get_called_class();
 			if ( in_array( $hook_suffix, array( 'edit.php', 'post.php', 'post-new.php' ), true ) ) {
 				$screen = get_current_screen();
-				if ( is_object( $screen ) && $classname::$post_type === $screen->post_type ) {
+				if ( is_object( $screen ) && static::$post_type === $screen->post_type ) {
 					parent::enqueue_script_helper( $classname . '-admin-script', $classname . '-admin.js' );
 					parent::enqueue_style_helper( $classname . '-admin-css', $classname . '-admin.css' );
 				}
@@ -550,10 +513,9 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @return string post_slug
 		 */
 		public static function get_slug() {
-			$classname = get_called_class();
-			$slug      = get_theme_mod( $classname::$post_type . '_permalink' );
+			$slug = get_theme_mod( static::$post_type . '_permalink' );
 			if ( empty( $slug ) ) {
-				$slug = ( array_key_exists( 'slug', $classname::$labels ) ) ? $classname::$labels['slug'] : $classname::get_pluralname();
+				$slug = ( array_key_exists( 'slug', static::$labels ) ) ? static::$labels['slug'] : static::get_pluralname();
 			}
 			return strtolower( $slug );
 		}
@@ -564,10 +526,9 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @return (WP_Post_Type|WP_Error) The registered post type object, or an error object.
 		 */
 		public static function register_post_type() {
-			$classname = get_called_class();
-			if ( ! post_type_exists( $classname::$post_type ) ) {
-				$singular_name = $classname::$labels['singular_name'];
-				$plural_name   = $classname::get_plural_name();
+			if ( ! post_type_exists( static::$post_type ) ) {
+				$singular_name = static::$labels['singular_name'];
+				$plural_name   = static::get_plural_name();
 
 				$default_labels = array(
 					'name'               => esc_attr( $plural_name ),
@@ -584,9 +545,9 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 					'not_found'          => esc_attr( 'Not Found' ),
 					'not_found_in_trash' => esc_attr( 'Not found in Trash' ),
 				);
-				$default_labels = array_replace( $default_labels, $classname::$labels );
+				$default_labels = array_replace( $default_labels, static::$labels );
 
-				$slug = $classname::get_slug();
+				$slug = static::get_slug();
 
 				$default_args = array(
 					'label'               => esc_attr( $plural_name ),
@@ -610,8 +571,8 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 					),
 					'capability_type'     => 'post',
 				);
-				$default_args = array_replace( $default_args, $classname::$args );
-				$result       = register_post_type( $classname::$post_type, $default_args );
+				$default_args = array_replace( $default_args, static::$args );
+				$result       = register_post_type( static::$post_type, $default_args );
 				return $result;
 			}
 		}
@@ -627,9 +588,9 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 			global $submenu;
 			$classname = get_called_class();
 			add_submenu_page(
-				'edit.php?post_type=' . $classname::$post_type,
-				$classname::get_plural_name() . ' Settings',
-				$classname::get_plural_name() . ' Settings',
+				'edit.php?post_type=' . static::$post_type,
+				static::get_plural_name() . ' Settings',
+				static::get_plural_name() . ' Settings',
 				'administrator',
 				$classname . '::settings_page',
 				plugins_url( '/images/icon.png', __FILE__ )
@@ -643,9 +604,9 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 */
 		public static function register_settings() {
 			$classname = get_called_class();
-			foreach ( $classname::$setting_keys as $key => $value ) {
+			foreach ( static::$setting_keys as $key => $value ) {
 				$args = array_replace( [], $value['args'] );
-				register_setting( $classname::$post_type . '-settings-group', $classname . '-' . $key, $args );
+				register_setting( static::$post_type . '-settings-group', $classname . '-' . $key, $args );
 			}
 		}
 
@@ -670,13 +631,13 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 			$classname = get_called_class();
 			?>
 			<div class="wrap">
-				<h1><?php echo esc_html( $classname::$labels['singular_name'] ); ?> Settings</h1>
+				<h1><?php echo esc_html( static::$labels['singular_name'] ); ?> Settings</h1>
 
 				<form method="post" action="options.php">
-					<?php settings_fields( $classname::$post_type . '-settings-group' ); ?>
-					<?php do_settings_sections( $classname::$post_type . '-settings-group' ); ?>
+					<?php settings_fields( static::$post_type . '-settings-group' ); ?>
+					<?php do_settings_sections( static::$post_type . '-settings-group' ); ?>
 					<table class="form-table">
-						<?php foreach ( $classname::$setting_keys as $key => $value ) { ?>
+						<?php foreach ( static::$setting_keys as $key => $value ) { ?>
 							<tr valign="top">
 								<th scope="row"><?php echo esc_html( $value['label'] ); ?></th>
 								<td><input type="text" name="<?php echo esc_attr( $classname . '-' . $key ); ?>" value="<?php echo esc_attr( get_option( $classname . '-' . $key ) ); ?>" /></td>
@@ -695,11 +656,10 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @return string plural label name
 		 */
 		public static function get_plural_name() {
-			$classname = get_called_class();
-			if ( array_key_exists( 'name', $classname::$labels ) ) {
-				$plural_name = $classname::$labels['name'];
+			if ( array_key_exists( 'name', static::$labels ) ) {
+				$plural_name = static::$labels['name'];
 			} else {
-				$plural_name = $classname::$labels['singular_name'] . 's';
+				$plural_name = static::$labels['singular_name'] . 's';
 			}
 			return $plural_name;
 		}
@@ -714,12 +674,12 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		public static function create_metadata_box() {
 			if ( is_admin() ) {
 				$classname   = get_called_class();
-				$plural_name = $classname::get_plural_name();
+				$plural_name = static::get_plural_name();
 				add_meta_box(
-					$classname::$post_type . '_defaulttm_metabox',
+					static::get_elem_name( 'default_metabox' ),
 					'Metadata',
 					$classname . '::inner_custom_box',
-					$classname::$post_type,
+					static::$post_type,
 					'normal',
 					'default'
 				);
@@ -737,14 +697,13 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @return void
 		 */
 		public static function inner_custom_box( $post ) {
-			$classname = get_called_class();
-			foreach ( $classname::$meta_keys as $key => $fieldmeta ) {
+			foreach ( static::$meta_keys as $key => $fieldmeta ) {
 				$fielddisplay = true;
 				if ( array_key_exists( 'display', $fieldmeta ) ) {
 					$fielddisplay = $fieldmeta['display'];
 				}
 				if ( $fielddisplay ) {
-					$classname::base_form_field( $post, $key );
+					static::base_form_field( $post, $key );
 				}
 			}
 		}
@@ -752,7 +711,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		/**
 		 * Displays a HTML form field based on details of meta_keys
 		 *
-		 * @param TMBasePost $post     (Required) Post.
+		 * @param WCBasePost $post     (Required) Post.
 		 * @param string     $key      (Required) meta_keyfor field.
 		 * @param string     $value    Field value to display.
 		 * @param string     $label    Textual label to display.
@@ -768,13 +727,13 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 				$value = $obj->$key;
 			}
 			if ( '_AUTO' === $label ) {
-				$label = $classname::$meta_keys[ $key ]['label'];
+				$label = static::$meta_keys[ $key ]['label'];
 			}
 			if ( '_AUTO' === $type ) {
-				$type = $classname::$meta_keys[ $key ]['type'];
+				$type = static::$meta_keys[ $key ]['type'];
 			}
-			if ( '_AUTO' === $settings && array_key_exists( 'settings', $classname::$meta_keys[ $key ] ) ) {
-				$settings = $classname::$meta_keys[ $key ]['settings'];
+			if ( '_AUTO' === $settings && array_key_exists( 'settings', static::$meta_keys[ $key ] ) ) {
+				$settings = static::$meta_keys[ $key ]['settings'];
 			}
 			if ( null === $settings || '_AUTO' === $settings ) {
 				$settings = [];
@@ -816,7 +775,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 			foreach ( $allposts as $relatedpost ) {
 				$settings['options'][ $relatedpost->ID ] = $relatedpost->title;
 			}
-			$classname::base_form_field_Select( $fieldkey, $value, $label, $settings );
+			static::base_form_field_Select( $fieldkey, $value, $label, $settings );
 		}
 
 		/**
@@ -866,9 +825,8 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @return void
 		 */
 		public static function save_post( $post_id ) {
-			$classname = get_called_class();
 			$post_type = get_post_type( $post_id );
-			if ( $classname::$post_type !== $post_type ) {
+			if ( static::$post_type !== $post_type ) {
 				return;
 			}
 
@@ -880,9 +838,9 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 
 			// verify this came from the our screen and with proper authorization,
 			// because save_fields can be triggered at other times.
-			if ( $classname::verify_nonce() ) {
+			if ( static::verify_nonce() ) {
 				$obj = new $classname( $post_id );
-				foreach ( $classname::$meta_keys as $key => $value ) {
+				foreach ( static::$meta_keys as $key => $value ) {
 					$fieldkey = $classname . '_' . $key;
 					switch ( $value['type'] ) {
 						case 'meta_attrib_check':
@@ -911,11 +869,11 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		}
 
 		/**
-		 * Converts a WP_Post to a TMBasePost object
+		 * Converts a WP_Post to a WCBasePost object
 		 *
 		 * @param WP_Post[] $wpposts (Required) Array of WP_Posts to convert.
 		 *
-		 * @return TMBasePost[] Array of converted objects.
+		 * @return WCBasePost[] Array of converted objects.
 		 */
 		public static function convert_WPPost_to_TMPost( $wpposts ) {
 			$classname = get_called_class();
@@ -927,33 +885,100 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		}
 
 		/**
-		 * Returns all posts of post_type
+		 * Return all items matching $filters
 		 *
-		 * @return TMBasePost[] Array of all matching posts.
+		 * @param String[] $filters Array of filters to apply.
+		 *
+		 * @return WCBasePost[] Array of WCBasePost objects matching query
 		 */
-		public static function get_all() {
-			$classname = get_called_class();
-			$posts     = get_posts(
-				array(
-					'numberposts' => -1,
-					'post_type'   => $classname::$post_type,
-				)
-			);
-			return $classname::convert_WPPost_to_TMPost( $posts );
+		public static function get_all( $filters = [] ) {
+			$queryargs = static::create_filter_query( $filters );
+			$posts     = get_posts( $queryargs );
+			return static::convert_WPPost_to_TMPost( $posts );
 		}
 
 		/**
-		 * Get a TMBasePost by it's slug
+		 * Create a filter query for WP_Query
+		 *
+		 * @param String[] $filters Array of filters to apply.
+		 *
+		 * @return String[] Returns arguments for WP_Query
+		 */
+		public static function create_filter_query( $filters = [] ) {
+			$classname  = get_called_class();
+			$queryargs  = array(
+				'numberposts' => -1,
+				'post_type'   => static::$post_type,
+			);
+			$meta_query = [];
+			$tax_query  = [];
+
+			foreach ( $filters as $filter => $value ) {
+				if ( array_key_exists( $filter, static::$meta_keys ) ) {
+					$fieldmeta = static::$meta_keys[ $filter ];
+					switch ( $fieldmeta['type'] ) {
+						case 'related_post':
+							$meta_query[] = array(
+								'key'     => $fieldmeta['meta_key'],
+								'value'   => $value,
+								'compare' => '=',
+							);
+							break;
+						case 'related_tax':
+							$tax_query[] = array(
+								'taxonomy' => $fieldmeta['classname']::$taxonomy,                      // taxonomy name.
+								'field'    => 'term_id',                                               // term_id, slug or name.
+								'terms'    => $value, // term id, term slug or term name.
+							);
+							break;
+						default:
+							$meta_query[] = array(
+								'key'     => $fieldmeta['meta_key'],
+								'value'   => $value,
+								'compare' => '=',
+							);
+							break;
+					}
+				}
+			}
+
+			switch ( count( $meta_query ) ) {
+				case 0:
+					break; // Do nothing.
+				case 1:
+					$queryargs['meta_query'] = $meta_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					break; // Nest n array.
+				default:
+					$queryargs['meta_query'] = array_merge( array( 'relation' => 'AND' ), $meta_query ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					break;
+			}
+
+			switch ( count( $tax_query ) ) {
+				case 0:
+					break; // Do nothing.
+				case 1:
+					$queryargs['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+					break; // Nest n array.
+				default:
+					$queryargs['tax_query'] = array_merge( array( 'relation' => 'AND' ), $tax_query ); // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+					break;
+			}
+
+			return $queryargs;
+		}
+
+		/**
+		 * Get a WCBasePost by it's slug
 		 *
 		 * @param string $slug The slug to search for.
 		 *
-		 * @return TMBasePost|null Matching post or null if not found.
+		 * @return WCBasePost|null Matching post or null if not found.
 		 */
 		public static function get_by_slug( $slug ) {
 			$classname = get_called_class();
 			$args      = array(
 				'name'        => $slug,
-				'post_type'   => $classname::$post_type,
+				'post_type'   => static::$post_type,
 				'post_status' => 'publish',
 				'numberposts' => 1,
 			);
@@ -970,7 +995,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 *
 		 * @param string $title Title of the new post_type.
 		 *
-		 * @return TMBasePost Newly created post object.
+		 * @return WCBasePost Newly created post object.
 		 */
 		public static function create_post( $title ) {
 			$classname = get_called_class();
@@ -978,7 +1003,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 				array(
 					'post_title'  => $title,
 					'post_status' => 'publish',
-					'post_type'   => $classname::$post_type,
+					'post_type'   => static::$post_type,
 				)
 			);
 			$classname = get_called_class();
@@ -991,14 +1016,13 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @param TMBaseTax $taxonomy The taxonomy to search.
 		 * @param number    $term_id  The term id search for.
 		 *
-		 * @return TMBasePost[] Array of all matching posts.
+		 * @return WCBasePost[] Array of all matching posts.
 		 */
 		public static function get_related_to_tax( $taxonomy, $term_id ) {
-			$classname = get_called_class();
-			$posts     = get_posts(
+			$posts = get_posts(
 				array(
 					'numberposts' => -1,
-					'post_type'   => $classname::$post_type,
+					'post_type'   => static::$post_type,
 					'tax_query'   => array(  // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 						array(
 							'taxonomy' => $taxonomy,
@@ -1008,7 +1032,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 					),
 				)
 			);
-			return $classname::convert_WPPost_to_TMPost( $posts );
+			return static::convert_WPPost_to_TMPost( $posts );
 		}
 
 		/**
@@ -1017,14 +1041,14 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @param string $meta_key   The meta_key to search.
 		 * @param string $meta_value The value to search for.
 		 *
-		 * @return TMBasePost[] Array of all matching posts.
+		 * @return WCBasePost[] Array of all matching posts.
 		 */
 		public static function get_with_meta_value( $meta_key, $meta_value ) {
 			$classname = get_called_class();
 			$posts     = get_posts(
 				array(
 					'numberposts' => -1,
-					'post_type'   => $classname::$post_type,
+					'post_type'   => static::$post_type,
 					'post_status' => 'publish',
 					'meta_query'  => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 						array(
@@ -1035,7 +1059,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 					),
 				)
 			);
-			return $classname::convert_WPPost_to_TMPost( $posts );
+			return static::convert_WPPost_to_TMPost( $posts );
 		}
 
 		/**
@@ -1048,8 +1072,8 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		public function __get( $key ) {
 			$classname = get_called_class();
 			$stemkey   = self::get_stemkey( $key );
-			if ( array_key_exists( $stemkey, $classname::$meta_keys ) ) {
-				$conf = $classname::$meta_keys[ $stemkey ];
+			if ( array_key_exists( $stemkey, static::$meta_keys ) ) {
+				$conf = static::$meta_keys[ $stemkey ];
 				switch ( $conf['type'] ) {
 					case 'related_post':
 						return $this->get_related_post( $key, $conf['meta_key'], $conf['classname'] );
@@ -1092,8 +1116,8 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		public function __set( $key, $value ) {
 			$classname = get_called_class();
 			$stemkey   = self::get_stemkey( $key );
-			if ( array_key_exists( $stemkey, $classname::$meta_keys ) ) {
-				$conf = $classname::$meta_keys[ $stemkey ];
+			if ( array_key_exists( $stemkey, static::$meta_keys ) ) {
+				$conf = static::$meta_keys[ $stemkey ];
 				switch ( $conf['type'] ) {
 					case 'related_post':
 						$this->update_related_post( $key, $conf['meta_key'], $value );
@@ -1185,7 +1209,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @param string $meta_key  (Required) WP meta_key.
 		 * @param string $postclass (Required) Classname of post to return.
 		 *
-		 * @return TMBasePost Related post object.
+		 * @return WCBasePost Related post object.
 		 */
 		protected function get_related_post( $key, $meta_key, $postclass ) {
 			if ( '_id' === substr( $meta_key, -3 ) ) {
@@ -1217,7 +1241,7 @@ if ( ! class_exists( 'TMBasePost' ) ) :
 		 * @param string $meta_key  (Required) WP meta_key.
 		 * @param string $postclass (Required) Classname of post to return.
 		 *
-		 * @return TMBasePost[] Array of related post object.
+		 * @return WCBasePost[] Array of related post object.
 		 */
 		protected function get_related_posts( $key, $meta_key, $postclass ) {
 			return $postclass::get_with_meta_value( $meta_key, $this->id );

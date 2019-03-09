@@ -5,12 +5,12 @@
  * @package Tm_wp_plugin
  */
 
-require_once 'testobjs/class-tmpost.php';
+require_once 'testobjs/class-wcpost.php';
 
-class TMBasePostGetWithMetaValueTest extends WP_UnitTestCase {
+class WCBasePostGetWithMetaValueTest extends WP_UnitTestCase {
 
 	public function test_get_with_meta_value_empty() {
-		$result = TMPost::get_with_meta_value( 'dummy', 'dummy' );
+		$result = WCPost::get_with_meta_value( 'dummy', 'dummy' );
 		$this->assertSame( $result, [] );
 	}
 
@@ -18,10 +18,10 @@ class TMBasePostGetWithMetaValueTest extends WP_UnitTestCase {
 		$this->factory->post->create(
 			array(
 				'post_title' => 'Test Post 1',
-				'post_type'  => 'tm_testpost',
+				'post_type'  => 'testpost',
 			)
 		);
-		$result = TMPost::get_with_meta_value( 'dummy', 'dummy' );
+		$result = WCPost::get_with_meta_value( 'dummy', 'dummy' );
 		$this->assertSame( $result, [] );
 	}
 
@@ -29,21 +29,21 @@ class TMBasePostGetWithMetaValueTest extends WP_UnitTestCase {
 		$p = $this->factory->post->create(
 			array(
 				'post_title' => 'Test Post 1',
-				'post_type'  => 'tm_testpost',
+				'post_type'  => 'testpost',
 			)
 		);
 		$this->factory->post->create(
 			array(
 				'post_title' => 'Test Post 2',
-				'post_type'  => 'tm_testpost',
+				'post_type'  => 'testpost',
 			)
 		);
-		$obj = new TMPost( $p );
-		$this->assertInstanceOf( TMPost::class, $obj );
+		$obj = new WCPost( $p );
+		$this->assertInstanceOf( WCPost::class, $obj );
 		$obj->meta_attrib_number = 50;
-		$result                  = TMPost::get_with_meta_value( 'meta_attrib_number', 50 );
+		$result                  = WCPost::get_with_meta_value( 'meta_attrib_number', 50 );
 		$this->assertSame( count( $result ), 1 );
-		$this->assertInstanceOf( TMPost::class, $result[0] );
+		$this->assertInstanceOf( WCPost::class, $result[0] );
 		$this->assertSame( $result[0]->title, 'Test Post 1' );
 		$this->assertSame( $result[0]->ID, $p );
 	}
@@ -52,19 +52,19 @@ class TMBasePostGetWithMetaValueTest extends WP_UnitTestCase {
 		$p1                       = $this->factory->post->create(
 			array(
 				'post_title' => 'Test Post 1',
-				'post_type'  => 'tm_testpost',
+				'post_type'  => 'testpost',
 			)
 		);
 		$p2                       = $this->factory->post->create(
 			array(
 				'post_title' => 'Test Post 2',
-				'post_type'  => 'tm_testpost',
+				'post_type'  => 'testpost',
 			)
 		);
 		$p3                       = $this->factory->post->create(
 			array(
 				'post_title' => 'Test Post 3',
-				'post_type'  => 'tm_testpost',
+				'post_type'  => 'testpost',
 			)
 		);
 		$p4                       = $this->factory->post->create(
@@ -72,23 +72,23 @@ class TMBasePostGetWithMetaValueTest extends WP_UnitTestCase {
 				'post_title' => 'Test Post 4',
 			)
 		);
-		$obj1                     = new TMPost( $p1 );
+		$obj1                     = new WCPost( $p1 );
 		$obj1->meta_attrib_number = 50;
-		$this->assertInstanceOf( TMPost::class, $obj1 );
-		$obj2                     = new TMPost( $p2 );
+		$this->assertInstanceOf( WCPost::class, $obj1 );
+		$obj2                     = new WCPost( $p2 );
 		$obj2->meta_attrib_number = 50;
-		$this->assertInstanceOf( TMPost::class, $obj2 );
-		$obj3                     = new TMPost( $p3 );
+		$this->assertInstanceOf( WCPost::class, $obj2 );
+		$obj3                     = new WCPost( $p3 );
 		$obj3->meta_attrib_number = 10;
-		$this->assertInstanceOf( TMPost::class, $obj3 );
-		$obj4                     = new TMPost( $p4 );
+		$this->assertInstanceOf( WCPost::class, $obj3 );
+		$obj4                     = new WCPost( $p4 );
 		$obj4->meta_attrib_number = 50;
-		$this->assertInstanceOf( TMPost::class, $obj3 );
-		$result = TMPost::get_with_meta_value( 'meta_attrib_number', 50 );
+		$this->assertInstanceOf( WCPost::class, $obj3 );
+		$result = WCPost::get_with_meta_value( 'meta_attrib_number', 50 );
 		$this->assertSame( count( $result ), 2 );
-		$this->assertInstanceOf( TMPost::class, $result[0] );
+		$this->assertInstanceOf( WCPost::class, $result[0] );
 		$this->assertSame( $result[0]->ID, $p1 );
-		$this->assertInstanceOf( TMPost::class, $result[1] );
+		$this->assertInstanceOf( WCPost::class, $result[1] );
 		$this->assertSame( $result[1]->ID, $p2 );
 	}
 
@@ -96,7 +96,7 @@ class TMBasePostGetWithMetaValueTest extends WP_UnitTestCase {
 		$p1                       = $this->factory->post->create(
 			array(
 				'post_title' => 'Test Post 1',
-				'post_type'  => 'tm_testpost',
+				'post_type'  => 'testpost',
 			)
 		);
 		$p2                       = $this->factory->post->create(
@@ -104,15 +104,15 @@ class TMBasePostGetWithMetaValueTest extends WP_UnitTestCase {
 				'post_title' => 'Test Post 2',
 			)
 		);
-		$obj1                     = new TMPost( $p1 );
+		$obj1                     = new WCPost( $p1 );
 		$obj1->meta_attrib_number = 50;
-		$this->assertInstanceOf( TMPost::class, $obj1 );
-		$obj2                     = new TMPost( $p2 );
+		$this->assertInstanceOf( WCPost::class, $obj1 );
+		$obj2                     = new WCPost( $p2 );
 		$obj2->meta_attrib_number = 50;
-		$this->assertInstanceOf( TMPost::class, $obj2 );
-		$result = TMPost::get_with_meta_value( 'meta_attrib_number', 50 );
+		$this->assertInstanceOf( WCPost::class, $obj2 );
+		$result = WCPost::get_with_meta_value( 'meta_attrib_number', 50 );
 		$this->assertSame( count( $result ), 1 );
-		$this->assertInstanceOf( TMPost::class, $result[0] );
+		$this->assertInstanceOf( WCPost::class, $result[0] );
 		$this->assertSame( $result[0]->ID, $p1 );
 	}
 }

@@ -1,9 +1,9 @@
 <?php
 
-require_once 'class-tmpost.php';
+require_once 'class-wcpost.php';
 
-class TMPostWithCols extends TMPost {
-	protected static $post_type = 'tm_testpost_withcols';
+class WCPostWithCols extends WCPost {
+	protected static $post_type = 'testpost_withcols';
 
 	protected static $meta_keys = array(
 		'meta_attrib_2'            => array(
@@ -37,7 +37,7 @@ class TMPostWithCols extends TMPost {
 		'meta_attrib_relatedpost'  => array(
 			'type'      => 'related_post',
 			'meta_key'  => 'meta_attrib_relatedpost',
-			'classname' => 'TMPost',
+			'classname' => 'WCPost',
 			'postlist'  => array(
 				'title'  => 'meta_attrib_relatedpost',
 				'index'  => 4,
@@ -47,7 +47,7 @@ class TMPostWithCols extends TMPost {
 		'meta_attrib_relatedpost2' => array(
 			'type'      => 'related_post',
 			'meta_key'  => 'meta_attrib_relatedpost2',
-			'classname' => 'TMPost',
+			'classname' => 'WCPost',
 			'postlist'  => array(
 				'title'  => 'meta_attrib_relatedpost2',
 				'index'  => 5,
@@ -57,7 +57,7 @@ class TMPostWithCols extends TMPost {
 		'meta_attrib_relatedtax'   => array(
 			'type'      => 'related_tax',
 			'meta_key'  => 'meta_attrib_relatedpost',
-			'classname' => 'TMTax',
+			'classname' => 'WCTax',
 			'postlist'  => array(
 				'title'  => 'meta_attrib_relatedtax',
 				'index'  => 6,

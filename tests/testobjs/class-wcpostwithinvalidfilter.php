@@ -1,9 +1,9 @@
 <?php
 
-require_once 'class-tmpost.php';
+require_once 'class-wcpost.php';
 
-class TMPostWithInvalidFilter extends TMPost {
-	protected static $post_type = 'tm_testpost_withinvalidfilter';
+class WCPostWithInvalidFilter extends WCPost {
+	protected static $post_type = 'testpost_withinvalidfilter';
 
 	protected static $meta_keys = array(
 		'meta_attrib_1' => array(

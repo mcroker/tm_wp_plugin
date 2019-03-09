@@ -9,9 +9,8 @@ Description: TM WordPress framwork developer by Martin Croker
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 require_once 'TMBasePlugin.php';
-require_once 'class-tmbasegeneric.php';
-require_once 'class-tmbasepost.php';
-require_once 'tests/testobjs/class-tmpost.php';
+require_once 'class-wcbasegeneric.php';
+require_once 'class-wcbasepost.php';
 require_once 'TMBaseTax.php';
 require_once 'TMBaseWidget.php';
 

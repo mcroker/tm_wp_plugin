@@ -5,24 +5,24 @@
  * @package Tm_wp_plugin
  */
 
-require_once 'testobjs/class-tmpost.php';
-require_once 'testobjs/class-tmpostwithoverrides.php';
+require_once 'testobjs/class-wcpost.php';
+require_once 'testobjs/class-wcpostwithoverrides.php';
 /**
  * Sample test case.
  */
-class TMBasePostRegisterPostTypeTest extends WP_UnitTestCase {
+class WCBasePostRegisterPostTypeTest extends WP_UnitTestCase {
 
 	public function test_register_posttype() {
 		global $wp_post_types;
-		if ( post_type_exists( 'tm_testpost' ) ) {
-			unregister_post_type( 'tm_testpost' );
+		if ( post_type_exists( 'testpost' ) ) {
+			unregister_post_type( 'testpost' );
 		}
-		$this->assertarrayNotHasKey( 'tm_testpost', $wp_post_types );
-		TMPost::register_post_type();
-		$this->assertarrayHasKey( 'tm_testpost', $wp_post_types );
-		$pt = $wp_post_types['tm_testpost'];
+		$this->assertarrayNotHasKey( 'testpost', $wp_post_types );
+		WCPost::register_post_type();
+		$this->assertarrayHasKey( 'testpost', $wp_post_types );
+		$pt = $wp_post_types['testpost'];
 		$this->assertInstanceOf( WP_Post_Type::class, $pt );
-		$this->assertSame( $pt->name, 'tm_testpost' );
+		$this->assertSame( $pt->name, 'testpost' );
 		$this->assertSame( $pt->label, 'TestPosts' );
 		$this->assertSame( $pt->description, 'TestPosts details' );
 		$this->assertTrue( $pt->public );
@@ -43,16 +43,16 @@ class TMBasePostRegisterPostTypeTest extends WP_UnitTestCase {
 
 	public function test_register_with_overrides() {
 		global $wp_post_types;
-		if ( post_type_exists( 'tm_testpost_over' ) ) {
-			unregister_post_type( 'tm_testpost_over' );
+		if ( post_type_exists( 'testpost_over' ) ) {
+			unregister_post_type( 'testpost_over' );
 		}
-		$this->assertarrayNotHasKey( 'tm_testpost_over', $wp_post_types );
-		TMPostWithOverrides::register_post_type();
-		$this->assertarrayHasKey( 'tm_testpost_over', $wp_post_types );
-		$pt = $wp_post_types['tm_testpost_over'];
+		$this->assertarrayNotHasKey( 'testpost_over', $wp_post_types );
+		WCPostWithOverrides::register_post_type();
+		$this->assertarrayHasKey( 'testpost_over', $wp_post_types );
+		$pt = $wp_post_types['testpost_over'];
 		$this->assertInstanceOf( WP_Post_Type::class, $pt );
 
-		$this->assertSame( $pt->name, 'tm_testpost_over' );
+		$this->assertSame( $pt->name, 'testpost_over' );
 		$this->assertSame( $pt->label, 'TestPostWithOverridess' );
 		$this->assertSame( $pt->description, 'TestPostWithOverridess details' );
 		$this->assertFalse( $pt->public );
@@ -73,15 +73,15 @@ class TMBasePostRegisterPostTypeTest extends WP_UnitTestCase {
 
 	public function test_register_posttype_twice() {
 		global $wp_post_types;
-		if ( post_type_exists( 'tm_testpost' ) ) {
-			unregister_post_type( 'tm_testpost' );
+		if ( post_type_exists( 'testpost' ) ) {
+			unregister_post_type( 'testpost' );
 		}
-		$this->assertarrayNotHasKey( 'tm_testpost', $wp_post_types );
+		$this->assertarrayNotHasKey( 'testpost', $wp_post_types );
 
-		TMPost::register_post_type();
-		$this->assertarrayHasKey( 'tm_testpost', $wp_post_types );
+		WCPost::register_post_type();
+		$this->assertarrayHasKey( 'testpost', $wp_post_types );
 
-		TMPost::register_post_type();
-		$this->assertarrayHasKey( 'tm_testpost', $wp_post_types );
+		WCPost::register_post_type();
+		$this->assertarrayHasKey( 'testpost', $wp_post_types );
 	}
 }

@@ -1,5 +1,5 @@
 <?php
-class TMBase extends TMBaseGeneric {
+class WCBase extends WCBaseGeneric {
 	protected static $meta_keys = array(
 		'meta_attrib_number' => array(
 			'type'     => 'number',

@@ -1,10 +1,10 @@
 <?php
 /**
- * TMBaseGeneric
+ * WCBaseGeneric
  *
  * @category
- * @package  TMWPPlugin
- * @author   Martin Croker <martin@croker.family>
+ * @package  WordCider
+ * @author   Martin Croker <oss@croker.ltd>
  * @license  Apache2
  * @link
  */
@@ -12,7 +12,7 @@
 defined( 'ABSPATH' ) || die( 'No script kiddies please!' );
 
 // TODO - Need to implement readonly text field.
-if ( ! class_exists( 'TMBaseGeneric' ) ) :
+if ( ! class_exists( 'WCBaseGeneric' ) ) :
 	/**
 	 * TMBaseTax
 	 *
@@ -21,7 +21,7 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 	 * @license Apache2
 	 * @link
 	 */
-	abstract class TMBaseGeneric {
+	abstract class WCBaseGeneric {
 
 		/**
 		 * $id
@@ -82,6 +82,17 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 		abstract protected function get_meta_value( $meta_key );
 
 		/**
+		 * Function to return all instances - needs to be implemented by children
+		 *
+		 * @param String[] $filters Array of field_filters to apply.
+		 *
+		 * @return TMBaseGeneric[] Array of all object instances
+		 */
+		protected static function get_all( $filters = [] ) {
+			return [];
+		}
+
+		/**
 		 * Default getter
 		 *
 		 * @param string $key key name to return based on index to meta_keys.
@@ -90,10 +101,9 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 		 * @throws class:Exception If $key is not found.
 		 */
 		public function __get( $key ) {
-			$classname = get_called_class();
-			$stemkey   = self::get_stemkey( $key );
-			if ( array_key_exists( $stemkey, $classname::$meta_keys ) ) {
-				$conf = $classname::$meta_keys[ $stemkey ];
+			$stemkey = static::get_stemkey( $key );
+			if ( array_key_exists( $stemkey, static::$meta_keys ) ) {
+				$conf = static::$meta_keys[ $stemkey ];
 				$type = $conf['type'];
 				if ( method_exists( $this, 'get_attrib_' . $type ) ) {
 					return call_user_func( array( $this, 'get_attrib_' . $type ), $key, $conf['meta_key'] );
@@ -125,10 +135,9 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 		 * @throws class:Exception If $key is not found.
 		 */
 		public function __set( $key, $value ) {
-			$classname = get_called_class();
-			$stemkey   = self::get_stemkey( $key );
-			if ( array_key_exists( $stemkey, $classname::$meta_keys ) ) {
-				$conf = $classname::$meta_keys[ $stemkey ];
+			$stemkey = static::get_stemkey( $key );
+			if ( array_key_exists( $stemkey, static::$meta_keys ) ) {
+				$conf = static::$meta_keys[ $stemkey ];
 				$type = $conf['type'];
 				if ( method_exists( $this, 'update_attrib_' . $type ) ) {
 					$stringvalue = call_user_func( array( $this, 'update_attrib_' . $type ), $key, $conf['meta_key'], $value );
@@ -461,6 +470,18 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 		}
 
 		/**
+		 * Get prefix for HTML Object Names
+		 *
+		 * @param String $suffix String to use for element specific identifier.
+		 *
+		 * @return String Prefix to add to HTML obkects
+		 */
+		public static function get_elem_name( $suffix ) {
+			$classname = get_called_class();
+			return $classname . '_' . $suffix;
+		}
+
+		/**
 		 * Create a String form field
 		 *
 		 * @param string   $fieldkey (Required) ID&Name for field - conventially
@@ -678,9 +699,8 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 		 * @return void
 		 */
 		public static function formfield_nonce( $boxid = 'default' ) {
-			$classname   = get_called_class();
-			$nonceaction = $classname . '_' . $boxid . '_nonce';
-			$noncename   = $classname . '_' . $boxid . '_field_nonce';
+			$nonceaction = static::get_elem_name( $boxid . '_nonce' );
+			$noncename   = static::get_elem_name( $boxid . '_field_nonce' );
 			// Use nonce for verification.
 			wp_nonce_field( $nonceaction, $noncename );
 		}
@@ -696,9 +716,8 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 		 */
 		public static function http_get_param( $fieldkey, $default = '', $check_nonce = true ) {
 			global $_GET; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$classname = get_called_class();
-			$value     = $default;
-			if ( $classname::verify_nonce() || ! $check_nonce ) {
+			$value = $default;
+			if ( static::verify_nonce() || ! $check_nonce ) {
 				if ( isset( $_GET[ $fieldkey ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					$value = sanitize_text_field( wp_unslash( $_GET[ $fieldkey ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				}
@@ -717,9 +736,8 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 		 */
 		public static function http_post_param( $fieldkey, $default = '' ) {
 			global $_POST; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			$classname = get_called_class();
-			$value     = $default;
-			if ( $classname::verify_nonce() ) {
+			$value = $default;
+			if ( static::verify_nonce() ) {
 				if ( isset( $_POST[ $fieldkey ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 					$value = sanitize_text_field( wp_unslash( $_POST[ $fieldkey ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				}
@@ -738,9 +756,8 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 		public static function verify_nonce( $boxid = 'default' ) {
 			global $_POST; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			global $_GET; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$classname   = get_called_class();
-			$nonceaction = $classname . '_' . $boxid . '_nonce';
-			$noncename   = $classname . '_' . $boxid . '_field_nonce';
+			$nonceaction = static::get_elem_name( $boxid . '_nonce' );
+			$noncename   = static::get_elem_name( $boxid . '_field_nonce' );
 			if ( isset( $_GET[ $noncename ] ) ) {
 				return wp_verify_nonce( sanitize_key( $_GET[ $noncename ] ), $nonceaction );
 			} elseif ( isset( $_POST[ $noncename ] ) ) {
@@ -763,8 +780,8 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 			$classname  = get_called_class();
 			$metafields = [];
 			$outerclass = '';
-			if ( array_key_exists( $key, $classname::$meta_keys ) ) {
-				$metafields = $classname::$meta_keys[ $key ];
+			if ( array_key_exists( $key, static::$meta_keys ) ) {
+				$metafields = static::$meta_keys[ $key ];
 			} else {
 				throw ( new Exception( 'Uknown key ' . $key ) );
 			}
@@ -787,14 +804,14 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 			} else {
 				throw( new Exception( 'Meta value type not set' ) );
 			}
-			$fieldkey = $classname . '_' . $key;
+			$fieldkey = static::get_elem_name( $key );
 			?>
 			<div class="tm_<?php echo esc_attr( $type ); ?> <?php echo esc_attr( $outerclass ); ?>">
 				<?php
 				if ( method_exists( __CLASS__, 'formfield_' . $type ) ) {
 					call_user_func( array( $classname, 'formfield_' . $type ), $fieldkey, $value, $label, $settings );
 				} else {
-					self::formfield_string( $fieldkey, $value, $label, $settings );
+					static::formfield_string( $fieldkey, $value, $label, $settings );
 				}
 				?>
 			</div>
@@ -811,9 +828,8 @@ if ( ! class_exists( 'TMBaseGeneric' ) ) :
 		 * @throws Exception Type not set in meta structure, or invalid key.
 		 */
 		public function echo_html( $key ) {
-			$classname = get_called_class();
-			if ( array_key_exists( $key, $classname::$meta_keys ) ) {
-				$metafields = $classname::$meta_keys[ $key ];
+			if ( array_key_exists( $key, static::$meta_keys ) ) {
+				$metafields = static::$meta_keys[ $key ];
 			} else {
 				throw ( new Exception( 'Uknown key ' . $key ) );
 			}

@@ -1,9 +1,9 @@
 <?php
 
-require_once 'class-tmpost.php';
+require_once 'class-wcpost.php';
 
-class TMPostWithOverrides extends TMPost {
-	protected static $post_type = 'tm_testpost_over';
+class WCPostWithOverrides extends WCPost {
+	protected static $post_type = 'testpost_over';
 
 	protected static $labels = array(
 		'singular_name'      => 'TestPostWithOverrides',

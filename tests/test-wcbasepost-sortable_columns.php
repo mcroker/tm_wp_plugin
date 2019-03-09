@@ -5,10 +5,10 @@
  * @package Tm_wp_plugin
  */
 
-require_once 'testobjs/class-tmpostwithcols.php';
-require_once 'testobjs/class-tmpost.php';
+require_once 'testobjs/class-wcpostwithcols.php';
+require_once 'testobjs/class-wcpost.php';
 
-class TMBasePostSortableColumnsTest extends WP_UnitTestCase {
+class WCBasePostSortableColumnsTest extends WP_UnitTestCase {
 
 	public function test_add_sortable_columns() {
 		$dummyinput     = array(
@@ -16,9 +16,9 @@ class TMBasePostSortableColumnsTest extends WP_UnitTestCase {
 		);
 		$expectedresult = array(
 			'dummykey'                     => 'dummyvalue',
-			'TMPostWithCols_meta_attrib_1' => 'TMPostWithCols_meta_attrib_1',
+			'WCPostWithCols_meta_attrib_1' => 'WCPostWithCols_meta_attrib_1',
 		);
-		$result         = TMPostWithCols::sortable_columns( $dummyinput );
+		$result         = WCPostWithCols::sortable_columns( $dummyinput );
 		$this->assertSame( $result, $expectedresult );
 	}
 
@@ -29,7 +29,7 @@ class TMBasePostSortableColumnsTest extends WP_UnitTestCase {
 		$expectedresult = array(
 			'dummykey' => 'dummyvalue',
 		);
-		$result         = TMPost::sortable_columns( $dummyinput );
+		$result         = WCPost::sortable_columns( $dummyinput );
 		$this->assertSame( $result, $expectedresult );
 	}
 

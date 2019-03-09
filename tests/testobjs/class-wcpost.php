@@ -1,6 +1,6 @@
 <?php
-class TMPost extends TMBasePost {
-	protected static $post_type = 'tm_testpost';
+class WCPost extends WCBasePost {
+	protected static $post_type = 'testpost';
 
 	protected static $labels = array(
 		'singular_name' => 'TestPost',
