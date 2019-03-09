@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 require_once 'TMBasePlugin.php';
 require_once 'class-wcbasegeneric.php';
 require_once 'class-wcbasepost.php';
-require_once 'TMBaseTax.php';
+require_once 'class-wcbasetax.php';
 require_once 'TMBaseWidget.php';
 
 if ( ! class_exists( 'TMPlugin' ) ) :

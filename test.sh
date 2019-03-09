@@ -1,4 +1,4 @@
-phpcbf class-*
+# phpcbf class-*
 phpcs class-*
 
 ## Install
