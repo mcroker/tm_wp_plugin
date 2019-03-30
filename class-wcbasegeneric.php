@@ -11,6 +11,15 @@
 
 defined( 'ABSPATH' ) || die( 'No script kiddies please!' );
 
+require_once('types/class-wctypecheck.php');
+require_once('types/class-wctypecode.php');
+require_once('types/class-wctypedate.php');
+require_once('types/class-wctypenumber.php');
+require_once('types/class-wctypeobject.php');
+require_once('types/class-wctypestring.php');
+require_once('types/class-wctypetext.php');
+require_once('types/class-wctypetime.php');
+
 // TODO - Need to implement readonly text field.
 if ( ! class_exists( 'WCBaseGeneric' ) ) :
 	/**
@@ -33,18 +42,18 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 		protected $obj;
 
 		/**
-		 * $cache
-		 *
-		 * @var object[] $cache
-		 */
-		protected $cache = [];
-
-		/**
 		 * $meta_keys
 		 *
 		 * @var object[] $meta_keys
 		 */
 		protected static $meta_keys = [];
+
+		/**
+		 * $attributes
+		 *
+		 * @var object[] $attributes
+		 */
+		protected $attributes = [];
 
 		/**
 		 * __construct
@@ -88,6 +97,52 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 		}
 
 		/**
+		 * Load attribute object from database
+		 *
+		 * @param string $key key name to return based on index to meta_keys.
+		 *
+		 * @return object Attribute object.
+		 * @throws class:Exception If $key is not found.
+		 */
+		public function create_attribute( $key ) {
+			$stemkey   = static::get_stemkey( $key );
+			if ( array_key_exists( $stemkey, static::$meta_keys ) ) {
+				if ( ! array_key_exists( $key, $this->attributes ) ) {
+					$classname   = get_called_class();
+					$conf        = static::$meta_keys[ $stemkey ];
+					$type        = $conf['type'];
+					$builtintype = 'WCType' . $type;
+					if ( class_exists( $type ) ) {
+						$this->attributes[ $key ] = new $type( $classname, $key, $conf );
+					} elseif ( class_exists ( $builtintype ) ) {
+						$this->attributes[ $key ] = new $builtintype( $classname, $key, $conf );
+					} else {
+						$this->attributes[ $key ] = new WCTypeString( $classname, $key, $conf );
+					}
+				}
+				return $this->attributes[ $key ];
+			} else {
+				throw( new Exception( 'Key ' + $key + ' not configured' ) );
+			}
+		}
+
+		/**
+		 * Load attribute object from database
+		 *
+		 * @param string $key key name to return based on index to meta_keys.
+		 *
+		 * @return object Attribute object.
+		 * @throws class:Exception If $key is not found.
+		 */
+		public function get_attribute( $key ) {
+			if ( ! array_key_exists( $key, $this->attributes ) ) {
+				$this->create_attribute( $key );
+				$this->attributes[ $key ]->unpack_value( $this->get_meta_value( $this->attributes[ $key ]->get_meta_key() ) );
+			}
+			return $this->attributes[ $key ];
+		}
+
+		/**
 		 * Default getter
 		 *
 		 * @param string $key key name to return based on index to meta_keys.
@@ -96,26 +151,12 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 		 * @throws class:Exception If $key is not found.
 		 */
 		public function __get( $key ) {
-			$stemkey = static::get_stemkey( $key );
-			if ( array_key_exists( $stemkey, static::$meta_keys ) ) {
-				$conf = static::$meta_keys[ $stemkey ];
-				$type = $conf['type'];
-				if ( method_exists( $this, 'get_attrib_' . $type ) ) {
-					return call_user_func( array( $this, 'get_attrib_' . $type ), $key, $conf['meta_key'] );
-				} else {
-					// Default to string handling.
-					if ( ! array_key_exists( $key, $this->cache ) ) {
-						$this->cache[ $key ] = $this->get_meta_value( $conf['meta_key'] );
-					}
-					return $this->cache[ $key ];
-				}
-			} else {
-				switch ( $key ) {
-					case 'ID':
-						return $this->id;
-					default:
-						throw( new Exception( 'Key ' + $key + ' not configured' ) );
-				}
+			switch ( $key ) {
+				case 'ID':
+					return $this->id;
+				default:
+					$attrib = $this->get_attribute( $key );
+					return $attrib->get_value();
 			}
 		}
 
@@ -130,20 +171,11 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 		 * @throws class:Exception If $key is not found.
 		 */
 		public function __set( $key, $value ) {
-			$stemkey = static::get_stemkey( $key );
-			if ( array_key_exists( $stemkey, static::$meta_keys ) ) {
-				$conf = static::$meta_keys[ $stemkey ];
-				$type = $conf['type'];
-				if ( method_exists( $this, 'update_attrib_' . $type ) ) {
-					$stringvalue = call_user_func( array( $this, 'update_attrib_' . $type ), $key, $conf['meta_key'], $value );
-				} else {
-					// Default to string handling.
-					$this->update_meta_value( $conf['meta_key'], $value );
-					$this->cache[ $key ] = $value;
-				}
-			} else {
-				throw( new Exception( 'Key ' + $key + ' not configured' ) );
+			if ( ! array_key_exists( $key, $this->attributes ) ) {
+				$this->create_attribute( $key );
 			}
+			$this->attributes[ $key ]->set_value( $value );
+			$this->update_meta_value( $this->attributes[ $key ]->get_meta_key(), $this->attributes[ $key ]->get_packed_value() );
 		}
 
 		/**
@@ -152,9 +184,22 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 		 * @return void
 		 */
 		public function clear_cache() {
-			$this->cache = [];
+			$this->attributes = [];
 		}
 
+		/**
+		 * Return the plural label name base on name and/or sungualr name
+		 *
+		 * @return string plural label name
+		 */
+		public static function get_plural_name() {
+			if ( array_key_exists( 'name', static::$labels ) ) {
+				$plural_name = static::$labels['name'];
+			} else {
+				$plural_name = static::$labels['singular_name'] . 's';
+			}
+			return $plural_name;
+		}
 
 		/**
 		 * Get parameter key (removes _id if required)
@@ -221,250 +266,6 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 		}
 
 		/**
-		 * Update number attribute
-		 *
-		 * @param string  $key      (Required) Cache key.
-		 * @param string  $meta_key (Required) Meta attribute key in WP.
-		 * @param numeric $value    (Required) Value.
-		 *
-		 * @return void
-		 *
-		 * @throws Exception Invalid number.
-		 */
-		protected function update_attrib_number( $key, $meta_key, $value ) {
-			if ( is_numeric( $value ) ) {
-				$this->update_meta_value( $meta_key, $value );
-				$this->cache[ $key ] = $value;
-			} else {
-				throw( new Exception( 'Expected value to be numberic' ) );
-			}
-		}
-
-		/**
-		 * Get number attribute
-		 *
-		 * @param string $key      (Required) Cache key.
-		 * @param string $meta_key (Required) Meta attribute key in WP.
-		 *
-		 * @return numeric Meta value persisted on WordPress record.
-		 */
-		protected function get_attrib_number( $key, $meta_key ) {
-			if ( ! array_key_exists( $key, $this->cache ) ) {
-				$this->cache[ $key ] = $this->get_meta_value( $meta_key );
-			}
-			return $this->cache[ $key ];
-		}
-
-		/**
-		 * Update check attribute
-		 *
-		 * @param string  $key      (Required) Cache key.
-		 * @param string  $meta_key (Required) Meta attribute key in WP.
-		 * @param Boolean $value    (Required) Value.
-		 *
-		 * @return void
-		 */
-		protected function update_attrib_check( $key, $meta_key, $value ) {
-			$this->update_meta_value( $meta_key, $value );
-			$this->cache[ $key ] = $value;
-		}
-
-		/**
-		 * Get check attribute
-		 *
-		 * @param string $key      (Required) Cache key.
-		 * @param string $meta_key (Required) Meta attribute key in WP.
-		 *
-		 * @return Boolean Meta value persisted on WordPress record.
-		 */
-		protected function get_attrib_check( $key, $meta_key ) {
-			if ( ! array_key_exists( $key, $this->cache ) ) {
-				$value = $this->get_meta_value( $meta_key );
-				if ( '1' === $value || $value ) {
-					$this->cache[ $key ] = true;
-				} else {
-					$this->cache[ $key ] = false;
-				}
-			}
-			return $this->cache[ $key ];
-		}
-
-		/**
-		 * Update object attribute
-		 *
-		 * @param string $key      (Required) Cache key.
-		 * @param string $meta_key (Required) Meta attribute key in WP.
-		 * @param object $value    (Required) Value.
-		 *
-		 * @return void
-		 */
-		protected function update_attrib_object( $key, $meta_key, $value ) {
-			// TODO: Switch serialise to JSON.
-			$serialvalue = serialize( $value ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
-			$this->update_meta_value( $meta_key, $serialvalue );
-			$this->cache[ $key ] = $value;
-		}
-
-		/**
-		 * Get string attribute
-		 *
-		 * @param string $key      (Required) Cache key.
-		 * @param string $meta_key (Required) Meta attribute key in WP.
-		 *
-		 * @return object Meta value persisted on WordPress record.
-		 */
-		protected function get_attrib_object( $key, $meta_key ) {
-			if ( ! array_key_exists( $key, $this->cache ) ) {
-				$serialvalue         = $this->get_meta_value( $meta_key );
-				$value               = unserialize( $serialvalue ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize
-				$this->cache[ $key ] = $value;
-			}
-			return $this->cache[ $key ];
-		}
-
-		/**
-		 * Update tate attribute
-		 *
-		 * @param string    $key      (Required) Cache key.
-		 * @param string    $meta_key (Required) Meta attribute key in WP.
-		 * @param timevalue $value    (Required) Value.
-		 *
-		 * @return void
-		 */
-		protected function update_attrib_date( $key, $meta_key, $value ) {
-			if ( is_string( $value ) ) {
-				$value = strtotime( $value );
-			}
-			$value = date( 'Y-m-d', $value );
-			$this->update_meta_value( $meta_key, $value );
-			$this->cache[ $key ] = $value;
-		}
-
-		/**
-		 * Get string attribute
-		 *
-		 * @param string $key      (Required) Cache key.
-		 * @param string $meta_key (Required) Meta attribute key in WP.
-		 *
-		 * @return timevalue Meta value persisted on WordPress record.
-		 */
-		protected function get_attrib_date( $key, $meta_key ) {
-			if ( ! array_key_exists( $key, $this->cache ) ) {
-				$value = $this->get_meta_value( $meta_key );
-				if ( is_null( $value ) || '' === $value ) {
-					$this->cache[ $key ] = 0;
-				} else {
-					$this->cache[ $key ] = strtotime( $value );
-				}
-				if ( is_numeric( $this->cache[ $key ] ) ) {
-					$this->cache[ $key ] = strftime( '%Y-%m-%d', $this->cache[ $key ] );
-				}
-			}
-			return $this->cache[ $key ];
-		}
-
-		/**
-		 * Update time attribute
-		 *
-		 * @param string    $key      (Required) Cache key.
-		 * @param string    $meta_key (Required) Meta attribute key in WP.
-		 * @param timevalue $value    (Required) Value.
-		 *
-		 * @return void
-		 */
-		protected function update_attrib_time( $key, $meta_key, $value ) {
-			if ( is_string( $value ) ) {
-				$value = strtotime( $value, 0 );
-			}
-			if ( is_a( $value, 'DateTime' ) ) {
-				$value = $value->getTimestamp();
-			}
-			$this->update_meta_value( $meta_key, $value );
-			$this->cache[ $key ] = $value;
-		}
-
-		/**
-		 * Get string attribute
-		 *
-		 * @param string $key      (Required) Cache key.
-		 * @param string $meta_key (Required) Meta attribute key in WP.
-		 *
-		 * @return DateTime Meta value persisted on WordPress record.
-		 */
-		protected function get_attrib_time( $key, $meta_key ) {
-			if ( ! array_key_exists( $key, $this->cache ) ) {
-				$value = $this->get_meta_value( $meta_key );
-				if ( is_null( $value ) || '' === $value ) {
-					$this->cache[ $key ] = 0;
-				} else {
-					$this->cache[ $key ] = (int) $value;
-				}
-			}
-			$dt = new DateTime();
-			$dt->setTimestamp( $this->cache[ $key ] );
-			$tz = get_option( 'timezone_string' );
-			if ( ! empty( $tz ) ) {
-				$dt->setTimezone( new DateTimeZone( get_option( 'timezone_string' ) ) );
-			}
-			return $dt;
-		}
-
-		/**
-		 * Create a String form field
-		 *
-		 * @param string   $fieldkey (Required) ID&Name for field - conventially
-		 *                           Classname_MetaKey.
-		 * @param string   $value    Field value to display.
-		 * @param string   $label    Textual label to display.
-		 * @param string[] $settings Additional settings to pass to display.
-		 *
-		 * @return void
-		 */
-		public static function formfield_string( $fieldkey, $value = '', $label = '', $settings = [] ) {
-			$inputclass = isset( $settings['inputclass'] ) ? $settings['inputclass'] : '';
-			?>
-			<input
-			class="<?php echo esc_attr( $inputclass ); ?>"
-			type="text"
-			name="<?php echo esc_attr( $fieldkey ); ?>"
-			value="<?php echo esc_attr( $value ); ?>"
-			id="<?php echo esc_attr( $fieldkey ); ?>"
-			/><br>
-			<?php
-		}
-
-		/**
-		 * Create a String form field
-		 *
-		 * @param string   $fieldkey (Required) ID&Name for field - conventially
-		 *                           Classname_MetaKey.
-		 * @param string   $value    Field value to display.
-		 * @param string   $label    Textual label to display.
-		 * @param string[] $settings Additional settings to pass to display.
-		 *
-		 * @return void
-		 *
-		 * @throws Exception Infalid DateTime instance.
-		 */
-		public static function formfield_time( $fieldkey, $value = null, $label = '', $settings = [] ) {
-			$inputclass = isset( $settings['inputclass'] ) ? $settings['inputclass'] : '';
-			if ( is_null( $value ) ) {
-				$value = new DateTime();
-			}
-			if ( ! $value instanceof DateTime ) {
-				throw( new Exception( '$value must be instance of DateTime or null' ) );
-			}
-			?>
-			<input class="<?php echo esc_attr( $inputclass ); ?>"
-			type="datetime-local"
-			name="<?php echo esc_attr( $fieldkey ); ?>"
-			id="<?php echo esc_attr( $fieldkey ); ?>"
-			value="<?php echo esc_attr( $value->format( 'TH:i' ) ); ?>"
-			/>
-			<?php
-		}
-
-		/**
 		 * Get prefix for HTML Object Names
 		 *
 		 * @param String $suffix String to use for element specific identifier.
@@ -474,111 +275,6 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 		public static function get_elem_name( $suffix ) {
 			$classname = get_called_class();
 			return $classname . '_' . $suffix;
-		}
-
-		/**
-		 * Create a String form field
-		 *
-		 * @param string   $fieldkey (Required) ID&Name for field - conventially
-		 *                           Classname_MetaKey.
-		 * @param string   $value    Field value to display.
-		 * @param string   $label    Textual label to display.
-		 * @param string[] $settings Additional settings to pass to display.
-		 *
-		 * @return void
-		 */
-		public static function formfield_date( $fieldkey, $value = '', $label = '', $settings = [] ) {
-			$inputclass = isset( $settings['inputclass'] ) ? $settings['inputclass'] : '';
-			if ( is_string( $value ) ) {
-				$value = strtotime( $value );
-			}
-			?>
-			<input class="<?php echo esc_attr( $inputclass ); ?>"
-			type="datetime-local"
-			name="<?php echo esc_attr( $fieldkey ); ?>"
-			id="<?php echo esc_attr( $fieldkey ); ?>"
-			value="<?php echo esc_attr( date( 'Y-m-d\TH:i', $value ) ); ?>"
-			/>
-			<?php
-		}
-
-		/**
-		 * Create a String form field
-		 *
-		 * @param string   $fieldkey (Required) ID&Name for field - conventially
-		 *                           Classname_MetaKey.
-		 * @param string   $value    Field value to display.
-		 * @param string   $label    Textual label to display.
-		 * @param string[] $settings Additional settings to pass to display.
-		 *
-		 * @return void
-		 */
-		public static function formfield_check( $fieldkey, $value = '', $label = '', $settings = [] ) {
-			$inputclass = isset( $settings['inputclass'] ) ? $settings['inputclass'] : '';
-			?>
-			<input class="<?php echo esc_attr( $inputclass ); ?>"
-			type="checkbox"
-			name="<?php echo esc_attr( $fieldkey ); ?>"
-			id="<?php echo esc_attr( $fieldkey ); ?>"
-			<?php checked( $value ); ?>
-			/>
-			<?php
-		}
-
-		/**
-		 * Create a String form field
-		 *
-		 * @param string   $fieldkey (Required) ID&Name for field - conventially
-		 *                           Classname_MetaKey.
-		 * @param string   $value    Field value to display.
-		 * @param string   $label    Textual label to display.
-		 * @param string[] $settings Additional settings to pass to display.
-		 *
-		 * @return void
-		 */
-		public static function formfield_number( $fieldkey, $value = '', $label = '', $settings = [] ) {
-			$inputclass = isset( $settings['inputclass'] ) ? $settings['inputclass'] : '';
-			?>
-			<input class="<?php echo esc_attr( $inputclass ); ?>"
-			type="number"
-			name="<?php echo esc_attr( $fieldkey ); ?>"
-			id="<?php echo esc_attr( $fieldkey ); ?>"
-			value="<?php echo esc_attr( $value ); ?>"
-			/>
-			<?php
-		}
-
-		/**
-		 * Create a String form field
-		 *
-		 * @param string   $fieldkey (Required) ID&Name for field - conventially
-		 *                           Classname_MetaKey.
-		 * @param string   $value    Field value to display.
-		 * @param string   $label    Textual label to display.
-		 * @param string[] $settings Additional settings to pass to display.
-		 *
-		 * @return void
-		 */
-		public static function formfield_text( $fieldkey, $value = '', $label = '', $settings = [] ) {
-			wp_editor( $value, $fieldkey, $settings );
-		}
-
-		/**
-		 * Create a String form field
-		 *
-		 * @param string   $fieldkey (Required) ID&Name for field - conventially
-		 *                           Classname_MetaKey.
-		 * @param string   $value    Field value to display.
-		 * @param string   $label    Textual label to display.
-		 * @param string[] $settings Additional settings to pass to display.
-		 *
-		 * @return void
-		 */
-		public static function formfield_code( $fieldkey, $value = '', $label = '', $settings = [] ) {
-			$inputclass = isset( $settings['inputclass'] ) ? $settings['inputclass'] : '';
-			?>
-			<textarea class="<?php echo esc_attr( $inputclass ); ?>" style="width:100%" rows=15 name="<?php echo esc_attr( $fieldkey ); ?>" id="<?php echo esc_attr( $fieldkey ); ?>"><?php echo esc_attr( $value ); ?></textarea>
-			<?php
 		}
 
 		/**
@@ -604,62 +300,6 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 				<?php } ?>
 			</select>
 			<?php
-		}
-
-		/**
-		 * Create a String form field
-		 *
-		 * @param string   $fieldkey (Required) ID&Name for field - conventially
-		 *                           Classname_MetaKey.
-		 * @param string   $value    Field value to display.
-		 * @param string   $label    Textual label to display.
-		 * @param string[] $settings Additional settings to pass to display.
-		 *
-		 * @return void
-		 */
-		public static function formfield_label( $fieldkey, $value = '', $label = '', $settings = [] ) {
-			$labelclass = isset( $settings['labelclass'] ) ? $settings['labelclass'] : '';
-			?>
-			<?php if ( '_NONE' !== $label ) { ?>
-				<label class="<?php echo esc_attr( $labelclass ); ?>" for="<?php echo esc_attr( $fieldkey ); ?>"><?php echo esc_html( $label ); ?></label>
-				<?php
-			}
-		}
-
-		/**
-		 * Throw an exception if somebody tries to create a logo field
-		 *
-		 * It is expected if this field type is required it is implemented by the subclass
-		 *
-		 * @param string   $fieldkey (Required) ID&Name for field - conventially
-		 *                           Classname_MetaKey.
-		 * @param string   $value    Field value to display.
-		 * @param string   $label    Textual label to display.
-		 * @param string[] $settings Additional settings to pass to display.
-		 *
-		 * @return void
-		 * @throws Exception Not implemented.
-		 */
-		public static function formfield_logo( $fieldkey, $value = '', $label = '', $settings = [] ) {
-			throw( new Exception( 'Not implemented ' . $type ) ); // May be implemented in child.
-		}
-
-		/**
-		 * Throw an exception if somebody tries to create a Object field
-		 *
-		 * It is expected if this field type is required it is implemented by the subclass
-		 *
-		 * @param string   $fieldkey (Required) ID&Name for field - conventially
-		 *                           Classname_MetaKey.
-		 * @param string   $value    Field value to display.
-		 * @param string   $label    Textual label to display.
-		 * @param string[] $settings Additional settings to pass to display.
-		 *
-		 * @return void
-		 * @throws Exception Not implemented.
-		 */
-		public static function formfield_object( $fieldkey, $value = '', $label = '', $settings = [] ) {
-			throw( new Exception( 'Not implemented ' . $fieldkey ) ); // May be implemented in child.
 		}
 
 		/**
@@ -771,43 +411,13 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 		 *
 		 * @throws Exception Invalid or unknown key.
 		 */
-		public function formfield( $key ) {
-			$classname  = get_called_class();
-			$metafields = [];
+		public function echo_formfield( $key ) {
 			$outerclass = '';
-			if ( array_key_exists( $key, static::$meta_keys ) ) {
-				$metafields = static::$meta_keys[ $key ];
-			} else {
-				throw ( new Exception( 'Uknown key ' . $key ) );
-			}
-			$value = $this->$key;
-			if ( array_key_exists( 'label', $metafields ) ) {
-				$label = $metafields['label'];
-			} else {
-				$label = '';
-			}
-			if ( array_key_exists( 'settings', $metafields ) ) {
-				$settings = $metafields['settings'];
-				if ( array_key_exists( 'outerclass', $settings ) ) {
-					$outerclass = $settings['outerclass'];
-				}
-			} else {
-				$settings = [];
-			}
-			if ( array_key_exists( 'type', $metafields ) ) {
-				$type = $metafields['type'];
-			} else {
-				throw( new Exception( 'Meta value type not set' ) );
-			}
-			$fieldkey = static::get_elem_name( $key );
 			?>
-			<div class="tm_<?php echo esc_attr( $type ); ?> <?php echo esc_attr( $outerclass ); ?>">
+			<div class="<?php echo esc_attr( $outerclass ); ?>">
 				<?php
-				if ( method_exists( __CLASS__, 'formfield_' . $type ) ) {
-					call_user_func( array( $classname, 'formfield_' . $type ), $fieldkey, $value, $label, $settings );
-				} else {
-					static::formfield_string( $fieldkey, $value, $label, $settings );
-				}
+				$attrib = $this->get_attribute( $key );
+				$attrib->echo_formfield();
 				?>
 			</div>
 			<?php
@@ -823,26 +433,8 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 		 * @throws Exception Type not set in meta structure, or invalid key.
 		 */
 		public function echo_html( $key ) {
-			if ( array_key_exists( $key, static::$meta_keys ) ) {
-				$metafields = static::$meta_keys[ $key ];
-			} else {
-				throw ( new Exception( 'Uknown key ' . $key ) );
-			}
-			if ( array_key_exists( 'settings', $metafields ) ) {
-				$settings = $metafields['settings'];
-			} else {
-				$settings = [];
-			}
-			if ( array_key_exists( 'type', $metafields ) ) {
-				$type = $metafields['type'];
-			} else {
-				throw( new Exception( 'Meta value type not set' ) );
-			}
-			if ( method_exists( $this, 'echo_html_' . $type ) ) {
-				call_user_func( array( $this, 'echo_html_' . $type ), $key, $settings );
-			} else {
-				echo esc_html( $this->$key );
-			}
+			$attrib = $this->get_attribute( $key );
+			$attrib->echo_html();
 		}
 
 	}

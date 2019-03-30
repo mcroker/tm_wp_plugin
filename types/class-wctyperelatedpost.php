@@ -1,6 +1,6 @@
 <?php
 /**
- * WCDefinitionGeneric
+ * WCTypeNumber
  *
  * @category
  * @package  WordCider
@@ -11,11 +11,12 @@
 
 defined( 'ABSPATH' ) || die( 'No script kiddies please!' );
 
-if ( ! class_exists( 'WCDefinitionGeneric' ) ) :
-	/**
-	 * WCDefinitionGeneric
-	 */
-	class WCDefinitionGeneric {
+require_once 'class-wctypebase.php';
 
+if ( ! class_exists( 'WCTypeRelatedPost' ) ) :
+	/**
+	 * WCTypeNumber
+	 */
+	class WCTypeRelatedPost extends WCTypeBase {
 	}
 endif;

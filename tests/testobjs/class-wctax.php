@@ -1,5 +1,11 @@
 <?php
-class WCBase extends WCBaseGeneric {
+class WCTax extends WCBaseTax {
+	public static $taxonomy = 'testtax';
+
+	protected static $labels = array(
+		'singular_name' => 'TestTax',
+	);
+
 	protected static $meta_keys = array(
 		'meta_attrib_number' => array(
 			'type'     => 'number',
@@ -42,25 +48,4 @@ class WCBase extends WCBaseGeneric {
 			'meta_key' => 'meta_attrib_object',
 		),
 	);
-
-	public $values = [];
-
-	function update_meta_value( $meta_key, $value ) {
-		if ( array_key_exists( $meta_key, static::$meta_keys ) ) {
-			$this->values[ $meta_key ] = $value;
-		} else {
-			throw new Exception('Key not recognsied ' + $meta_key);
-		}
-	}
-	function get_meta_value( $meta_key ) {
-		if ( array_key_exists( $meta_key, static::$meta_keys ) ) {
-			if ( array_key_exists( $meta_key, $this->values ) ) {
-				return $this->values[ $meta_key ];
-			} else {
-				return null;
-			}
-		} else {
-			throw new Exception('Key not recognsied ' + $meta_key);
-		}
-	}
 }

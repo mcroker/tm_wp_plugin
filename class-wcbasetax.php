@@ -22,6 +22,8 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		/**
 		 * $taxonomy
 		 *
+		 * TODO - this needs to be protected.
+		 *
 		 * @var string $taxonomy
 		 */
 		public static $taxonomy;
@@ -77,34 +79,11 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 			$classname = get_called_class();
 			add_action( 'init', $classname . '::registerTaxonomy' );
 			if ( is_admin() ) {
-				add_action(
-					'admin_enqueue_scripts',
-					$classname . '::enqueueAdminScripts'
-				);
-				add_action(
-					static::$taxonomy . '_add_form_fields',
-					$classname . '::addFormFields',
-					10,
-					2
-				);
-				add_action(
-					static::$taxonomy . '_edit_form_fields',
-					$classname . '::editFormFields',
-					10,
-					2
-				);
-				add_action(
-					'created_' . static::$taxonomy,
-					$classname . '::saveTax',
-					10,
-					2
-				);
-				add_action(
-					'edited_' . static::$taxonomy,
-					$classname . '::saveTax',
-					10,
-					2
-				);
+				add_action( 'admin_enqueue_scripts', $classname . '::enqueueAdminScripts' );
+				add_action( static::$taxonomy . '_add_form_fields', $classname . '::add_form_fields', 10, 2 );
+				add_action( static::$taxonomy . '_edit_form_fields', $classname . '::edit_form_fields', 10, 2 );
+				add_action( 'created_' . static::$taxonomy, $classname . '::save_tax', 10, 2 );
+				add_action( 'edited_' . static::$taxonomy, $classname . '::save_tax', 10, 2 );
 			}
 			add_action( 'wp_enqueue_scripts', $classname . '::enqueueScripts' );
 		}
@@ -114,9 +93,9 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return void
 		 */
-		public static function registerTaxonomy() {
+		public static function register_taxonomy() {
 			$singular_name = static::$labels['singular_name'];
-			$plural_name   = static::getPluralname();
+			$plural_name   = static::get_plural_name();
 
 			$default_labels = array(
 				'name'                  => esc_attr( $plural_name, 'taxonomy general name', 'wordcider' ),
@@ -150,11 +129,11 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return void
 		 */
-		public static function enqueueScripts() {
+		public static function enqueue_scripts() {
 			$classname = get_called_class();
 			if ( is_object_in_taxonomy( get_post_type(), static::$taxonomy ) ) {
-				parent::enqueueScriptHelper( $classname . '-script', $classname . '.js' );
-				parent::enqueueStyleHelper( $classname . '-css', $classname . '.css' );
+				parent::enqueue_style_helper( $classname . '-script', $classname . '.js' );
+				parent::enqueue_style_helper( $classname . '-css', $classname . '.css' );
 			}
 		}
 
@@ -165,15 +144,15 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return void
 		 */
-		public static function enqueueAdminScripts( $hook_suffix ) {
+		public static function enqueue_admin_scripts( $hook_suffix ) {
 			$classname = get_called_class();
 			if ( in_array( $hook_suffix, array( 'term.php', 'edit-tags.php' ), true ) ) {
 				$screen = get_current_screen();
 				if ( is_object( $screen ) && static::$taxonomy === $screen->taxonomy ) {
-					parent::enqueueScriptHelper( $classname . '-admin-script', $classname . '-admin.js' );
-					parent::enqueueStyleHelper( $classname . '-admin-css', $classname . '-admin.css' );
+					parent::enqueue_script_helper( $classname . '-admin-script', $classname . '-admin.js' );
+					parent::enqueue_style_helper( $classname . '-admin-css', $classname . '-admin.css' );
 					wp_enqueue_media();
-					parent::enqueueScriptHelper( $classname . '-logo-field-js', 'TMLogoField.js', [], __FILE__ );
+					parent::enqueue_script_helper( $classname . '-logo-field-js', 'TMLogoField.js', [], __FILE__ );
 				}
 			}
 		}
@@ -224,7 +203,7 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return TMBaseTax class object of term matching name.
 		 */
-		public static function getByName( $term_name ) {
+		public static function get_by_name( $term_name ) {
 			$classname = get_called_class();
 			$term      = get_term( array( 'name' => $term_name ), static::$taxonomy );
 			return new $classname( $term->term_id );
@@ -237,7 +216,7 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return TMBaseTax class object of term matching id.
 		 */
-		public static function getByID( $term_id ) {
+		public static function get_by_id( $term_id ) {
 			$classname = get_called_class();
 			$term      = get_term( $term_id, static::$taxonomy );
 			return new $classname( $term->term_id );
@@ -250,11 +229,10 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return TMBaseTax class object of inserted term.
 		 */
-		public static function insertTerm( $term_slug ) {
+		public static function insert_term( $term_slug ) {
 			$classname = get_called_class();
 			$resp      = wp_insert_term( $term_slug, static::$taxonomy, $args = array() );
-			$classname = get_called_class();
-			return new $classname( $resp->term_id );
+			return new $classname( $resp['term_id'] );
 		}
 
 		/**
@@ -265,12 +243,12 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 * @return undefined Value of meta_attribute.
 		 */
 		public function __get( $key ) {
-			$stemkey   = static::getStemkey( $key );
+			$stemkey = static::get_stemkey( $key );
 			if ( array_key_exists( $stemkey, static::$meta_keys ) ) {
 				$conf = static::$meta_keys[ $stemkey ];
 				switch ( $conf['type'] ) {
 					case 'related_posts':
-						return $this->getRelatedPosts( $key, $conf['classname'] );
+						return $this->get_related_posts( $key, $conf['classname'] );
 					default:
 						return parent::__get( $key );
 				}
@@ -282,7 +260,7 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 						return $this->term->slug;
 					case 'term':
 						if ( is_null( $this->_obj ) ) {
-							$this->_obj = get_term( $this->_id, $this->wp_taxonomy );
+							$this->_obj = get_term( $this->id, $this->wp_taxonomy );
 						}
 						return $this->_obj;
 					default:
@@ -303,8 +281,8 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return void
 		 */
-		protected function updateMetaValue( $meta_key, $value ) {
-			update_term_meta( $this->_id, $meta_key, $value );
+		protected function update_meta_value( $meta_key, $value ) {
+			update_term_meta( $this->id, $meta_key, $value );
 		}
 
 		/**
@@ -317,8 +295,8 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return undefined meta_value stored against WP_Term.
 		 */
-		protected function getMetaValue( $meta_key ) {
-			return get_term_meta( $this->_id, $meta_key, true );
+		protected function get_meta_value( $meta_key ) {
+			return get_term_meta( $this->id, $meta_key, true );
 		}
 
 		/**
@@ -330,8 +308,8 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return TMBasePost[] Array of TMBasePosts associated to term.
 		 */
-		protected function getRelatedPosts( $key, $postclass ) {
-			return $postclass::getRelatedToTax( static::$taxonomy, $this->_id );
+		protected function get_related_posts( $key, $postclass ) {
+			return $postclass::get_related_to_tax( static::$taxonomy, $this->id );
 		}
 
 		/**
@@ -342,7 +320,7 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return boolean function indicating which is higher in sort order.
 		 */
-		public static function sortBySlugAsc( $a, $b ) {
+		public static function sort_by_slug_asc( $a, $b ) {
 			return ( $a->slug > $b->slug );
 		}
 
@@ -354,7 +332,7 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return boolean function indicating which is higher in sort order.
 		 */
-		public static function sortBySlugDesc( $a, $b ) {
+		public static function sort_by_slug_desc( $a, $b ) {
 			return ( $a->slug < $b->slug );
 		}
 
@@ -367,10 +345,10 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return void
 		 */
-		public static function addFormFields( $taxonomy ) {
-			static::baseFormFieldNonce();
+		public static function add_form_fields( $taxonomy ) {
+			static::base_form_field_nonce();
 			foreach ( static::$meta_keys as $key => $value ) {
-				static::addFormField( $key );
+				static::add_form_field( $key );
 			}
 		}
 
@@ -383,10 +361,10 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return void
 		 */
-		public static function editFormFields( $term ) {
-			static::baseFormFieldNonce();
+		public static function edit_form_fields( $term ) {
+			static::base_form_field_nonce();
 			foreach ( static::$meta_keys as $key => $value ) {
-				static::editFormField( $term, $key );
+				static::edit_form_field( $term, $key );
 			}
 		}
 
@@ -403,7 +381,7 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return void
 		 */
-		public static function addFormField( $key, $value = '_AUTO', $label = '_AUTO', $type = '_AUTO', $settings = '_AUTO' ) {
+		public static function add_form_field( $key, $value = '_AUTO', $label = '_AUTO', $type = '_AUTO', $settings = '_AUTO' ) {
 			// TODO Work out how to promote this code to Generic.
 			if ( '_AUTO' === $value ) {
 				// TODO A default would be great here.
@@ -423,8 +401,8 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 			}
 			?>
 			<div class="form-field term-group">
-				<?php self::baseFormLabel( $key, $value, $label, $settings ); ?>
-				<?php self::baseformField( $key, $type, $value, $label, $settings ); ?>
+				<?php static::base_form_label( $key, $value, $label, $settings ); ?>
+				<?php static::base_form_field( $key, $type, $value, $label, $settings ); ?>
 			</div>
 			<?php
 		}
@@ -443,7 +421,7 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return void
 		 */
-		public static function editFormField( $term, $key, $value = '_AUTO', $label = '_AUTO', $type = '_AUTO', $settings = '_AUTO' ) {
+		public static function edit_form_field( $term, $key, $value = '_AUTO', $label = '_AUTO', $type = '_AUTO', $settings = '_AUTO' ) {
 			if ( '_AUTO' === $value ) {
 				$obj   = new $classname( $term );
 				$value = $obj->$key;
@@ -463,10 +441,10 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 			?>
 			<tr class="form-field term-group-wrap">
 				<th scope="row">
-					<?php self::baseFormLabel( $key, $value, $label, $settings ); ?>
+					<?php static::base_form_label( $key, $value, $label, $settings ); ?>
 				</th>
 				<td>
-					<?php self::baseFormField( $key, $type, $value, $label, $settings ); ?>
+					<?php static::base_form_field( $key, $type, $value, $label, $settings ); ?>
 				</td>
 			</tr>
 			<?php
@@ -482,13 +460,13 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @throws Exception Not implemented.
 		 */
-		public static function saveTax( $term_id, $tt_id ) {
+		public static function save_tax( $term_id, $tt_id ) {
 			// TODO - What does TT id do?
 			if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 				return;
 			}
 
-			if ( static::verifyNonce() ) {
+			if ( static::verify_nonce() ) {
 				$obj = new $classname( $term_id );
 				foreach ( static::$meta_keys as $key => $value ) {
 					$fieldkey = static::get_elem_name( $key );
@@ -521,7 +499,7 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return void
 		 */
-		public static function baseFormFieldLogo( $fieldkey, $value = '', $label = '', $settings = [] ) {
+		public static function base_form_field_logo( $fieldkey, $value = '', $label = '', $settings = [] ) {
 			global $content_width, $_wp_additional_image_sizes;
 
 			$removebuttonid = static::get_elem_name( 'logo_remove' );

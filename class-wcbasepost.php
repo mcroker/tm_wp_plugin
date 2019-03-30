@@ -510,7 +510,7 @@ if ( ! class_exists( 'WCBasePost' ) ) :
 		public static function get_slug() {
 			$slug = get_theme_mod( static::$post_type . '_permalink' );
 			if ( empty( $slug ) ) {
-				$slug = ( array_key_exists( 'slug', static::$labels ) ) ? static::$labels['slug'] : static::get_pluralname();
+				$slug = ( array_key_exists( 'slug', static::$labels ) ) ? static::$labels['slug'] : static::get_plural_name();
 			}
 			return strtolower( $slug );
 		}
@@ -643,20 +643,6 @@ if ( ! class_exists( 'WCBasePost' ) ) :
 				</form>
 			</div>
 			<?php
-		}
-
-		/**
-		 * Return the plural label name base on name and/or sungualr name
-		 *
-		 * @return string plural label name
-		 */
-		public static function get_plural_name() {
-			if ( array_key_exists( 'name', static::$labels ) ) {
-				$plural_name = static::$labels['name'];
-			} else {
-				$plural_name = static::$labels['singular_name'] . 's';
-			}
-			return $plural_name;
 		}
 
 		/**
