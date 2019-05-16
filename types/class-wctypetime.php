@@ -50,22 +50,13 @@ if ( ! class_exists( 'WCTypeTime' ) ) :
 		 *
 		 * @return String Meta value persisted on WordPress record.
 		 */
-		public function unpack_value( $packedvalue ) {
-			$this->set_value( $packedvalue );
-		}
-
-		/**
-		 * Set DateTime Value
-		 *
-		 * @return String Meta value persisted on WordPress record.
-		 */
-		public function get_packed_value() {
-			$value = parent::get_packed_value();
+		public function get_serialized() {
+			$value = parent::get_serialized();
 			return $value->getTimestamp();
 		}
 
 		public function echo_formfield( $settings = [] ) {
-			$settings = $this->get_formfield_settings( $settings );
+			$htmlsettings = $this->get_html_settings( $settings );
 			$value = $this->get_value();
 			if ( is_null( $value ) ) {
 				$value = new DateTime();
@@ -74,7 +65,7 @@ if ( ! class_exists( 'WCTypeTime' ) ) :
 				throw( new Exception( '$value must be instance of DateTime or null' ) );
 			}
 			?>
-			<input class="<?php echo esc_attr( $settings['inputclass'] ); ?>"
+			<input class="<?php echo esc_attr( $htmlsettings['inputclass'] ); ?>"
 			type="datetime-local"
 			name="<?php echo esc_attr( $this->get_elem_name() ); ?>"
 			id="<?php echo esc_attr( $this->get_elem_name() ); ?>"

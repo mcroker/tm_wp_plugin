@@ -19,6 +19,11 @@ if ( ! class_exists( 'WCTypeNumber' ) ) :
 	 */
 	class WCTypeNumber extends WCTypeBase {
 
+		public function __construct( $parent_name, $attrib_name, $options = [], $value = null ) {
+			if ( ! is_numeric( $value ) && ! is_null( $value ) ) throw( new Exception( 'Expected $value to be number|null' ) );
+			parent::__construct( $parent_name, $attrib_name, $options, $value );
+		}
+
 		/**
 		 * Update number attribute
 		 *
@@ -27,17 +32,16 @@ if ( ! class_exists( 'WCTypeNumber' ) ) :
 		 * @return void
 		 */
 		public function set_value( $value ) {
-			if ( is_numeric( $value ) ) {
-				parent::set_value( $value );
-			} else {
-				throw( new Exception( 'Expected value to be numberic' ) );
-			}
+			if ( ! is_numeric( $value ) && ! is_null( $value ) ) throw( new Exception( 'Expected $value to be number|null' ) );
+			parent::set_value( $value );
 		}
 
 		public function echo_formfield( $settings = [] ) {
-			$settings = $this->get_formfield_settings( $settings );
+			if ( ! is_array( $settings ) ) throw( new Exception( 'Expected $settings to be array|null' ) );
+
+			$htmlsettings = $this->get_html_settings( $settings );
 			?>
-			<input class="<?php echo esc_attr( $settings['inputclass'] ); ?>"
+			<input class="<?php echo esc_attr( $htmlsettings['inputclass'] ); ?>"
 			type="number"
 			name="<?php echo esc_attr( $this->get_elem_name() ); ?>"
 			id="<?php echo esc_attr( $this->get_elem_name() ); ?>"

@@ -30,7 +30,7 @@ class WCBasePostSettersTest extends WP_UnitTestCase {
 		$this->assertThat( $base, $this->isInstanceOf( 'WCBasePost' ) );
 		$base->meta_attrib_date = '1976-06-05';
 		$base->clear_cache();
-		$this->assertSame( $base->meta_attrib_date, '1976-06-05' );
+		$this->assertSame($base->meta_attrib_date , '1976-06-05' );
 	}
 
 	public function test_attrib_time() {

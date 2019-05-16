@@ -281,7 +281,7 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return void
 		 */
-		protected function update_meta_value( $meta_key, $value ) {
+		public function update_meta_value( $meta_key, $value ) {
 			update_term_meta( $this->id, $meta_key, $value );
 		}
 
@@ -295,7 +295,7 @@ if ( ! class_exists( 'WCBaseTax' ) ) :
 		 *
 		 * @return undefined meta_value stored against WP_Term.
 		 */
-		protected function get_meta_value( $meta_key ) {
+		public function get_meta_value( $meta_key ) {
 			return get_term_meta( $this->id, $meta_key, true );
 		}
 

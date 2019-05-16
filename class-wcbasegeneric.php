@@ -11,6 +11,7 @@
 
 defined( 'ABSPATH' ) || die( 'No script kiddies please!' );
 
+require_once('types/class-wctypebase.php');
 require_once('types/class-wctypecheck.php');
 require_once('types/class-wctypecode.php');
 require_once('types/class-wctypedate.php');
@@ -19,6 +20,11 @@ require_once('types/class-wctypeobject.php');
 require_once('types/class-wctypestring.php');
 require_once('types/class-wctypetext.php');
 require_once('types/class-wctypetime.php');
+
+require_once('elems/class-wcelembase.php');
+require_once('elems/class-wcelembutton.php');
+require_once('elems/class-wcelemselect.php');
+require_once('elems/class-wcelemnonce.php');
 
 // TODO - Need to implement readonly text field.
 if ( ! class_exists( 'WCBaseGeneric' ) ) :
@@ -74,7 +80,7 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 		 *
 		 * @return void
 		 */
-		abstract protected function update_meta_value( $meta_key, $value );
+		abstract public function update_meta_value( $meta_key, $value );
 
 		/**
 		 * Abstract function to handle WordPress meta integration
@@ -83,7 +89,7 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 		 *
 		 * @return undefined value returned from WordPress as persisted as an atribute
 		 */
-		abstract protected function get_meta_value( $meta_key );
+		abstract public function get_meta_value( $meta_key );
 
 		/**
 		 * Function to return all instances - needs to be implemented by children
@@ -108,16 +114,15 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 			$stemkey   = static::get_stemkey( $key );
 			if ( array_key_exists( $stemkey, static::$meta_keys ) ) {
 				if ( ! array_key_exists( $key, $this->attributes ) ) {
-					$classname   = get_called_class();
 					$conf        = static::$meta_keys[ $stemkey ];
 					$type        = $conf['type'];
 					$builtintype = 'WCType' . $type;
 					if ( class_exists( $type ) ) {
-						$this->attributes[ $key ] = new $type( $classname, $key, $conf );
+						$this->attributes[ $key ] = new $type( $this, $key, $conf );
 					} elseif ( class_exists ( $builtintype ) ) {
-						$this->attributes[ $key ] = new $builtintype( $classname, $key, $conf );
+						$this->attributes[ $key ] = new $builtintype( $this, $key, $conf );
 					} else {
-						$this->attributes[ $key ] = new WCTypeString( $classname, $key, $conf );
+						$this->attributes[ $key ] = new WCTypeString( $this, $key, $conf );
 					}
 				}
 				return $this->attributes[ $key ];
@@ -137,7 +142,6 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 		public function get_attribute( $key ) {
 			if ( ! array_key_exists( $key, $this->attributes ) ) {
 				$this->create_attribute( $key );
-				$this->attributes[ $key ]->unpack_value( $this->get_meta_value( $this->attributes[ $key ]->get_meta_key() ) );
 			}
 			return $this->attributes[ $key ];
 		}
@@ -175,7 +179,7 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 				$this->create_attribute( $key );
 			}
 			$this->attributes[ $key ]->set_value( $value );
-			$this->update_meta_value( $this->attributes[ $key ]->get_meta_key(), $this->attributes[ $key ]->get_packed_value() );
+			$this->attributes[ $key ]->save_to_db();
 		}
 
 		/**
@@ -278,69 +282,6 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 		}
 
 		/**
-		 * Create a String form field
-		 *
-		 * @param string   $fieldkey (Required) ID&Name for field - conventially
-		 *                           Classname_MetaKey.
-		 * @param string   $value    Field value to display.
-		 * @param string   $label    Textual label to display.
-		 * @param string[] $settings Additional settings to pass to display.
-		 *
-		 * @return void
-		 */
-		public static function formfield_select( $fieldkey, $value = '', $label = '', $settings = [] ) {
-			$inputclass = isset( $settings['inputclass'] ) ? $settings['inputclass'] : '';
-			?>
-			<select class="<?php echo esc_attr( $inputclass ); ?>"
-				id="<?php echo esc_attr( $fieldkey ); ?>"
-				name="<?php echo esc_attr( $fieldkey ); ?>" >
-				<option value=''>Page default</option>
-				<?php foreach ( $settings['options'] as $optionkey => $optiontext ) { ?>
-					<option value=<?php echo esc_attr( $optionkey ); ?> <?php selected( $value, $optionkey ); ?> > <?php echo esc_attr( $optiontext ); ?> </option>
-				<?php } ?>
-			</select>
-			<?php
-		}
-
-		/**
-		 * Create a button formfield
-		 *
-		 * @param string $fieldkey (Required) ID&Name for field - conventially
-		 *                         Classname_MetaKey.
-		 * @param string $label    (Required) Field Label to display.
-		 * @param string $onclick  (Required) Action to perform on button click.
-		 * @param string $status   Default contents of status field.
-		 *
-		 * @return void
-		 */
-		public static function formfield_button( $fieldkey, $label, $onclick, $status = '' ) {
-			$inputclass = isset( $settings['inputclass'] ) ? $settings['inputclass'] : '';
-			?>
-			<input
-			id='<?php echo esc_attr( $fieldkey ); ?>'
-			class='button <?php echo esc_attr( $inputclass ); ?>'
-			type='button'
-			onclick='<?php echo esc_attr( $onclick ); ?>'
-			value='<?php echo esc_attr( $label ); ?>' />
-			<label class="<?php echo esc_attr( $settings['labelclass'] ); ?>" id="<?php echo esc_attr( $fieldkey ); ?>_status" for="<?php echo esc_attr( $fieldkey ); ?>"><?php echo esc_html( $status ); ?></label>
-			<?php
-		}
-
-		/**
-		 * Create a nonce form field
-		 *
-		 * @param string $boxid Override nonce name.
-		 *
-		 * @return void
-		 */
-		public static function formfield_nonce( $boxid = 'default' ) {
-			$nonceaction = static::get_elem_name( $boxid . '_nonce' );
-			$noncename   = static::get_elem_name( $boxid . '_field_nonce' );
-			// Use nonce for verification.
-			wp_nonce_field( $nonceaction, $noncename );
-		}
-
-		/**
 		 * Gets a field from $_GET.
 		 *
 		 * @param String  $fieldkey     (required) The key name for the field.
@@ -351,8 +292,9 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 		 */
 		public static function http_get_param( $fieldkey, $default = '', $check_nonce = true ) {
 			global $_GET; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$nonce = WCElemNonce::getInstance();
 			$value = $default;
-			if ( static::verify_nonce() || ! $check_nonce ) {
+			if ( $nonce->verify() || ! $check_nonce ) {
 				if ( isset( $_GET[ $fieldkey ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					$value = sanitize_text_field( wp_unslash( $_GET[ $fieldkey ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				}
@@ -372,7 +314,8 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 		public static function http_post_param( $fieldkey, $default = '' ) {
 			global $_POST; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$value = $default;
-			if ( static::verify_nonce() ) {
+			$nonce = WCElemNonce::getInstance();
+			if ( $nonce->verify() ) {
 				if ( isset( $_POST[ $fieldkey ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 					$value = sanitize_text_field( wp_unslash( $_POST[ $fieldkey ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				}
@@ -381,26 +324,6 @@ if ( ! class_exists( 'WCBaseGeneric' ) ) :
 			return $value;
 		}
 
-		/**
-		 * Create a nonce form field
-		 *
-		 * @param string $boxid Override nonce name.
-		 *
-		 * @return boolean True if nonce is valid
-		 */
-		public static function verify_nonce( $boxid = 'default' ) {
-			global $_POST; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			global $_GET; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$nonceaction = static::get_elem_name( $boxid . '_nonce' );
-			$noncename   = static::get_elem_name( $boxid . '_field_nonce' );
-			if ( isset( $_GET[ $noncename ] ) ) {
-				return wp_verify_nonce( sanitize_key( $_GET[ $noncename ] ), $nonceaction );
-			} elseif ( isset( $_POST[ $noncename ] ) ) {
-				return wp_verify_nonce( sanitize_key( $_POST[ $noncename ] ), $nonceaction );
-			} else {
-				return false;
-			}
-		}
 
 		/**
 		 * Create a form field based on the meta_key config for the fieldkey

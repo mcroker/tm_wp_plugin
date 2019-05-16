@@ -20,10 +20,10 @@ if ( ! class_exists( 'WCTypeCode' ) ) :
 	class WCTypeCode extends WCTypeBase {
 
 		public function echo_formfield(  $settings = []  ) {
-			$settings = $this->get_formfield_settings( $settings );
+			$htmlsettings = $this->get_html_settings( $settings );
 			?>
 			<textarea
-			class="<?php echo esc_attr( $settings['inputclass'] ); ?>"
+			class="<?php echo esc_attr( $htmlsettings['inputclass'] ); ?>"
 			style="width:100%"
 			rows=15
 			name="<?php echo esc_attr( $this->get_elem_name() ); ?>"

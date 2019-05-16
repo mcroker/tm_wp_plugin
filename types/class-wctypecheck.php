@@ -19,23 +19,22 @@ if ( ! class_exists( 'WCTypeCheck' ) ) :
 	 */
 	class WCTypeCheck extends WCTypeBase {
 
-		/**
-		 * Set Value using packed database value.
-		 *
-		 * @param Boolean $value Meta value persisted on WordPress record.
-		 */
-		public function unpack_value( $packedvalue ) {
-			if ( '1' === $packedvalue || $packedvalue ) {
-				parent::unpack_value(true);
-			} else {
-				parent::unpack_value(false);
-			}
+		public function get_value() {
+			if ( null == $this->value ) {
+			  $value = $this->get_from_db();
+			  if ( '1' === $value || $value ) {
+				$this->value = true;
+			  } else {
+				$this->value = false;
+			  }
+		    }
+			return $this->value;
 		}
 
 		public function echo_formfield( $settings = [] ) {
-			$settings = $this->get_formfield_settings( $settings );
+			$htmlsettings = $this->get_html_settings( $settings );
 			?>
-			<input class="<?php echo esc_attr( $settings['inputclass'] ); ?>"
+			<input class="<?php echo esc_attr( $htmlsettings['inputclass'] ); ?>"
 			type="checkbox"
 			name="<?php echo esc_attr( $this->get_elem_name() ); ?>"
 			id="<?php echo esc_attr( $this->get_elem_name() ); ?>"

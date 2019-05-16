@@ -1,13 +1,13 @@
 <?php
 /**
- * WCTypeNumber
- *
- * @category
- * @package  WordCider
- * @author   Martin Croker <oss@croker.ltd>
- * @license  Apache2
- * @link
- */
+* WCTypeNumber
+*
+* @category
+* @package  WordCider
+* @author   Martin Croker <oss@croker.ltd>
+* @license  Apache2
+* @link
+*/
 
 defined( 'ABSPATH' ) || die( 'No script kiddies please!' );
 
@@ -15,8 +15,8 @@ require_once 'class-wctypebase.php';
 
 if ( ! class_exists( 'WCTypeDate' ) ) :
 	/**
-	 * WCTypeNumber
-	 */
+	* WCTypeNumber
+	*/
 	class WCTypeDate extends WCTypeBase {
 
 		/**
@@ -26,9 +26,12 @@ if ( ! class_exists( 'WCTypeDate' ) ) :
 		*/
 		public function set_value( $value ) {
 			if ( is_string( $value ) ) {
-				$value = strtotime( $value );
+				$this->value = strtotime( $value );
+			} else if ( is_numeric( $value ) ) {
+				$this->value = $value;
+			} else {
+				throw new Exeption('Expected $value to be string|number');
 			}
-			parent::set_value( $value );
 		}
 
 		/**
@@ -39,43 +42,47 @@ if ( ! class_exists( 'WCTypeDate' ) ) :
 		* @return undefined Meta value persisted on WordPress record.
 		*/
 		public function get_value() {
-			return date( 'Y-m-d', parent::get_value() );
+			return date( 'Y-m-d', $this->get_timevalue() );
+		}
+
+		public function get_timevalue() {
+			if ( null == $this->value ) {
+				$this->value = $this->get_from_db();
+			}
+			return $this->value;
 		}
 
 		/**
-		 * Update number attribute
-		 *
-		 * @param String $packedvalue    (Required) Value.
-		 *
-		 * @return void
-		 */
-		public function unpack_value( $packedvalue ) {
-			// TODO: Switch serialise to JSON.
-			if ( is_null( $packedvalue ) || '' === $packedvalue ) {
-				parent::unpack_value(0);
+		* Get number attribute
+		*/
+		public function save_to_db() {
+			$this->parent_object->update_meta_value( $this->meta_key, $this->value );
+		}
+
+		/**
+		* Get number attribute
+		*/
+		public function get_from_db() {
+			$value = $this->parent_object->get_meta_value( $this->meta_key );
+			if ( is_null( $value ) || '' === $value ) {
+				return 0;
+			} else if ( is_string( $value ) ) {
+				return strtotime( $value );
+			} else if ( is_numeric( $value ) ) {
+				return $value;
 			} else {
-				parent::unpack_value( strtotime( $packedvalue ) );
+				throw new Exeption('Expected database value to be null|string|number');
 			}
 		}
 
-		/**
-		 * Get checkbox attribute
-		 *
-		 * @return String Meta value persisted on WordPress record.
-		 */
-		public function get_packed_value() {
-			return date( 'Y-m-d', parent::get_packed_value() );
-		}
-
 		public function echo_formfield(  $settings = []  ) {
-			$settings = $this->get_formfield_settings( $settings );
-			$value = parent::get_value();
+			$htmlsettings = $this->get_html_settings( $settings );
 			?>
-			<input class="<?php echo esc_attr( $settings['inputclass'] ); ?>"
+			<input class="<?php echo esc_attr( $htmlsettings['inputclass'] ); ?>"
 			type="datetime-local"
 			name="<?php echo esc_attr( $this->get_elem_name() ); ?>"
 			id="<?php echo esc_attr( $this->get_elem_name() ); ?>"
-			value="<?php echo esc_attr( date( 'Y-m-d\TH:i', $value ) ); ?>"
+			value="<?php echo esc_attr( date( 'Y-m-d\TH:i', $this->get_timevalue() ) ); ?>"
 			/>
 			<?php
 		}

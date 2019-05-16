@@ -26,9 +26,9 @@ if ( ! class_exists( 'WCTypeObject' ) ) :
 		 *
 		 * @return void
 		 */
-		public function unpack_value( $packedvalue ) {
+		public function set_serialized( $packedvalue ) {
 			// TODO: Switch serialise to JSON.
-			parent::unpack_value( unserialize( $packedvalue ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize
+			parent::set_serialized( unserialize( $packedvalue ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize
 		}
 
 		/**
@@ -36,8 +36,8 @@ if ( ! class_exists( 'WCTypeObject' ) ) :
 		 *
 		 * @return String Meta value persisted on WordPress record.
 		 */
-		public function get_packed_value() {
-			return( serialize( parent::get_packed_value() ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
+		public function get_serialized() {
+			return( serialize( parent::get_serialized() ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
 		}
 
 		public function echo_formfield( $settings = [] ) {

@@ -18,5 +18,8 @@ if ( ! class_exists( 'WCTypeRelatedPost' ) ) :
 	 * WCTypeNumber
 	 */
 	class WCTypeRelatedPost extends WCTypeBase {
+
+
 	}
+
 endif;

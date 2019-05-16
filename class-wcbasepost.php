@@ -690,76 +690,6 @@ if ( ! class_exists( 'WCBasePost' ) ) :
 		}
 
 		/**
-		 * Displays a HTML form field based on details of meta_keys
-		 *
-		 * @param WCBasePost $post     (Required) Post.
-		 * @param string     $key      (Required) meta_keyfor field.
-		 * @param string     $value    Field value to display.
-		 * @param string     $label    Textual label to display.
-		 * @param string     $type     Meta_type of post.
-		 * @param string[]   $settings Additional settings to pass to display.
-		 *
-		 * @return void
-		 */
-		public static function form_field( $post, $key, $value = '_AUTO', $label = '_AUTO', $type = '_AUTO', $settings = '_AUTO' ) {
-			$classname = get_called_class();
-			if ( '_AUTO' === $value ) {
-				$obj   = new $classname( $post );
-				$value = $obj->$key;
-			}
-			if ( '_AUTO' === $label ) {
-				$label = static::$meta_keys[ $key ]['label'];
-			}
-			if ( '_AUTO' === $type ) {
-				$type = static::$meta_keys[ $key ]['type'];
-			}
-			if ( '_AUTO' === $settings && array_key_exists( 'settings', static::$meta_keys[ $key ] ) ) {
-				$settings = static::$meta_keys[ $key ]['settings'];
-			}
-			if ( null === $settings || '_AUTO' === $settings ) {
-				$settings = [];
-			}
-			self::base_form_label( $key, $value, $label, $settings );
-			switch ( $type ) {
-				case 'related_post':
-					self::base_form_field_relatedpost( $fieldkey, $value, $label, $settings );
-					break;
-				case 'related_posts':
-					self::base_form_field_relatedposts( $fieldkey, $value, $label, $settings );
-					break;
-				case 'related_tax':
-					self::base_form_field_relatedtax( $fieldkey, $value, $label, $settings );
-					break;
-				default:
-					parent::base_form_field( $key, $type, $value, $label, $settings );
-			}
-		}
-
-		/**
-		 * Throw an exception if somebody tries to create a relatedPosts field
-		 *
-		 * It is expected if this field type is required it is implemented by the subclass
-		 *
-		 * @param string   $fieldkey (Required) ID&Name for field - conventially
-		 *                           Classname_MetaKey.
-		 * @param string   $value    Field value to display.
-		 * @param string   $label    Textual label to display.
-		 * @param string[] $settings Additional settings to pass to display.
-		 *
-		 * @return void
-		 */
-		public static function base_form_field_relatedposts( $fieldkey, $value = '', $label = '', $settings = [] ) {
-			$classname           = get_called_class();
-			$relatedclass        = $settings['classname'];
-			$allposts            = $relatedclass::getAll();
-			$settings['options'] = [];
-			foreach ( $allposts as $relatedpost ) {
-				$settings['options'][ $relatedpost->ID ] = $relatedpost->title;
-			}
-			static::base_form_field_Select( $fieldkey, $value, $label, $settings );
-		}
-
-		/**
 		 * Throw an exception if somebody tries to create a relatedPost field
 		 *
 		 * It is expected if this field type is required it is implemented by the subclass
@@ -1142,7 +1072,7 @@ if ( ! class_exists( 'WCBasePost' ) ) :
 		 *
 		 * @return void
 		 */
-		protected function update_meta_value( $meta_key, $value ) {
+		public function update_meta_value( $meta_key, $value ) {
 			update_post_meta( $this->id, $meta_key, $value );
 		}
 
@@ -1156,7 +1086,7 @@ if ( ! class_exists( 'WCBasePost' ) ) :
 		 *
 		 * @return undefined meta_value stored against WP_Term.
 		 */
-		protected function get_meta_value( $meta_key ) {
+		public function get_meta_value( $meta_key ) {
 			return get_post_meta( $this->id, $meta_key, true );
 		}
 
